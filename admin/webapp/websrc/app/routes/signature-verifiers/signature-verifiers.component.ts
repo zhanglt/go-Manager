@@ -72,6 +72,7 @@ export class SignatureVerifiersComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Signatures = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -91,6 +92,7 @@ export class SignatureVerifiersComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Verifiers = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -109,11 +111,11 @@ export class SignatureVerifiersComponent implements OnInit {
       this.onSelectionChanged4Signature;
     this.gridOptions4Verifiers.onSelectionChanged =
       this.onSelectionChanged4Verifier;
-
-    this.refresh();
   }
 
   refresh = (index: number = 0) => {
+    if (!this.gridApi4Signatures || !this.gridApi4Verifiers) return;
+
     this.getSignatures(index);
   };
 
@@ -162,14 +164,11 @@ export class SignatureVerifiersComponent implements OnInit {
           this.signatures = signatureArray;
 
           // this.filteredCount = this.signatures.length;
-          this.gridApi4Signatures!.setGridOption('rowData', this.signatures);
+          this.gridApi4Signatures.setGridOption('rowData', this.signatures);
           if (!this.signatures || this.signatures.length === 0)
-            this.gridApi4Verifiers!.setGridOption('rowData', []);
-          setTimeout(() => {
-            let rowNode =
-              this.gridApi4Signatures!.getDisplayedRowAtIndex(index);
-            rowNode?.setSelected(true);
-          }, 200);
+            this.gridApi4Verifiers.setGridOption('rowData', []);
+          const rowNode = this.gridApi4Signatures.getDisplayedRowAtIndex(index);
+          rowNode?.setSelected(true);
         },
         error => {}
       );
@@ -247,15 +246,13 @@ export class SignatureVerifiersComponent implements OnInit {
     if (sigstoreName) {
       this.signaturesService.getVerifiersData(sigstoreName).subscribe(
         (response: any) => {
-          setTimeout(() => {
-            this.verifiers = response.verifiers || [];
-            this.gridApi4Verifiers!.setGridOption('rowData', this.verifiers);
-            if (this.verifiers.length > 0) {
-              let rowNode = this.gridApi4Verifiers!.getDisplayedRowAtIndex(0);
-              rowNode!.setSelected(true);
-              this.gridApi4Verifiers!.sizeColumnsToFit();
-            }
-          }, 200);
+          this.verifiers = response.verifiers || [];
+          this.gridApi4Verifiers.setGridOption('rowData', this.verifiers);
+          if (this.verifiers.length > 0) {
+            const rowNode = this.gridApi4Verifiers.getDisplayedRowAtIndex(0);
+            rowNode?.setSelected(true);
+            this.gridApi4Verifiers.sizeColumnsToFit();
+          }
         },
         error => {}
       );

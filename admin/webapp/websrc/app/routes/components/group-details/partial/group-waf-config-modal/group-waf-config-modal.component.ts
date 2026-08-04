@@ -41,6 +41,7 @@ export class GroupWafConfigModalComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -59,7 +60,6 @@ export class GroupWafConfigModalComponent implements OnInit {
       this.selectedWafSensors = this.gridApi!.getSelectedRows();
       this.selectedWafSensorNodes = this.gridApi!.getSelectedNodes();
     };
-    this.refresh();
   }
 
   onCancel = () => {
@@ -67,6 +67,8 @@ export class GroupWafConfigModalComponent implements OnInit {
   };
 
   refresh = () => {
+    if (!this.gridApi) return;
+
     this.groupsService.getWafSensorData(this.data.source).subscribe(
       (response: any) => {
         this.wafSensorOption = response;

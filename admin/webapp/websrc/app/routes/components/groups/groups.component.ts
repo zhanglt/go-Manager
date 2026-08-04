@@ -122,6 +122,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.loadInitialGroups();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -190,7 +191,6 @@ export class GroupsComponent implements OnInit, OnDestroy {
           this.selectedGroups.length > 0 &&
           params.data.name === this.selectedGroups[0].name,
       };
-      this.getScoreImprovementGroups();
       this.serviceModeService.refreshEvent$.subscribe(refresh => {
         if (refresh) {
           if (refresh.all) {
@@ -200,12 +200,16 @@ export class GroupsComponent implements OnInit, OnDestroy {
           this.gridApi?.refreshCells({ force: true });
         }
       });
+    }
+  }
+
+  private loadInitialGroups(): void {
+    if (this.isScoreImprovement) {
+      this.getScoreImprovementGroups();
+    } else if (this.source === this.navSource.FED_POLICY) {
+      this.getFedGroups();
     } else {
-      if (this.source === this.navSource.FED_POLICY) {
-        this.getFedGroups();
-      } else {
-        this.getGroups();
-      }
+      this.getGroups();
     }
   }
 

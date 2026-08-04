@@ -129,14 +129,8 @@ export class EdgeDetailsComponent implements AfterViewInit, OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.conversationDetail) {
+    if (changes.conversationDetail && this.gridApi) {
       this.prepareGridData();
-      setTimeout(() => {
-        let nodes = this.gridApi.getRenderedNodes();
-        if (nodes.length) {
-          nodes[0].setSelected(true); //selects the first row in the rendered view
-        }
-      }, 500);
     }
     this.sessionCount = '';
     this.onRule = false;
@@ -160,6 +154,8 @@ export class EdgeDetailsComponent implements AfterViewInit, OnInit, OnChanges {
   }
 
   private prepareGridData() {
+    if (!this.gridApi || !this._conversationDetail?.entries) return;
+
     const ELEM_CONV_HISTORY = document.getElementById('conversationHistory');
     // this.entriesGridHeight = Math.max(
     //   this.entriesGridHeight,
@@ -190,14 +186,13 @@ export class EdgeDetailsComponent implements AfterViewInit, OnInit, OnChanges {
         }
       );
       this.gridApi.setGridOption('rowData', this._conversationDetail.entries);
+      this.gridApi.getDisplayedRowAtIndex(0)?.setSelected(true);
     });
   }
   onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
+    this.prepareGridData();
     setTimeout(() => {
-      this.gridApi.forEachNode(node =>
-        node.rowIndex ? 0 : node.setSelected(true)
-      );
       this.gridApi.sizeColumnsToFit();
       this.cd.markForCheck();
     }, 500);

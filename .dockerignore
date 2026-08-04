@@ -26,6 +26,10 @@ project/plugins/project/
 .project
 .metadata
 bin/**
+**/node_modules/
+stage/
+admin/project/
+admin-go/cmd/manager/manager
 tmp/**
 tmp/**/*
 *.tmp
@@ -59,10 +63,10 @@ token.json
 .metals
 admin/test/REST_API/output
 admin/webapp/root
+admin-go/assets/web/root
 admin/webapp/.angular
 /.bsp/*
 /admin/.angular/
 /admin/webapp/websrc/assets/mockdata
-/admin/webapp/package-lock.json
 admin/webapp/websrc/assets/i18n/en.json
 admin/webapp/websrc/assets/i18n/zh_cn.json

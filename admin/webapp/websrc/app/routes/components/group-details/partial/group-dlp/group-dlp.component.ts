@@ -61,6 +61,7 @@ export class GroupDlpComponent implements OnInit, OnChanges {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -89,7 +90,6 @@ export class GroupDlpComponent implements OnInit, OnChanges {
     };
     this.getEditGroupSensorModal.emit(this.openEditGroupSensorModal);
     this.getToggleDLPConfigEnablement.emit(this.toggleDLPConfigEnablement);
-    this.refresh();
   }
 
   ngOnChanges(): void {
@@ -98,6 +98,8 @@ export class GroupDlpComponent implements OnInit, OnChanges {
   }
 
   refresh = () => {
+    if (!this.gridApi) return;
+
     this.groupsService.getGroupDlpSensorData(this.groupName).subscribe(
       (response: any) => {
         if (response.sensors.length === 0) {

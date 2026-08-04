@@ -8,6 +8,7 @@ import os
 import requests
 import socket
 import sys
+import tempfile
 import time
 
 support_test = [
@@ -108,6 +109,8 @@ support_workload = [
 
 ENV_CTRL_SERVER_IP = "CTRL_SERVER_IP"
 ENV_CTRL_SERVER_PORT = "CTRL_SERVER_PORT"
+ENV_SUPPORT_TOKEN = "NV_SUPPORT_TOKEN"
+ENV_SUPPORT_RESS = "NV_SUPPORT_RESS"
 
 class RestException(Exception):
     message = "An unknown exception occurred."
@@ -307,6 +310,37 @@ def support(client, jointID, enforcers, output):
     output.write('}')
     return 0
 
+def write_support_output(output_path, client, joint_id, enforcers):
+    directory, name = os.path.split(output_path)
+    if not name:
+        raise ValueError("output filename is required")
+    if not directory:
+        directory = "."
+
+    fd, temporary_path = tempfile.mkstemp(prefix=".%s-" % name, dir=directory)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "wb") as raw_output:
+            fd = -1
+            with gzip.GzipFile(fileobj=raw_output, mode="wb") as compressed:
+                with io.TextIOWrapper(compressed, encoding="utf-8") as encoded:
+                    rc = support(client, joint_id, enforcers, encoded)
+        with open(temporary_path, "rb") as completed:
+            os.fsync(completed.fileno())
+        os.chmod(temporary_path, 0o600)
+        os.replace(temporary_path, output_path)
+        temporary_path = None
+        return rc
+    finally:
+        if fd >= 0:
+            os.close(fd)
+        if temporary_path is not None:
+            try:
+                os.unlink(temporary_path)
+            except FileNotFoundError:
+                pass
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='NeuVector Support Script.')
     parser.add_argument('-s', '--server', help='controller IP address.')
@@ -318,20 +352,17 @@ if __name__ == "__main__":
     parser.add_argument('-j', '--joint', help='remote joint cluster id.') # if not specified, meaning get local support logs
     args = parser.parse_args()
 
-    client = RestClient(args.server, args.port, args.token, args.ress)
+    token = args.token if args.token is not None else os.environ.get(ENV_SUPPORT_TOKEN)
+    ress = args.ress if args.ress is not None else os.environ.get(ENV_SUPPORT_RESS)
+    client = RestClient(args.server, args.port, token, ress)
 
     rc = 0
-    if args.output:
-        (path, name) =  os.path.split(args.output)
-        if not name:
-            sys.exit(-1)
-
-        tmpfile = os.path.join(path, "." + name)
-        with gzip.open(tmpfile, 'wb') as output:
-            with io.TextIOWrapper(output, encoding='utf-8') as encode:
-                rc = support(client,  args.joint, args.enforcers, encode)
-        os.rename(tmpfile, args.output)
-    else:
-        rc = support(client, args.joint, args.enforcers, sys.stdout)
+    try:
+        if args.output:
+            rc = write_support_output(args.output, client, args.joint, args.enforcers)
+        else:
+            rc = support(client, args.joint, args.enforcers, sys.stdout)
+    except KeyboardInterrupt:
+        rc = 130
 
     sys.exit(rc)

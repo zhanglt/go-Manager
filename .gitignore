@@ -3,6 +3,11 @@
 apis.yaml
 docker-compose.yml
 
+# Python tooling
+__pycache__/
+*.py[cod]
+/admin-go/bin/
+
 # sbt specific
 .cache
 .history
