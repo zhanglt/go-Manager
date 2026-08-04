@@ -8,10 +8,10 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	managerCache "github.com/neuvector/manager/admin-go/internal/cache"
 	"github.com/neuvector/manager/admin-go/internal/controller"
 	"github.com/neuvector/manager/admin-go/internal/hashutil"
 	managerMiddleware "github.com/neuvector/manager/admin-go/internal/middleware"
@@ -23,7 +23,9 @@ type Handler struct {
 	sessions    *session.Store
 	now         func() time.Time
 	invalidator tokenInvalidator
-	sso         *managerCache.Store[loginResponse]
+	ssoResults  *transientStore[loginResponse]
+	oidcStates  *transientStore[string]
+	ssoOptions  SSOOptions
 }
 
 type tokenInvalidator interface {
@@ -125,11 +127,34 @@ type loginResponse struct {
 }
 
 func NewHandler(client *controller.Client, sessions *session.Store, invalidators ...tokenInvalidator) *Handler {
+	return NewHandlerWithOptions(client, sessions, SSOOptions{SecureCookies: true}, invalidators...)
+}
+
+type SSOOptions struct {
+	PublicURL     *url.URL
+	PathPrefix    string
+	TTL           time.Duration
+	MaxEntries    int
+	SecureCookies bool
+}
+
+func NewHandlerWithOptions(client *controller.Client, sessions *session.Store, options SSOOptions, invalidators ...tokenInvalidator) *Handler {
 	var invalidator tokenInvalidator
 	if len(invalidators) > 0 {
 		invalidator = invalidators[0]
 	}
-	return &Handler{controller: client, sessions: sessions, now: time.Now, invalidator: invalidator, sso: managerCache.New[loginResponse](16, 1<<20, 5*time.Minute)}
+	if options.TTL <= 0 {
+		options.TTL = 5 * time.Minute
+	}
+	if options.MaxEntries <= 0 {
+		options.MaxEntries = 1024
+	}
+	return &Handler{
+		controller: client, sessions: sessions, now: time.Now, invalidator: invalidator,
+		ssoResults: newTransientStore[loginResponse](options.MaxEntries, options.TTL),
+		oidcStates: newTransientStore[string](options.MaxEntries, options.TTL),
+		ssoOptions: options,
+	}
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -149,8 +174,9 @@ func (h *Handler) Login(c *gin.Context) {
 // SAMLLogoutResponse mirrors the legacy IdP logout callback, which always returns to the UI root.
 func (h *Handler) SAMLLogoutResponse(c *gin.Context) {
 	managerMiddleware.RemoveSecurityHeaders(c.Writer.Header())
-	c.Header("Location", "/")
-	c.Data(http.StatusFound, "text/html; charset=UTF-8", []byte(`The requested resource temporarily resides under <a href="/">this URI</a>.`))
+	root := h.ssoOptions.PathPrefix + "/"
+	c.Header("Location", root)
+	c.Data(http.StatusFound, "text/html; charset=UTF-8", []byte(`The requested resource temporarily resides under <a href="`+root+`">this URI</a>.`))
 }
 
 func (h *Handler) GetSAMLAuthServer(c *gin.Context) {
@@ -158,7 +184,11 @@ func (h *Handler) GetSAMLAuthServer(c *gin.Context) {
 	var body io.Reader
 	if serverName, present := c.GetQuery("serverName"); present {
 		path = "/token_auth_server/saml1"
-		redirectURL := "https://" + c.GetHeader("Host") + "/token_auth_server"
+		redirectURL, err := h.ssoCallbackURL(c, "/token_auth_server")
+		if err != nil {
+			c.String(http.StatusBadRequest, "Invalid public callback URL")
+			return
+		}
 		payload, _ := json.Marshal(struct {
 			RedirectEndpoint string `json:"redirect_endpoint"`
 			Issuer           string `json:"issuer"`
@@ -191,13 +221,16 @@ func (h *Handler) GetOpenIDAuth(c *gin.Context) {
 	var body io.Reader
 	if _, hasServerName := c.GetQuery("serverName"); hasServerName {
 		path = "/token_auth_server/openId1"
-		if host := c.GetHeader("Host"); host != "" {
-			method = http.MethodPost
-			payload, _ := json.Marshal(struct {
-				RedirectEndpoint string `json:"redirect_endpoint"`
-			}{"https://" + host + "/openId_auth"})
-			body = bytes.NewReader(payload)
+		redirectURL, err := h.ssoCallbackURL(c, "/openId_auth")
+		if err != nil {
+			c.String(http.StatusBadRequest, "Invalid public callback URL")
+			return
 		}
+		method = http.MethodPost
+		payload, _ := json.Marshal(struct {
+			RedirectEndpoint string `json:"redirect_endpoint"`
+		}{redirectURL})
+		body = bytes.NewReader(payload)
 	}
 	headers := make(http.Header)
 	headers.Set("X-R-SSO", "false")
@@ -207,20 +240,41 @@ func (h *Handler) GetOpenIDAuth(c *gin.Context) {
 		return
 	}
 	defer response.Body.Close()
+	if method == http.MethodPost && response.StatusCode != http.StatusOK {
+		clearCookie(c, oidcFlowCookie, h.ssoOptions)
+		c.String(http.StatusBadGateway, "OpenID provider configuration failed")
+		return
+	}
 	payload, err := io.ReadAll(response.Body)
 	if err != nil || !json.Valid(payload) {
 		c.String(http.StatusInternalServerError, "Internal server error")
 		return
 	}
+	if method == http.MethodPost {
+		if err := h.bindOIDCState(c, payload); err != nil {
+			clearCookie(c, oidcFlowCookie, h.ssoOptions)
+			c.String(http.StatusBadGateway, "Invalid OpenID provider response")
+			return
+		}
+	}
 	c.Data(http.StatusOK, "application/json", payload)
 }
 
 func (h *Handler) GetSAMLAuthServerLogout(c *gin.Context) {
-	host := c.GetHeader("Host")
+	logoutURL, err := h.ssoCallbackURL(c, "/samlslo")
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid public callback URL")
+		return
+	}
+	redirectURL, err := h.ssoCallbackURL(c, "/token_auth_server")
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid public callback URL")
+		return
+	}
 	payload, _ := json.Marshal(struct {
 		RedirectEndpoint string `json:"redirect_endpoint"`
 		Issuer           string `json:"issuer"`
-	}{"https://" + host + "/samlslo", "https://" + host + "/token_auth_server"})
+	}{logoutURL, redirectURL})
 	headers := make(http.Header)
 	headers.Set("X-Auth-Token", c.GetHeader("Token"))
 	headers.Set("X-R-Sess", "")

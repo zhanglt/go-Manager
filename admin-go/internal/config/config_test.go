@@ -14,11 +14,12 @@ func TestLoadDefaults(t *testing.T) {
 		"MANAGER_CACHE_MAX_ENTRIES", "MANAGER_CACHE_MAX_BYTES", "MANAGER_CACHE_TTL",
 		"MANAGER_SUPPORT_COMMAND", "MANAGER_SUPPORT_TEMP_DIR", "MANAGER_SUPPORT_TIMEOUT",
 		"MANAGER_SUPPORT_MAX_FILE_BYTES", "MANAGER_SUPPORT_MAX_CONCURRENT",
+		"MANAGER_PUBLIC_URL", "MANAGER_SSO_STATE_TTL", "MANAGER_SSO_MAX_PENDING",
 	} {
 		t.Setenv(name, "")
 	}
 	// An explicitly empty value is different from an absent value for most compatibility options.
-	for _, name := range []string{"MANAGER_SERVER_PORT", "CTRL_SERVER_IP", "CTRL_SERVER_PORT", "MANAGER_SSL", "CTRL_TLS_VERIFY", "HTTP_MAX_HEADER_LENGTH", "MANAGER_SHUTDOWN_TIMEOUT", "CTRL_REQUEST_TIMEOUT", "MANAGER_SESSION_MAX_ENTRIES", "MANAGER_CACHE_MAX_ENTRIES", "MANAGER_CACHE_MAX_BYTES", "MANAGER_CACHE_TTL", "MANAGER_SUPPORT_COMMAND", "MANAGER_SUPPORT_TEMP_DIR", "MANAGER_SUPPORT_TIMEOUT", "MANAGER_SUPPORT_MAX_FILE_BYTES", "MANAGER_SUPPORT_MAX_CONCURRENT"} {
+	for _, name := range []string{"MANAGER_SERVER_PORT", "CTRL_SERVER_IP", "CTRL_SERVER_PORT", "MANAGER_SSL", "CTRL_TLS_VERIFY", "HTTP_MAX_HEADER_LENGTH", "MANAGER_SHUTDOWN_TIMEOUT", "CTRL_REQUEST_TIMEOUT", "MANAGER_SESSION_MAX_ENTRIES", "MANAGER_CACHE_MAX_ENTRIES", "MANAGER_CACHE_MAX_BYTES", "MANAGER_CACHE_TTL", "MANAGER_SUPPORT_COMMAND", "MANAGER_SUPPORT_TEMP_DIR", "MANAGER_SUPPORT_TIMEOUT", "MANAGER_SUPPORT_MAX_FILE_BYTES", "MANAGER_SUPPORT_MAX_CONCURRENT", "MANAGER_SSO_STATE_TTL", "MANAGER_SSO_MAX_PENDING"} {
 		t.Setenv(name, map[string]string{
 			"MANAGER_SERVER_PORT": "8443", "CTRL_SERVER_IP": "127.0.0.1", "CTRL_SERVER_PORT": "10443",
 			"MANAGER_SSL": "on", "CTRL_TLS_VERIFY": "false", "HTTP_MAX_HEADER_LENGTH": "32k",
@@ -28,6 +29,7 @@ func TestLoadDefaults(t *testing.T) {
 			"MANAGER_CACHE_TTL": "5m", "MANAGER_SUPPORT_COMMAND": "/usr/local/bin/support",
 			"MANAGER_SUPPORT_TEMP_DIR": "/tmp/neuvector-support", "MANAGER_SUPPORT_TIMEOUT": "10m",
 			"MANAGER_SUPPORT_MAX_FILE_BYTES": "64m", "MANAGER_SUPPORT_MAX_CONCURRENT": "2",
+			"MANAGER_SSO_STATE_TTL": "5m", "MANAGER_SSO_MAX_PENDING": "1024",
 		}[name])
 	}
 
@@ -50,6 +52,9 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.Support.Command != "/usr/local/bin/support" || cfg.Support.TempDir != "/tmp/neuvector-support" || cfg.Support.Timeout != 10*time.Minute || cfg.Support.MaxFileBytes != 64*1024*1024 || cfg.Support.MaxConcurrent != 2 {
 		t.Fatalf("unexpected support defaults: %+v", cfg.Support)
 	}
+	if cfg.SSO.PublicURL != nil || cfg.SSO.TTL != 5*time.Minute || cfg.SSO.MaxEntries != 1024 {
+		t.Fatalf("unexpected SSO defaults: %+v", cfg.SSO)
+	}
 }
 
 func TestLoadDevelopmentMode(t *testing.T) {
@@ -63,6 +68,19 @@ func TestLoadDevelopmentMode(t *testing.T) {
 	}
 }
 
+func TestLoadSSOPublicURL(t *testing.T) {
+	t.Setenv("MANAGER_PUBLIC_URL", "https://manager.example:8443/")
+	t.Setenv("MANAGER_SSO_STATE_TTL", "2m")
+	t.Setenv("MANAGER_SSO_MAX_PENDING", "64")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	if cfg.SSO.PublicURL == nil || cfg.SSO.PublicURL.String() != "https://manager.example:8443" || cfg.SSO.TTL != 2*time.Minute || cfg.SSO.MaxEntries != 64 {
+		t.Fatalf("unexpected SSO config: %+v", cfg.SSO)
+	}
+}
+
 func TestLoadReportsMultipleErrors(t *testing.T) {
 	t.Setenv("MANAGER_SERVER_PORT", "nope")
 	t.Setenv("CTRL_SERVER_PORT", "70000")
@@ -73,12 +91,15 @@ func TestLoadReportsMultipleErrors(t *testing.T) {
 	t.Setenv("MANAGER_SUPPORT_TIMEOUT", "0s")
 	t.Setenv("MANAGER_SUPPORT_MAX_FILE_BYTES", "0")
 	t.Setenv("MANAGER_SUPPORT_MAX_CONCURRENT", "0")
+	t.Setenv("MANAGER_PUBLIC_URL", "http://manager.example/path")
+	t.Setenv("MANAGER_SSO_STATE_TTL", "0s")
+	t.Setenv("MANAGER_SSO_MAX_PENDING", "0")
 
 	_, err := Load()
 	if err == nil {
 		t.Fatal("Load() error = nil, want aggregated validation error")
 	}
-	for _, want := range []string{"MANAGER_SERVER_PORT", "CTRL_SERVER_PORT", "MANAGER_SSL", "HTTP_MAX_HEADER_LENGTH", "MANAGER_SUPPORT_COMMAND", "MANAGER_SUPPORT_TEMP_DIR", "MANAGER_SUPPORT_TIMEOUT", "MANAGER_SUPPORT_MAX_FILE_BYTES", "MANAGER_SUPPORT_MAX_CONCURRENT"} {
+	for _, want := range []string{"MANAGER_SERVER_PORT", "CTRL_SERVER_PORT", "MANAGER_SSL", "HTTP_MAX_HEADER_LENGTH", "MANAGER_SUPPORT_COMMAND", "MANAGER_SUPPORT_TEMP_DIR", "MANAGER_SUPPORT_TIMEOUT", "MANAGER_SUPPORT_MAX_FILE_BYTES", "MANAGER_SUPPORT_MAX_CONCURRENT", "MANAGER_PUBLIC_URL", "MANAGER_SSO_STATE_TTL", "MANAGER_SSO_MAX_PENDING"} {
 		if !contains(err.Error(), want) {
 			t.Errorf("error %q does not contain %q", err, want)
 		}

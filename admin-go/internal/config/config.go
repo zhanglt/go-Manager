@@ -21,6 +21,7 @@ type Config struct {
 	Session    SessionConfig
 	Cache      CacheConfig
 	Support    SupportConfig
+	SSO        SSOConfig
 }
 
 type ServerConfig struct {
@@ -70,6 +71,12 @@ type SupportConfig struct {
 	Timeout       time.Duration
 	MaxFileBytes  int64
 	MaxConcurrent int
+}
+
+type SSOConfig struct {
+	PublicURL  *url.URL
+	TTL        time.Duration
+	MaxEntries int
 }
 
 func Load() (Config, error) {
@@ -131,6 +138,14 @@ func Load() (Config, error) {
 	if err != nil || supportMaxConcurrent < 1 {
 		problems = append(problems, errors.New("MANAGER_SUPPORT_MAX_CONCURRENT must be a positive integer"))
 	}
+	ssoTTL, err := time.ParseDuration(env("MANAGER_SSO_STATE_TTL", "5m"))
+	if err != nil || ssoTTL <= 0 {
+		problems = append(problems, errors.New("MANAGER_SSO_STATE_TTL must be a positive duration"))
+	}
+	ssoMaxEntries, err := strconv.Atoi(env("MANAGER_SSO_MAX_PENDING", "1024"))
+	if err != nil || ssoMaxEntries < 1 {
+		problems = append(problems, errors.New("MANAGER_SSO_MAX_PENDING must be a positive integer"))
+	}
 	supportCommand := strings.TrimSpace(env("MANAGER_SUPPORT_COMMAND", "/usr/local/bin/support"))
 	if !filepath.IsAbs(supportCommand) {
 		problems = append(problems, errors.New("MANAGER_SUPPORT_COMMAND must be an absolute path"))
@@ -142,6 +157,10 @@ func Load() (Config, error) {
 	prefix, err := normalizePrefix(os.Getenv("PATH_PREFIX"))
 	if err != nil {
 		problems = append(problems, fmt.Errorf("PATH_PREFIX: %w", err))
+	}
+	publicURL, err := parsePublicURL(os.Getenv("MANAGER_PUBLIC_URL"), managerTLS)
+	if err != nil {
+		problems = append(problems, fmt.Errorf("MANAGER_PUBLIC_URL: %w", err))
 	}
 	internalAddress := strings.TrimSpace(os.Getenv("MANAGER_INTERNAL_ADDR"))
 	if internalAddress != "" {
@@ -197,7 +216,27 @@ func Load() (Config, error) {
 			Command: supportCommand, TempDir: supportTempDir, Timeout: supportTimeout,
 			MaxFileBytes: int64(supportMaxBytes), MaxConcurrent: supportMaxConcurrent,
 		},
+		SSO: SSOConfig{PublicURL: publicURL, TTL: ssoTTL, MaxEntries: ssoMaxEntries},
 	}, nil
+}
+
+func parsePublicURL(value string, tlsEnabled bool) (*url.URL, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return nil, nil
+	}
+	parsed, err := url.Parse(value)
+	if err != nil || !parsed.IsAbs() || parsed.Hostname() == "" {
+		return nil, errors.New("must be an absolute HTTP(S) origin")
+	}
+	if parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Path != "" && parsed.Path != "/") {
+		return nil, errors.New("must not contain credentials, a path, query, or fragment")
+	}
+	if parsed.Scheme != "https" && !(parsed.Scheme == "http" && !tlsEnabled) {
+		return nil, errors.New("must use https when MANAGER_SSL is on")
+	}
+	parsed.Path = ""
+	return parsed, nil
 }
 
 func env(name, fallback string) string {
