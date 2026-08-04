@@ -25,14 +25,23 @@ vet、严格路由覆盖检查和临时 HTTPS 证书启动验证均已通过。�
 
 ### RW-002 SAML/OIDC 安全闭环
 
-- [ ] 对 state、code、临时 Token、redirect URL 和 Cookie 处理进行威胁建模。
-- [ ] 验证一次性消费、过期、重放拒绝、并发登录隔离和多 Manager 副本行为。
-- [ ] 确定生产环境采用粘性会话还是共享临时状态存储。
-- [ ] 验证 Cookie 属性、redirect allow-list、Host 处理和 CSRF/session fixation 防护，且日志
+- [x] 对 state、code、临时 Token、redirect URL 和 Cookie 处理进行威胁建模。
+- [x] 验证一次性消费、过期、重放拒绝、并发登录隔离和多 Manager 副本行为。
+- [x] 确定生产环境采用粘性会话；共享临时状态存储留作取消粘性时的后续替换。
+- [x] 验证 Cookie 属性、固定 public redirect origin、Host 处理和 CSRF/session fixation 防护，且日志
   不得泄露凭据。
 - [ ] 增加真实 IdP 支持的 SAML/OIDC E2E，覆盖成功、拒绝、超时、重放、登出和并发用户。
 
 验收：安全评审通过，认证 E2E 不存在跨用户 Token 或 Cookie 泄漏。
+
+实现记录（2026-08-04）：移除全局固定 `samlSso` 结果键，改用 256-bit 随机、短期、一次性
+handoff capability；OIDC 将 Controller redirect 中的 state 与当前浏览器的 HttpOnly flow
+Cookie 绑定并原子消费。Store 有 TTL/容量边界，Cookie 使用 `Secure`、`SameSite=Lax`、prefix
+Path，敏感 capability 额外使用 `HttpOnly`；生产 callback origin 固定为 `MANAGER_PUBLIC_URL`。
+单元与 race 测试覆盖并发隔离、过期、错误 state、重放、跨实例 fail-closed、Host poisoning 和
+prefix。详细威胁模型、状态机、部署要求与残余测试见
+[`06-sso-security-design.md`](06-sso-security-design.md)。真实 IdP E2E 与 Security Owner 签字仍是
+本项最终关闭条件。
 
 ### RW-003 正式性能与稳定性门禁
 
@@ -210,7 +219,8 @@ Angular `npm ci` 当前仍报告 36 个既有依赖告警（3 low、8 moderate�
 
 - [ ] Security/FIPS Owner：批准 Go/FIPS 工具链、密码模块、基础镜像和证据流程。
 - [ ] QA/DevOps：提供代表性 Controller 数据集、负载模型、目标硬件和基准窗口。
-- [ ] Architecture/Product：确定单副本、粘性会话或共享 SSO/session 临时状态设计。
+- [x] Architecture/Product：首版采用进程内临时状态，生产 SSO 全链路使用粘性会话；取消粘性时
+  必须引入支持原子消费的共享 Store。
 - [ ] Security：确定 Controller 证书跳过验证是否继续作为兼容性例外。
 - [ ] Release/Operations：确认 support command capability、临时存储、non-root 策略和回滚阈值。
 
@@ -219,7 +229,7 @@ Angular `npm ci` 当前仍报告 36 个既有依赖告警（3 low、8 moderate�
 1. 实现同条件 Scala/Go 基准工具，并在外部性能环境准备期间生成可重复的本地对比制品。
 2. 完成 Angular 静态资源服务后，实施 RW-006 多阶段构建以自动刷新嵌入快照。
 3. 增加强制 Go、Python 和严格路由覆盖 CI 门禁。
-4. 完成 SAML/OIDC 威胁建模并实现获批的 session/correlation 设计。
+4. 在真实 IdP 与生产负载均衡环境验证 SAML/OIDC，并完成 Security Owner 评审。
 5. 构建生产多阶段镜像，再完成 FIPS、真实 Controller、性能和安全资格验证。
 6. 执行蓝绿切换，并在达到稳定发布退出条件前保留 Scala。
 

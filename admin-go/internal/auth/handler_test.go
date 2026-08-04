@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -169,12 +170,36 @@ func TestSAMLCallbackStoresOneTimeToken(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "http://manager.example/token_auth_server", strings.NewReader("assertion"))
 	request.RemoteAddr = "192.0.2.10:4567"
 	engine.ServeHTTP(callback, request)
-	if callback.Code != http.StatusFound || callback.Header().Get("Location") != "/" || callback.Header().Get("Set-Cookie") != "temp=c2FtbFNzbw==" {
+	if callback.Code != http.StatusFound || callback.Header().Get("Location") != "/" {
 		t.Fatalf("callback=%d headers=%v body=%q", callback.Code, callback.Header(), callback.Body.String())
+	}
+	var handoff *http.Cookie
+	var marker *http.Cookie
+	for _, cookie := range callback.Result().Cookies() {
+		if cookie.Name == ssoMarkerCookie {
+			marker = cookie
+			if cookie.HttpOnly || !cookie.Secure || cookie.SameSite != http.SameSiteLaxMode || cookie.Value != base64.StdEncoding.EncodeToString([]byte(ssoMarkerValue)) {
+				t.Fatalf("invalid marker cookie: %+v", cookie)
+			}
+		}
+		if cookie.Name == ssoHandoffCookie {
+			handoff = cookie
+			if !cookie.HttpOnly || !cookie.Secure || cookie.SameSite != http.SameSiteLaxMode || cookie.Value == "" {
+				t.Fatalf("insecure handoff cookie: %+v", cookie)
+			}
+		}
+	}
+	if handoff == nil {
+		t.Fatal("handoff cookie was not set")
+	}
+	if marker == nil {
+		t.Fatal("Angular marker cookie was not set")
 	}
 	for index, want := range []int{http.StatusOK, http.StatusUnauthorized} {
 		response := httptest.NewRecorder()
-		engine.ServeHTTP(response, httptest.NewRequest(http.MethodPatch, "/token_auth_server", nil))
+		consume := httptest.NewRequest(http.MethodPatch, "/token_auth_server", nil)
+		consume.AddCookie(handoff)
+		engine.ServeHTTP(response, consume)
 		if response.Code != want {
 			t.Fatalf("consume %d: status=%d body=%s", index, response.Code, response.Body.String())
 		}

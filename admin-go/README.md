@@ -1,105 +1,125 @@
 # Admin Go POC
 
-该目录是 Scala Admin 后端透明迁移的 Go/Gin POC。它目前实现认证生命周期、完整
-ExtraAuth、federation cluster 管理、用户/角色/API key/密码策略管理，不能替代生产
-Manager。device 领域已覆盖 enforcer、controller、scanner、summary、usage 和 host 的
-只读查询、file config 下载/transaction/multipart 导入和 federation config 导入导出，
-以及 webhook、V1/V2 system config 和 remote repository 管理。当前 POC
-还实现了 Sigstore root of trust 与 verifier CRUD；不代表已通过 FIPS、G0 或性能门禁。
-workload 领域当前覆盖 workload/container 基础查询、隔离、monitor、compliance、分页
-scanned 和 domain 配置，以及 workload/host scan report、sniffer 生命周期和 PCAP 流式下载。
-device 领域还覆盖 Docker/Kubernetes benchmark 查询与触发、CSP support 包下载，以及
-Token/cluster 隔离、限时授权和下载后清理的 support debug log 生命周期。
-group 领域覆盖导入导出、group-list、custom check、group CRUD、service、process/file profile，
-以及 DLP/WAF sensor CRUD/导入导出和 DLP/WAF group 查询、更新。
-policy 领域当前覆盖 response policy CRUD/import/export、network policy 的核心操作、
-Admission Control 全部 14 个公开操作，以及 scan status/host/platform/config、registry
-CRUD/repository/image/layer/top 和 V2 registry test；事务请求会锁定 Controller target；
-同时覆盖 policy 列表分页、policy graph 和 workload scan 查询/汇总；group 与 policy 共用
-受限的 cluster-aware transfer 代理，分页缓存受统一容量、TTL 和认证生命周期约束。
-risk 领域当前覆盖 CVE asset 查询和 assets-view、vulnerability profile 的查询、更新、
-entry 管理和导入导出，scanned-assets/vulasset 查询与分页，以及 compliance
-asset/template/filter 和 profile 管理。
-notification 领域当前覆盖 IP geolocation、event、incident、audit/audit2、violation 日志查询、
-violation top/track、threat 列表/详情/top/track、network session、conversation/history/endpoint
-操作、network graph/layout/blacklist、security-events/security-events2，以及 global notification accept。network graph
-保留 Scala 的节点/边转换、GPU 开关和用户布局/黑名单状态；其缓存按 Token、cluster、user
-隔离，并受统一容量和 TTL 限制（与 Scala 磁盘 Ehcache 不同，重启后不保留）。security-events 保留
-Scala 的事件方向、可选字段省略、details JSON 字符串和时间戳排序语义；audit2 分页缓存逐页验证 Token；
-IP 数据库首次请求时惰性加载为紧凑 range，避免增加进程启动期常驻内存。
-dashboard 领域当前覆盖 system alerts、details 聚合、score metrics 查询/更新和 notification 聚合，并保留
-Controller 页面来源 Header、global user 默认值、domain 查询、事件显示名回退、top 分组和
-按日期的 critical/warning 汇总语义；details 对六类 Controller 资源并发读取，并保留局部
-失败降级；multi-cluster summary 支持嵌套 cluster 选路、并发 summary/score 获取、有界
-summary 降级缓存和 score 请求失败时的全零回退。
-生产 Angular build 已嵌入 Go binary，并支持版本 Hash 跳转、`PATH_PREFIX`、预压缩
-JavaScript、静态 Content-Type 和页面深层链接 fallback；已注册 API 路由始终优先。
+`admin-go/` 是 Scala Admin 后端的 Go/Gin 迁移 POC。它用于验证 API、认证生命周期、静态资源
+服务和部署方案，尚不能替代生产 Manager，也尚未通过 FIPS、G0、正式性能和安全门禁。
+
+## 当前覆盖范围
+
+POC 当前覆盖以下领域：
+
+- **认证与管理**：认证生命周期、完整 ExtraAuth、federation cluster、用户、角色、API key、密码策略。
+- **Device**：enforcer、controller、scanner、summary、usage、host、workload、compliance、
+  file config、webhook、V1/V2 system config、remote repository、Docker/Kubernetes benchmark、
+  CSP support package 和 support debug log 生命周期。
+- **Workload**：workload/container 查询、隔离、monitor、compliance、分页 scanned、domain、
+  scan report、sniffer 生命周期和 PCAP 流式下载。
+- **Group**：group-list、custom check、group CRUD、导入导出、service、process/file profile、
+  DLP/WAF sensor CRUD、导入导出以及 DLP/WAF group 管理。
+- **Policy**：response/network policy 核心操作、全部 14 个 Admission Control 操作、scan、
+  registry/repository/image/layer/top、V2 registry test、policy 分页/graph 和 workload scan。
+- **Risk**：CVE asset、assets-view、vulnerability profile/entry、scanned-assets/vulasset、
+  compliance profile/asset/template/filter。
+- **Notification**：IP geolocation、event、incident、audit/audit2、violation、threat、network
+  session、conversation/history/endpoint、network graph/layout/blacklist、security-events、
+  global notification accept；audit2 分页逐页验证 Token。
+- **Dashboard**：system alerts、details 聚合、score metrics、notification 和 multi-cluster summary；
+  details 对六类 Controller 资源并发读取，并保留局部失败降级。
+
+实现保持了 Scala 的关键兼容行为，包括 Controller target 锁定、cluster-aware transfer、分页
+缓存容量/TTL/认证生命周期约束、可选字段省略、事件方向和时间戳排序。缓存与 Scala 磁盘
+Ehcache 不同，进程重启后不会保留。
+
+生产 Angular build 已嵌入 Go binary，支持版本 Hash 跳转、`PATH_PREFIX`、预压缩 JavaScript、
+静态 Content-Type 和页面深层链接 fallback；已注册 API 路由始终优先。
 
 ## 本地运行
+
+在仓库根目录执行以下命令可完成 UI 构建、静态资源同步和 Go 编译：
+
+```bash
+make manager MANAGER_BINARY="$PWD/admin-go/bin/manager"
+```
+
+也可以在本目录中单独编译和启动：
 
 ```bash
 go test ./...
 go build -trimpath -o bin/manager ./cmd/manager
-MANAGER_SSL=off MANAGER_SERVER_PORT=18444 \
-  MANAGER_SUPPORT_COMMAND="$(realpath ../scripts/support)" ./bin/manager
+
+MANAGER_SSL=off \
+MANAGER_SERVER_PORT=18444 \
+MANAGER_SUPPORT_COMMAND="$(realpath ../scripts/support)" \
+./bin/manager
 ```
 
-默认连接 `https://127.0.0.1:10443/v1`。常用兼容配置包括
-`CTRL_SERVER_IP`、`CTRL_SERVER_PORT`、`MANAGER_SERVER_PORT`、`MANAGER_SSL`、
-`HTTP_MAX_HEADER_LENGTH`、`PATH_PREFIX` 和 `IS_DEV`。`IS_DEV=true` 时 JavaScript 使用
-未压缩的嵌入资源；其他值均使用生产 `.js.gz`。POC 新增：
+默认 Controller 地址为 `https://127.0.0.1:10443/v1`。常用环境变量如下：
 
-- `CTRL_TLS_VERIFY=false`：保持当前 Controller 证书兼容模式；正式环境需按安全评审设置；
-- `CTRL_REQUEST_TIMEOUT=60s`：Controller 请求总超时；
-- `MANAGER_SHUTDOWN_TIMEOUT=30s`：收到 SIGTERM/SIGINT 后的退出期限；
-- `MANAGER_INTERNAL_ADDR`：非空时启用独立的 `/livez`、`/readyz` HTTP Listener；
-- `MANAGER_SESSION_MAX_ENTRIES=10000`：限制进程内 Token Session 数量；
-- `MANAGER_CACHE_MAX_ENTRIES=1000`：限制分页缓存条目数；
-- `MANAGER_CACHE_MAX_BYTES=64m`：限制分页响应缓存和单次解码的字节预算；
-- `MANAGER_CACHE_TTL=5m`：设置分页缓存的存活时间；
-- `MANAGER_SUPPORT_COMMAND=/usr/local/bin/support`：固定 support executable；必须是不可被
-  group/world 写入的普通可执行文件；
-- `MANAGER_SUPPORT_TEMP_DIR=/tmp/neuvector-support`：专用输出目录；启动时创建并校验为当前
-  UID 所有、权限不宽于 `0700`；
-- `MANAGER_SUPPORT_TIMEOUT=10m`：单次收集的硬超时；超时或 Manager 退出时终止整个进程组；
-- `MANAGER_SUPPORT_MAX_FILE_BYTES=64m`：gzip 文件及解压校验的最大字节数；
-- `MANAGER_SUPPORT_MAX_CONCURRENT=2`：全局并发收集上限，超限请求返回 HTTP 429；
-- `IP_GEO_IPV4_DB`、`IP_GEO_IPV6_DB`：可选的 IP2Location CSV 路径；默认依次查找源码
-  resources 和 `/usr/share/neuvector/`；生产镜像必须提供这两个数据文件；
-- `CIS_NIST_DB`：可选的 CIS-to-NIST CSV 路径；默认查找源码 resources 和
-  `/usr/share/neuvector/CIS_NIST-MASTER.CSV`；
-- `MANAGER_CERT_FILE`、`MANAGER_KEY_FILE`：HTTPS 证书和私钥路径；两者均为普通文件时
-  加载现有 PEM chain 和 PKCS#1/PKCS#8 RSA key，否则按 Scala 兼容语义生成仅驻留内存的
-  RSA-2048/SHA-256 临时自签名证书。生产部署必须提供受信任证书，不能依赖该回退。
+### Controller 与 Manager
 
-POC 构建可注入与 Scala 相同的版本值，例如：
+- `CTRL_SERVER_IP`、`CTRL_SERVER_PORT`：Controller 地址和端口。
+- `CTRL_TLS_VERIFY=false`：保持当前 Controller 证书兼容模式；生产环境应按安全评审设置。
+- `CTRL_REQUEST_TIMEOUT=60s`：Controller 请求总超时。
+- `MANAGER_SERVER_PORT`、`MANAGER_SSL`：Manager 监听端口和 TLS 开关。
+- `MANAGER_CERT_FILE`、`MANAGER_KEY_FILE`：HTTPS 证书和私钥。两者为普通文件时加载 PEM
+  chain 与 PKCS#1/PKCS#8 RSA key，否则按 Scala 兼容语义生成仅驻留内存的 RSA-2048/SHA-256
+  临时自签名证书。生产部署必须挂载受信任证书。
+- `MANAGER_SHUTDOWN_TIMEOUT=30s`：收到 SIGTERM/SIGINT 后的退出期限。
+- `MANAGER_INTERNAL_ADDR`：非空时启用独立的 `/livez` 和 `/readyz` HTTP listener。
+- `PATH_PREFIX`：静态资源和 API 的路径前缀。
+- `IS_DEV=true`：使用未压缩 JavaScript；其他值使用生产 `.js.gz`。
 
-```bash
-go build -trimpath \
-  -ldflags "-X github.com/neuvector/manager/admin-go/internal/buildinfo.Version=<version>" \
-  -o bin/manager ./cmd/manager
-```
+### SAML/OIDC
 
-正式发布构建必须改用 Security/FIPS Owner 批准的 Go 工具链和构建参数。
+- `MANAGER_PUBLIC_URL`：浏览器可访问的 Manager HTTPS origin，例如
+  `https://manager.example:8443`。生产环境必须配置；回调地址只由该值和 `PATH_PREFIX` 生成，
+  不信任请求中的 `Host`。不得包含路径、凭据、查询或 fragment。
+- `MANAGER_SSO_STATE_TTL=5m`：OIDC state、浏览器关联值和一次性登录结果的有效期。
+- `MANAGER_SSO_MAX_PENDING=1024`：每个进程允许的待完成 OIDC 流程及待领取登录结果上限。
 
-## 生产镜像与本地打包
+SSO 登录结果使用随机 `nv_sso_handoff` Cookie 一次性交付；该 Cookie 设置 `HttpOnly`、
+`Secure` 和 `SameSite=Lax`。Angular 可见的 `temp` 仅是无权限 marker，不包含 Token 或关联 ID。
+当前临时状态保存在进程内，因此多副本部署必须对从 SSO 发起到 `PATCH /token_auth_server` 或
+`PATCH /openId_auth` 的完整链路启用粘性会话。未命中原实例会安全返回 `401`，不会回退到其他
+用户的结果。生产环境必须保持 `MANAGER_SSL=on`；HTTP 模式仅用于本地开发。
 
-生产镜像由仓库根目录的多阶段 Dockerfile 构建；Angular、Go binary 和 Python CLI 都在
-隔离的 builder stage 中生成，最终 SUSE BCI Micro 镜像不包含 JDK、SBT 或 Manager JAR：
+### 缓存、数据与 Support
+
+- `MANAGER_SESSION_MAX_ENTRIES=10000`：进程内 Token Session 上限。
+- `MANAGER_CACHE_MAX_ENTRIES=1000`、`MANAGER_CACHE_MAX_BYTES=64m`、`MANAGER_CACHE_TTL=5m`：
+  分页响应缓存的条目数、字节数和存活时间。
+- `MANAGER_SUPPORT_COMMAND=/usr/local/bin/support`：固定 support executable，必须是不可被
+  group/world 写入的普通可执行文件。
+- `MANAGER_SUPPORT_TEMP_DIR=/tmp/neuvector-support`：专用输出目录，权限不得宽于 `0700`，且
+  必须由当前 UID 所有。
+- `MANAGER_SUPPORT_TIMEOUT=10m`、`MANAGER_SUPPORT_MAX_FILE_BYTES=64m`、
+  `MANAGER_SUPPORT_MAX_CONCURRENT=2`：Support 收集超时、文件大小和并发上限。
+- `IP_GEO_IPV4_DB`、`IP_GEO_IPV6_DB`：IP2Location CSV 路径；生产镜像必须提供两个文件。
+- `CIS_NIST_DB`：CIS-to-NIST CSV 路径；生产镜像默认查找
+  `/usr/share/neuvector/CIS_NIST-MASTER.CSV`。
+
+Support 收集不需要 Linux capability。Token 与 Rancher session 仅通过子进程环境传递，不出现在
+命令行或日志；结果使用 `0600` 原子写入，并在下载完成、中断、失败、超时、替换或 Manager
+关闭时删除。IP 数据库首次请求时惰性加载，避免增加进程启动期常驻内存。
+
+## 构建与打包
+
+在仓库根目录运行：
 
 ```bash
 make build-image VERSION=dev TAG=dev
 make verify-image TAG=dev
+
 make build-fips-image VERSION=dev TAG=dev
 make verify-fips-image TAG=dev
+make test-images
+make package
 ```
 
 `make test-images` 对 `linux/amd64,linux/arm64` 执行不发布的跨架构构建。发布目标通过
-buildx 生成 SBOM 和 provenance；`runtime-fips` target 设置 `GODEBUG=fips140=only`，但只有
-Security/FIPS Owner 批准工具链、基础镜像和证据后才能作为认证的 FIPS 制品发布。运行时以
-UID/GID `1000:1000` 启动，证书应通过部署配置挂载并使用 `MANAGER_CERT_FILE` 和
-`MANAGER_KEY_FILE` 指向只读文件。网络受限环境可通过 `GOPROXY` 覆盖 Go module proxy，
-并通过 `PIP_INDEX_URL` 覆盖 Python package index，例如：
+Buildx 生成 SBOM 和 provenance；`runtime-fips` 设置 `GODEBUG=fips140=only`，但只有
+Security/FIPS Owner 批准工具链、基础镜像和证据后才能作为认证 FIPS 制品发布。
+
+运行时使用 UID/GID `1000:1000`，证书通过只读文件挂载。网络受限时可覆盖依赖源：
 
 ```bash
 make build-image \
@@ -107,16 +127,23 @@ make build-image \
   PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
-support 收集不需要 Linux capability；镜像验证以 `--cap-drop ALL`、只读 rootfs 和
-`/tmp` tmpfs 启动。Token 与 Rancher session 仅通过子进程环境传递，不出现在命令行或日志；
-结果使用 `0600` 原子写入，下载完成或中断、失败、超时、替换及 Manager 关闭时均删除。
+`make package` 默认输出传统目录制品到 `stage/`，只包含 Manager binary、CLI、support command、
+数据文件和许可证，不生成 Scala/JAR 制品。
 
-普通模式继续为 index cache key 和 `emailHash` 返回 Scala 兼容的 MD5；FIPS-only 模式不能
-调用 MD5，因此对这两个非安全标识使用 SHA-256。前端只将其作为 cache busting/Gravatar ID，
-不得把这些字段用于认证、签名或完整性判断。
+普通模式对 index cache key 和 `emailHash` 使用 Scala 兼容 MD5；FIPS-only 模式改用 SHA-256。
+这两个字段只用于 cache busting/Gravatar ID，不得用于认证、签名或完整性判断。
 
-需要生成传统目录制品时可运行 `make package`，默认输出到 `stage/`。该目录只包含 Manager
-binary、CLI、support command、数据文件和许可证，不再生成 Scala/JAR 制品。
+## 版本信息注入
+
+构建时可以注入与 Scala 相同的版本值：
+
+```bash
+go build -trimpath \
+  -ldflags "-X github.com/neuvector/manager/admin-go/internal/buildinfo.Version=<version>" \
+  -o bin/manager ./cmd/manager
+```
+
+正式发布必须使用 Security/FIPS Owner 批准的 Go 工具链和构建参数。
 
 ## 契约验证
 
@@ -124,6 +151,7 @@ binary、CLI、support command、数据文件和许可证，不再生成 Scala/J
 
 ```bash
 export MANAGER_TEST_TOKEN=fixture-token-1234567890
+
 python3 tools/migration/contract_runner.py \
   --manifest docs/admin-go-migration/baseline/contract-manifest.m2-poc.json \
   --left-url http://127.0.0.1:18443 \
@@ -131,7 +159,7 @@ python3 tools/migration/contract_runner.py \
   --output /tmp/manager-m2-contract.json
 ```
 
-报告只保存响应长度、Hash、脱敏 Header 和差异路径，不保存响应正文。
-当前合成 fixture 的独立 Scala/Go 全量差分为 304/304；Manifest 覆盖清单中的
-263/263 个语义路由（100%），且无未知、歧义或重复 case ID。这些结果只证明当前合成
-POC 范围的兼容性，不能替代真实 Controller 样本、正式性能和安全门禁。
+报告只保存响应长度、Hash、脱敏 Header 和差异路径，不保存响应正文。当前合成 fixture 的独立
+Scala/Go 差分为 `304/304`，Manifest 覆盖 `263/263` 个语义路由（100%），没有未知、歧义或
+重复 case ID。这些结果只证明当前 POC 范围的兼容性，不能替代真实 Controller 样本、正式
+性能和安全门禁。

@@ -286,8 +286,11 @@ sequenceDiagram
     G-->>U: Scala-compatible JSON/cookie/redirect
 ```
 
-OIDC state、SAML 临时 Key 和 SLO 数据也通过有 TTL 的专用 Store 保存，避免魔法固定 Key
-覆盖并发登录。是否改善这一历史行为必须由 golden 与并发测试证明不改变用户语义。
+OIDC state 和 SAML/OIDC 登录结果通过有 TTL、容量上限和原子消费语义的专用 Store 保存，避免
+魔法固定 Key 覆盖并发登录。浏览器只持有随机 flow/handoff capability；OIDC state 错配、过期、
+重放或跨实例请求均 fail closed。首版 Store 位于进程内，生产负载均衡器必须在完整 SSO 链路
+启用粘性会话；共享状态替换必须保持原子 get-and-delete。安全细节与测试矩阵见
+[`06-sso-security-design.md`](06-sso-security-design.md)。
 
 ## 9. Cache 设计
 

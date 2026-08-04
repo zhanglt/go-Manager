@@ -92,7 +92,10 @@ func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *cont
 	registerCompatibilityRoutes(
 		group,
 		cfg,
-		auth.NewHandler(controllerClient, sessions, invalidators),
+		auth.NewHandlerWithOptions(controllerClient, sessions, auth.SSOOptions{
+			PublicURL: cfg.SSO.PublicURL, PathPrefix: cfg.Server.PathPrefix,
+			TTL: cfg.SSO.TTL, MaxEntries: cfg.SSO.MaxEntries, SecureCookies: cfg.Server.TLS,
+		}, invalidators),
 		access.NewHandler(controllerClient, resolver, sessions, invalidators),
 		account.NewHandler(controllerClient, resolver, sessions),
 		cluster.NewHandler(controllerClient, resolver, sessions),
