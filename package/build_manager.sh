@@ -1,57 +1,47 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-STAGE_DIR=stage
-
-export CHROME_BIN=/usr/bin/google-chrome
-
-rm -rf admin/target
-pushd admin/webapp
-if [[ $# > 0 ]]; then
-    case $1 in
-        -d)
-        mkdir -p /root/.ivy2
-        ln -s /prebuild/manager/cache /root/.ivy2/cache
-        ;;
-        *)
-        ;;
-    esac
-fi
-npm install --legacy-peer-deps 2>&1
-if [ $? -eq 0 ]; then
-    echo npm package installation SUCCEED
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+stage_input=${STAGE_DIR:-stage}
+if [[ $stage_input == /* ]]; then
+  stage_dir=$stage_input
 else
-    npm cache clean --force 2>&1
-    sleep 10
-    npm install 2>&1
-    if [ $? -eq 0 ]; then
-        echo npm package installation SUCCEED
-    else
-        echo ================================
-        echo npm package installation FAILED
-        echo ================================
-        exit 1
-    fi
+  stage_dir=$repo_root/$stage_input
 fi
-npm run build 2>&1
-if [ $? -eq 0 ]; then
-    echo UI build SUCCEED
-else
-    echo ================================
-    echo UI build FAILED
-    echo ================================
+version=${VERSION:-interim/master.xxxx}
+commit=${COMMIT:-unknown}
+build_date=${BUILD_DATE:-unknown}
+
+case $stage_dir in
+  ""|/|"$repo_root")
+    echo "refusing unsafe STAGE_DIR: $stage_dir" >&2
     exit 1
-fi
-popd
-env JAVA_OPTS="-Xms2g -Xmx3g" sbt admin/assembly
-zip -d admin/target/scala-3.3.5/admin-assembly-1.0.jar rest-management-private-classpath\*
-rm -rf admin/webapp/root/.sass-cache
+    ;;
+esac
 
-mkdir -p ${STAGE_DIR}/licenses/ ${STAGE_DIR}/usr/local/bin/ ${STAGE_DIR}/usr/lib64/jvm/java-17-openjdk-17/conf/security/
-cp licenses/* ${STAGE_DIR}/licenses/
-cp cli/cli ${STAGE_DIR}/usr/local/bin/
-cp cli/cli.py ${STAGE_DIR}/usr/local/bin/
-cp -r cli/prog ${STAGE_DIR}/usr/local/bin/
-cp scripts/* ${STAGE_DIR}/usr/local/bin/
-cp java.security ${STAGE_DIR}/usr/lib64/jvm/java-17-openjdk-17/conf/security/java.security.fips
-cp admin/target/scala-3.3.5/admin-assembly-1.0.jar ${STAGE_DIR}/usr/local/bin/
+cd "$repo_root/admin/webapp"
+cp package-lock.manager.json package-lock.json
+npm ci --legacy-peer-deps
+npm run build
+
+rsync --archive --delete "$repo_root/admin/webapp/root/" "$repo_root/admin-go/assets/web/root/"
+
+rm -rf -- "$stage_dir"
+mkdir -p "$stage_dir/usr/local/bin" "$stage_dir/usr/share/neuvector" "$stage_dir/licenses"
+cd "$repo_root/admin-go"
+CGO_ENABLED=0 go build -trimpath -buildvcs=false \
+  -ldflags "-s -w \
+    -X github.com/neuvector/manager/admin-go/internal/buildinfo.Version=$version \
+    -X github.com/neuvector/manager/admin-go/internal/buildinfo.Commit=$commit \
+    -X github.com/neuvector/manager/admin-go/internal/buildinfo.BuildDate=$build_date" \
+  -o "$stage_dir/usr/local/bin/manager" ./cmd/manager
+
+install -m 0755 "$repo_root/cli/cli" "$stage_dir/usr/local/bin/cli"
+install -m 0644 "$repo_root/cli/cli.py" "$stage_dir/usr/local/bin/cli.py"
+cp -R "$repo_root/cli/prog" "$stage_dir/usr/local/bin/prog"
+install -m 0755 "$repo_root/scripts/support" "$stage_dir/usr/local/bin/support"
+install -m 0644 "$repo_root/scripts/support.py" "$stage_dir/usr/local/bin/support.py"
+install -m 0644 "$repo_root/admin/src/main/resources/IP2LOCATION-LITE-DB1.CSV" "$stage_dir/usr/share/neuvector/"
+install -m 0644 "$repo_root/admin/src/main/resources/IP2LOCATION-LITE-DB1.IPV6.CSV" "$stage_dir/usr/share/neuvector/"
+install -m 0644 "$repo_root/admin/src/main/resources/CIS_NIST-MASTER.CSV" "$stage_dir/usr/share/neuvector/"
+cp "$repo_root"/licenses/* "$stage_dir/licenses/"

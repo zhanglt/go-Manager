@@ -1,125 +1,114 @@
-# Builder image
-FROM registry.suse.com/bci/openjdk:17 AS builder
+# syntax=docker/dockerfile:1.7
 
+ARG NODE_BUILDER_IMAGE=node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+ARG GO_BUILDER_IMAGE=golang:1.25.0-alpine@sha256:f18a072054848d87a8077455f0ac8a25886f2397f88bfdd222d6fafbb5bba440
+ARG BCI_BASE_IMAGE=registry.suse.com/bci/bci-base:15.7@sha256:f210b01e65ad0d6485cdac7236475101613be1206740e3dc97b53007aaffa1e1
+ARG BCI_MICRO_IMAGE=registry.suse.com/bci/bci-micro:15.7@sha256:44f5c047210188eb290414c52f883b763efa1e234c2a15c325f03e83f0984fa6
+
+FROM --platform=$BUILDPLATFORM ${NODE_BUILDER_IMAGE} AS web-builder
+WORKDIR /src/admin/webapp
+COPY admin/webapp/package.json ./
+COPY admin/webapp/package-lock.manager.json ./package-lock.json
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --legacy-peer-deps
+COPY admin/webapp/ ./
+RUN npm run build
+
+FROM --platform=$BUILDPLATFORM ${GO_BUILDER_IMAGE} AS go-builder
 ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION=interim/master.xxxx
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
+ARG GOPROXY=https://proxy.golang.org,direct
+WORKDIR /src/admin-go
+COPY admin-go/go.mod admin-go/go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    GOPROXY="$GOPROXY" go mod download
+COPY admin-go/ ./
+COPY --from=web-builder /src/admin/webapp/root/ ./assets/web/root/
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS="$TARGETOS" GOARCH="$TARGETARCH" \
+    go build -trimpath -buildvcs=false \
+      -ldflags="-s -w \
+        -X github.com/neuvector/manager/admin-go/internal/buildinfo.Version=${VERSION} \
+        -X github.com/neuvector/manager/admin-go/internal/buildinfo.Commit=${COMMIT} \
+        -X github.com/neuvector/manager/admin-go/internal/buildinfo.BuildDate=${BUILD_DATE}" \
+      -o /out/manager ./cmd/manager
 
-COPY admin /src/admin
-COPY cli /src/cli
-COPY common /src/common
-COPY images /src/images
-COPY licenses /src/licenses
-COPY java.security /src/java.security
-COPY package /src/package
-COPY project /src/project
-COPY scripts /src/scripts
-COPY build.sbt .scalafix.conf .scalafmt.conf /src/
-
-WORKDIR /src
-
-RUN zypper refresh && \
-    zypper install -y wget curl zip git awk nodejs22 npm22 && \
-    npm install -g npm@10.9.2 && \
-    hash -r
-
-ARG VERSION
-
-ARG CS_VERSION=v2.1.18
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    curl -fL https://github.com/coursier/coursier/releases/download/${CS_VERSION}/cs-x86_64-pc-${TARGETOS}.gz | gzip -d > cs; \
-  elif [ "$TARGETARCH" = "arm64" ]; then \
-    curl -fL https://github.com/VirtusLab/coursier-m1/releases/download/${CS_VERSION}/cs-aarch64-pc-${TARGETOS}.gz | gzip -d > cs; \
-  else \
-    echo "Unsupported architecture: $ARCH"; \
-    exit 1; \
-  fi && \
-    chmod +x cs && \
-    export PATH="$PATH:/root/.local/share/coursier/bin" && \
-    ./cs install scala:3.3.5 sbt:1.10.2 --install-dir /usr/local/bin
-
-RUN npm install -g @angular/cli@20 && \
-    npm install -g npm-force-resolutions
-
-RUN sed -i -e 's#interim.*xxxx#'"$VERSION"'#g' ./common/src/main/resources/application.conf
-RUN bash package/build_manager.sh
-
-# Manager unitest
-RUN if [ "$ARCH" = "amd64" ]; then \
-  zypper addrepo https://download.opensuse.org/repositories/M17N:fonts/15.7/M17N:fonts.repo && \
-  rpm --import https://download.opensuse.org/repositories/M17N/15.7/repodata/repomd.xml.key && \
-  zypper --non-interactive refresh && \
-  zypper install -y liberation-fonts && \
-  wget https://dl.google.com/${OS}/direct/google-chrome-stable_current_${ARCH}.rpm && \
-  wget https://dl.google.com/${OS}/${OS}_signing_key.pub && \
-  rpm --import linux_signing_key.pub && \
-  zypper install -y google-chrome-stable_current_x86_64.rpm; \
-fi
-
-# Base image
-FROM registry.suse.com/bci/bci-micro:15.7 AS micro
-FROM registry.suse.com/bci/bci-base:15.7 AS base
-
-COPY --from=builder /src/package/requirements.txt /chroot/requirements.txt
+FROM ${BCI_MICRO_IMAGE} AS micro
+FROM ${BCI_BASE_IMAGE} AS python-rootfs
+ARG PIP_INDEX_URL=https://pypi.org/simple
 COPY --from=micro / /chroot/
-
-RUN zypper refresh && zypper --installroot /chroot -n in --no-recommends \
-    python313 python313-pip iproute2 lsof procps grep awk && \
+COPY package/requirements.txt /chroot/requirements.txt
+RUN --mount=type=cache,target=/var/cache/zypp \
+    --mount=type=cache,target=/chroot/root/.cache/pip \
+    for attempt in 1 2 3 4 5; do \
+      zypper refresh && break; \
+      test "$attempt" -lt 5 || exit 1; \
+      sleep $((attempt * 2)); \
+    done && \
+    zypper --installroot /chroot --non-interactive install --no-recommends \
+      bash ca-certificates python313 python313-pip iproute2 lsof procps grep awk && \
     cp /etc/resolv.conf /chroot/etc/resolv.conf && \
-    chroot /chroot /usr/bin/python3.13 -m pip install --upgrade setuptools && \
-    zypper --installroot /chroot clean -a && \
-    rm -rf /chroot/var/log/
-
-# Create proper symbolic links for Python and pip
-RUN ln -sf /usr/bin/python3.13 /chroot/usr/bin/python3 && \
+    chroot /chroot /usr/bin/python3.13 -m pip install \
+      --retries 10 --timeout 120 --index-url "$PIP_INDEX_URL" -r /requirements.txt && \
+    ln -sf /usr/bin/python3.13 /chroot/usr/bin/python3 && \
     ln -sf /usr/bin/python3.13 /chroot/usr/bin/python && \
-    ln -sf /usr/bin/pip3.13 /chroot/usr/bin/pip3 && \
-    ln -sf /usr/bin/pip3.13 /chroot/usr/bin/pip
+    zypper --installroot /chroot clean --all && \
+    rm -rf /chroot/requirements.txt /chroot/var/cache/zypp /chroot/var/log/*
 
-# Install requirements and clean up
-RUN chroot /chroot /bin/sh -c "pip install --no-cache-dir -r /requirements.txt && \
-    rm -rf /root/.cache /requirements.txt"
-
-# Remove unnecessary binaries to reduce image size
-RUN cd /chroot/usr/bin/ && \
-    rm -rf basename chcon chgrp chmod chown chroot cksum dd df dircolors \
-    dirname du install install-info join locale localedef mkdir mkfifo \
-    mknod mktemp paste pathchk readlink realpath sync smidiff smidump \
-    smilink smiquery smistrip smixlate tee tiemout tload top truncate \
-    unlink watch
-
-FROM micro
-ARG VERSION
-ARG COMMIT
+FROM micro AS runtime
+ARG VERSION=unknown
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
 WORKDIR /
-COPY --from=base /chroot/ /
-COPY --from=base /usr/sbin/useradd /usr/sbin
-COPY --from=builder /usr/lib64/jvm /usr/lib64/jvm
-COPY --from=builder /usr/lib64/lib*.so* /usr/lib64/
-COPY --from=builder /src/package/entrypoint.sh /entrypoint.sh
-COPY --from=builder /src/stage /
+COPY --from=python-rootfs /chroot/ /
+COPY --from=go-builder --chmod=0755 /out/manager /usr/local/bin/manager
+COPY --chmod=0755 cli/cli /usr/local/bin/cli
+COPY cli/cli.py /usr/local/bin/cli.py
+COPY cli/prog/ /usr/local/bin/prog/
+COPY --chmod=0755 scripts/support /usr/local/bin/support
+COPY scripts/support.py /usr/local/bin/support.py
+COPY admin/src/main/resources/IP2LOCATION-LITE-DB1.CSV /usr/share/neuvector/IP2LOCATION-LITE-DB1.CSV
+COPY admin/src/main/resources/IP2LOCATION-LITE-DB1.IPV6.CSV /usr/share/neuvector/IP2LOCATION-LITE-DB1.IPV6.CSV
+COPY admin/src/main/resources/CIS_NIST-MASTER.CSV /usr/share/neuvector/CIS_NIST-MASTER.CSV
+COPY licenses/ /licenses/
+COPY --chmod=0755 package/entrypoint.sh /entrypoint.sh
 
-ENV JAVA_HOME=/usr/lib64/jvm/java-17-openjdk-17 \
-    PATH=/usr/lib64/jvm/java-17-openjdk-17/bin:$PATH \
-    LD_LIBRARY_PATH=/usr/lib64 \
-    LANG=C.UTF-8 \
-    PYTHONUNBUFFERED=1
+ENV LANG=C.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    IP_GEO_IPV4_DB=/usr/share/neuvector/IP2LOCATION-LITE-DB1.CSV \
+    IP_GEO_IPV6_DB=/usr/share/neuvector/IP2LOCATION-LITE-DB1.IPV6.CSV \
+    CIS_NIST_DB=/usr/share/neuvector/CIS_NIST-MASTER.CSV
 
-LABEL "name"="manager" \
-      "vendor"="SUSE Security" \
-      "neuvector.image"="neuvector/manager" \
-      "neuvector.role"="manager" \
-      "neuvector.rev"="${COMMIT}" \
-      "io.artifacthub.package.logo-url"=https://avatars2.githubusercontent.com/u/19367275 \
-      "io.artifacthub.package.readme-url"="https://raw.githubusercontent.com/neuvector/manager/${VERSION}/README.md" \
-      "org.opencontainers.image.description"="SUSE Security Manager" \
-      "org.opencontainers.image.title"="SUSE Security Manager" \
-      "org.opencontainers.image.source"="https://github.com/neuvector/manager/" \
-      "org.opencontainers.image.version"="${VERSION}" \
-      "org.opensuse.reference"="neuvector/manager:${VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.description="SUSE Security Manager" \
+      org.opencontainers.image.revision="${COMMIT}" \
+      org.opencontainers.image.source="https://github.com/neuvector/manager" \
+      org.opencontainers.image.title="SUSE Security Manager" \
+      org.opencontainers.image.vendor="SUSE Security" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opensuse.reference="neuvector/manager:${VERSION}" \
+      io.artifacthub.package.logo-url="https://avatars2.githubusercontent.com/u/19367275" \
+      io.artifacthub.package.readme-url="https://raw.githubusercontent.com/neuvector/manager/${VERSION}/README.md" \
+      name="manager" \
+      vendor="SUSE Security" \
+      neuvector.image="neuvector/manager" \
+      neuvector.rev="${COMMIT}" \
+      neuvector.role="manager"
 
-ARG user=manager
-RUN echo "$user:x:1000:1000::/nonexistent:/bin/bash" >> /etc/passwd && \
-    echo "$user:x:1000:" >> /etc/group
-USER $user
+RUN echo 'manager:x:1000:1000::/nonexistent:/bin/bash' >> /etc/passwd && \
+    echo 'manager:x:1000:' >> /etc/group
+USER 1000:1000
+EXPOSE 8443
+ENTRYPOINT ["/entrypoint.sh"]
 
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+# This target enforces Go's FIPS-only runtime mode. Certification still depends on the approved
+# toolchain, base image, target platform, and release evidence owned by the Security/FIPS team.
+FROM runtime AS runtime-fips
+ENV GODEBUG=fips140=only
+LABEL neuvector.fips-mode="required"
+
+FROM runtime AS final

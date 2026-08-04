@@ -20,6 +20,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
+    - name: Enable arm64 emulation
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      with:
+        platforms: arm64
+
+    - name: Configure buildx
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      with:
+        name: neuvector
+
     - name: Load Secrets from Vault
       uses: rancher-eio/read-vault-secrets@7282bf97898cd1c16c89f837e0bb442e6d384c89 # v3
       with:
@@ -35,6 +45,21 @@ jobs:
       run: |
         TARGET=${{ github.ref_name }}
         echo "TAG=${TARGET#v}" >> $GITHUB_ENV
+    - name: Validate normal multi-architecture image
+      run: |
+        make build-image \
+          VERSION="${{ github.ref_name }}" TAG="${TAG}" \
+          TARGET_PLATFORMS=linux/amd64,linux/arm64 \
+          IMAGE_ARGS="--cache-from type=gha,scope=manager-final --cache-to type=gha,scope=manager-final,mode=max" \
+          BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
+    - name: Validate FIPS-only multi-architecture image
+      run: |
+        make build-image \
+          VERSION="${{ github.ref_name }}" TAG="${TAG}" \
+          IMAGE_TARGET=runtime-fips IMAGE="neuvector/manager-fips:${TAG}" \
+          TARGET_PLATFORMS=linux/amd64,linux/arm64 \
+          IMAGE_ARGS="--cache-from type=gha,scope=manager-fips --cache-to type=gha,scope=manager-fips,mode=max" \
+          BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
     - name: Publish neuvector manifest
       uses: rancher/ecm-distro-tools/actions/publish-image@10ab39987d39be83da6a252c1c3b540e496e0287 # v0.66.0
       with:

@@ -109,6 +109,39 @@ export class AdmissionRulesComponent implements OnInit {
     this.filtered = this.filteredCount !== this.admissionRules.length;
   }
 
+  private prepareGridOptions(
+    rowData: Array<AdmissionRule>,
+    overlayNoRowsTemplate?: string
+  ) {
+    this.gridOptions = this.admissionRulesService.configRuleGrid(
+      this.isAdmissionRuleAuthorized
+    );
+    if (overlayNoRowsTemplate) {
+      this.gridOptions.overlayNoRowsTemplate = overlayNoRowsTemplate;
+    }
+    this.gridOptions.onGridReady = params => {
+      const $win = $(GlobalVariable.window);
+      if (params && params.api) {
+        this.gridApi = params.api;
+        params.api.setGridOption('rowData', rowData);
+      }
+      setTimeout(() => {
+        if (params && params.api) {
+          params.api.sizeColumnsToFit();
+        }
+      }, 500);
+      $win.on(GlobalConstant.AG_GRID_RESIZE, () => {
+        setTimeout(() => {
+          if (params && params.api) {
+            params.api.sizeColumnsToFit();
+          }
+        }, 1000);
+      });
+    };
+    this.gridOptions.onSelectionChanged = this.onAdmissionRulesSelected;
+    this.isGridOptionsReady = true;
+  }
+
   private getAdmissionStateAndRules = () => {
     this.admissionStateErr = false;
     this.isGridOptionsReady = false;
@@ -131,29 +164,6 @@ export class AdmissionRulesComponent implements OnInit {
           this.globalStatus = this.admissionStateRec.state?.enable!;
           this.mode = this.admissionStateRec.state?.mode!;
           this.admissionRulesService.globalMode = this.mode;
-          this.gridOptions = this.admissionRulesService.configRuleGrid(
-            this.isAdmissionRuleAuthorized
-          );
-          this.gridOptions.onGridReady = params => {
-            const $win = $(GlobalVariable.window);
-            if (params && params.api) {
-              this.gridApi = params.api;
-            }
-            setTimeout(() => {
-              if (params && params.api) {
-                params.api.sizeColumnsToFit();
-              }
-            }, 500);
-            $win.on(GlobalConstant.AG_GRID_RESIZE, () => {
-              setTimeout(() => {
-                if (params && params.api) {
-                  params.api.sizeColumnsToFit();
-                }
-              }, 1000);
-            });
-          };
-          this.gridOptions.onSelectionChanged = this.onAdmissionRulesSelected;
-          this.isGridOptionsReady = true;
           this.default_action = this.admissionStateRec.state?.default_action!;
           if (this.source === GlobalConstant.NAV_SOURCE.SELF) {
             const GLOBAL_ACTION_RULE = {
@@ -196,32 +206,20 @@ export class AdmissionRulesComponent implements OnInit {
               'admissionControl.NOT_SUPPORT'
             );
           }
-          setTimeout(() => {
-            this.gridApi.setGridOption('rowData', this.admissionRules);
-          }, 200);
+          this.prepareGridOptions(this.admissionRules);
         },
         error => {
           console.log(error);
-          this.isGridOptionsReady = true;
           this.admissionStateErr = true;
-          setTimeout(() => {
-            if (error.status === 404) {
-              this.gridOptions.overlayNoRowsTemplate =
-                this.utils.getOverlayTemplateMsg(error);
-              this.gridApi!.setGridOption('rowData', []);
-              this.stateWarning = this.translate.instant(
-                'admissionControl.NOT_BINDING'
-              );
-            } else if (error.status === 403) {
-              this.gridOptions.overlayNoRowsTemplate =
-                this.translate.instant('general.NO_ROWS');
-              this.gridApi!.setGridOption('rowData', []);
-            } else {
-              this.gridOptions.overlayNoRowsTemplate =
-                this.utils.getOverlayTemplateMsg(error);
-              this.gridApi!.setGridOption('rowData', []);
-            }
-          }, 200);
+          let overlayNoRowsTemplate = this.utils.getOverlayTemplateMsg(error);
+          if (error.status === 404) {
+            this.stateWarning = this.translate.instant(
+              'admissionControl.NOT_BINDING'
+            );
+          } else if (error.status === 403) {
+            overlayNoRowsTemplate = this.translate.instant('general.NO_ROWS');
+          }
+          this.prepareGridOptions([], overlayNoRowsTemplate);
         }
       );
   };

@@ -1,0 +1,1083 @@
+{
+  "schema_version": 1,
+  "normalization": {
+    "ignored_headers": [
+      "date",
+      "server"
+    ],
+    "ignored_json_pointers": []
+  },
+  "cases": [
+    {
+      "id": "login-success-post",
+      "request": {
+        "method": "POST",
+        "path": "/auth",
+        "body_json": {
+          "username": "fixture-user",
+          "password": "fixture-password",
+          "isRancherSSOUrl": false,
+          "new_password": null
+        }
+      },
+      "normalization": {
+        "ignored_json_pointers": [
+          "/login_timestamp"
+        ]
+      }
+    },
+    {
+      "id": "public-gravatar-get",
+      "request": {
+        "method": "GET",
+        "path": "/gravatar"
+      }
+    },
+    {
+      "id": "public-rebrand-get",
+      "request": {
+        "method": "GET",
+        "path": "/rebrand"
+      }
+    },
+    {
+      "id": "authenticated-version-get",
+      "request": {
+        "method": "GET",
+        "path": "/version",
+        "headers": {
+          "Token": "${ENV:MANAGER_TEST_TOKEN}"
+        }
+      }
+    },
+    {
+      "id": "authenticated-self-get",
+      "request": {
+        "method": "GET",
+        "path": "/self?isOnNV=true&isRancherSSOUrl=false",
+        "headers": {
+          "Token": "${ENV:MANAGER_TEST_TOKEN}"
+        }
+      },
+      "normalization": {
+        "ignored_json_pointers": [
+          "/login_timestamp"
+        ]
+      }
+    },
+    {
+      "id": "ip-geo-patch",
+      "request": {
+        "method": "PATCH",
+        "path": "/ip-geo",
+        "headers": {
+          "Token": "${ENV:MANAGER_TEST_TOKEN}"
+        },
+        "body_json": [
+          "8.8.8.8",
+          "2001:4860:4860::8888"
+        ]
+      }
+    },
+    {
+      "id": "heartbeat-patch",
+      "request": {
+        "method": "PATCH",
+        "path": "/heartbeat",
+        "headers": {
+          "Token": "${ENV:MANAGER_TEST_TOKEN}"
+        }
+      }
+    },
+    {
+      "id": "public-eula-get",
+      "request": {
+        "method": "GET",
+        "path": "/eula?isSSO=false"
+      }
+    },
+    {
+      "id": "cluster-switch-get",
+      "request": {
+        "method": "GET",
+        "path": "/fed/switch?id=member-one",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "permission-options-get",
+      "request": {
+        "method": "GET", "path": "/role2/permission-options",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "role-list-get",
+      "request": {
+        "method": "GET", "path": "/role2",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "role-create-post",
+      "request": {
+        "method": "POST", "path": "/role2",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "custom-role", "comment": null, "permissions": []}}
+      }
+    },
+    {
+      "id": "role-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/role2",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "custom-role", "comment": null, "permissions": []}}
+      }
+    },
+    {
+      "id": "role-delete",
+      "request": {
+        "method": "DELETE", "path": "/role2?name=custom-role",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "api-key-list-get",
+      "request": {
+        "method": "GET", "path": "/api_key",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "api-key-create-post",
+      "request": {
+        "method": "POST", "path": "/api_key",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {
+          "apikey": {
+            "expiration_type": "hours", "expiration_hours": 24, "apikey_name": "ci-key",
+            "description": "fixture", "role": "reader", "role_domains": null
+          }
+        }
+      }
+    },
+    {
+      "id": "api-key-delete",
+      "request": {
+        "method": "DELETE", "path": "/api_key?name=ci-key",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
+      }
+    },
+    {
+      "id": "token-validation-post",
+      "request": {"method": "POST", "path": "/token", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}},
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+    },
+    {
+      "id": "single-user-get",
+      "request": {"method": "GET", "path": "/user?name=fixture-user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}},
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+    },
+    {
+      "id": "user-list-get",
+      "request": {"method": "GET", "path": "/user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "user-create-post",
+      "request": {
+        "method": "POST", "path": "/user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {
+          "fullname": "Fixture User", "server": "local", "username": "fixture-user",
+          "password": "fixture-password", "email": "fixture@example.invalid", "role": "reader",
+          "locale": "en", "timeout": 300, "default_password": false, "modify_password": false,
+          "password_resettable": true, "blocked_for_failed_login": false,
+          "blocked_for_password_expired": false, "role_domains": {}, "extra_permissions": [],
+          "extra_permissions_domains": []
+        }
+      }
+    },
+    {
+      "id": "user-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {
+          "fullname": "Fixture User", "username": "fixture-user", "email": "fixture@example.invalid",
+          "role": "reader", "password": null, "new_password": null, "timeout": 300,
+          "locale": "en", "default_password": false, "modify_password": false, "role_domains": {}
+        }
+      }
+    },
+    {
+      "id": "user-delete",
+      "request": {"method": "DELETE", "path": "/user?userId=fixture-user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "password-public-get",
+      "request": {"method": "GET", "path": "/password-profile/public", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "user-block-post",
+      "request": {
+        "method": "POST", "path": "/password-profile/user", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"fullname": "fixture-user", "clear_failed_login": true,
+          "new_password": null, "force_reset_password": false, "reset_password_in_next_login": false}}
+      }
+    },
+    {
+      "id": "password-profile-get",
+      "request": {"method": "GET", "path": "/password-profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "password-profile-update",
+      "request": {
+        "method": "PATCH", "path": "/password-profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "default", "min_len": 8, "min_uppercase_count": 1,
+          "min_lowercase_count": 1, "min_digit_count": 1, "min_special_count": 1,
+          "block_after_failed_login_count": 5, "password_expire_after_days": 90,
+          "password_keep_history_count": 5, "block_minutes": 30,
+          "enable_block_after_failed_login": true, "enable_password_expiration": true,
+          "enable_password_history": true, "session_timeout": 300}}
+      }
+    },
+    {
+      "id": "eula-update-post",
+      "request": {"method": "POST", "path": "/eula", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"accepted": true}}
+    },
+    {
+      "id": "license-get",
+      "request": {"method": "GET", "path": "/license", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "license-request-post",
+      "request": {
+        "method": "POST", "path": "/license", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"license_request": {"name": "Fixture", "email": "fixture@example.invalid",
+          "phone": null, "months": 1, "node_limit": 10, "multi_cluster_limit": null,
+          "cpu_limit": null, "scan": true, "enforce": true}}
+      }
+    },
+    {
+      "id": "license-update-post",
+      "request": {"method": "POST", "path": "/license/update", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"license_key": "fixture-license-key"}}
+    },
+    {
+      "id": "server-list-get",
+      "request": {"method": "GET", "path": "/server", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "server-create-post",
+      "request": {
+        "method": "POST", "path": "/server", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "ldap1", "ldap": {"hostname": "ldap.example.invalid",
+          "port": 636, "ssl": true, "base_dn": null, "group_dn": null, "bind_dn": null,
+          "bind_password": "fixture-secret", "enable": true, "default_role": null, "directory": null,
+          "group_mapped_roles": null, "group_member_attr": null, "username_attr": null},
+          "saml": null, "oidc": null}}
+      }
+    },
+    {
+      "id": "server-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/server", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "ldap1", "ldap": {"hostname": "ldap.example.invalid",
+          "port": 636, "ssl": true, "base_dn": null, "group_dn": null, "bind_dn": null,
+          "bind_password": "fixture-secret", "enable": true, "default_role": null, "directory": null,
+          "group_mapped_roles": null, "group_member_attr": null, "username_attr": null},
+          "saml": null, "oidc": null}}
+      }
+    },
+    {
+      "id": "server-delete",
+      "request": {
+        "method": "DELETE", "path": "/server", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "ldap1", "ldap": null, "saml": null, "oidc": null}}
+      }
+    },
+    {
+      "id": "server-debug-post",
+      "request": {
+        "method": "POST", "path": "/debug", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"test": {"name": "ldap1", "ldap": {"hostname": "ldap.example.invalid",
+          "port": 636, "ssl": true, "base_dn": null, "group_dn": null, "bind_dn": null,
+          "bind_password": "fixture-secret", "enable": true, "default_role": null, "directory": null,
+          "group_mapped_roles": null, "group_member_attr": null, "username_attr": null},
+        "test_ldap": {"username": "fixture-user", "password": "fixture-password"}}}
+      }
+    },
+    {
+      "id": "fed-member-get",
+      "request": {"method": "GET", "path": "/fed/member", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "fed-summary-get",
+      "request": {"method": "GET", "path": "/fed/summary?id=member-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "fed-promote-post",
+      "request": {
+        "method": "POST", "path": "/fed/promote", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "primary", "master_rest_info": {"server": "master.example.invalid", "port": 10443},
+          "use_proxy": null, "deploy_repo_scan_data": true}
+      }
+    },
+    {
+      "id": "fed-demote-post",
+      "request": {"method": "POST", "path": "/fed/demote", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "fed-join-token-get",
+      "request": {"method": "GET", "path": "/fed/join_token", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "fed-join-post",
+      "request": {
+        "method": "POST", "path": "/fed/join", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "member", "server": "master.example.invalid", "port": 10443,
+          "join_token": "fixture-federation-join-token", "joint_rest_info": null, "use_proxy": null}
+      }
+    },
+    {
+      "id": "fed-leave-post",
+      "request": {"method": "POST", "path": "/fed/leave", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"force": true}}
+    },
+    {
+      "id": "fed-config-patch",
+      "request": {
+        "method": "PATCH", "path": "/fed/config", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"poll_interval": 10, "name": "primary", "use_proxy": null,
+          "rest_info": {"server": "master.example.invalid", "port": 10443}, "deploy_repo_scan_data": true}
+      }
+    },
+    {
+      "id": "fed-delete",
+      "request": {"method": "DELETE", "path": "/fed?id=member-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "fed-deploy-post",
+      "request": {"method": "POST", "path": "/fed/deploy", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"ids": ["rule-1"]}}
+    },
+    {
+      "id": "enforcer-list-get",
+      "request": {"method": "GET", "path": "/enforcer", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "enforcer-stats-get",
+      "request": {"method": "GET", "path": "/enforcer?id=enforcer-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "single-enforcer-get",
+      "request": {"method": "GET", "path": "/single-enforcer?id=enforcer-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "controller-list-get",
+      "request": {"method": "GET", "path": "/controller", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "controller-stats-get",
+      "request": {"method": "GET", "path": "/controller?id=controller-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "scanner-list-get",
+      "request": {"method": "GET", "path": "/scanner", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "system-summary-get",
+      "request": {"method": "GET", "path": "/summary", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "ibm-sa-setup-get",
+      "request": {"method": "GET", "path": "/ibmsa_setup", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "usage-get",
+      "request": {"method": "GET", "path": "/usage", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "host-list-get",
+      "request": {"method": "GET", "path": "/host", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "host-detail-get",
+      "request": {"method": "GET", "path": "/host?id=host-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "host-workloads-get",
+      "request": {"method": "GET", "path": "/host/workload?id=host-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "host-compliance-get",
+      "request": {"method": "GET", "path": "/host/compliance?id=host-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "host-scan-report-post",
+      "request": {
+        "method": "POST", "path": "/host/scan-report", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"show_accepted": true, "max_cve_records": 50,
+          "cursor": {"host_name": "host-one"}, "vul_score_filter": {"score_version": "v3", "score_top": 10},
+          "filters": [], "severity_filter": "critical"}
+      }
+    },
+    {
+      "id": "webhook-create-post",
+      "request": {
+        "method": "POST", "path": "/webhook", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "alerts", "url": "https://hooks.example.invalid", "enable": true,
+          "use_proxy": false, "type": "slack", "cfg_type": "federal"}
+      }
+    },
+    {
+      "id": "webhook-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/webhook?scope=local", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "alerts", "url": "https://hooks.example.invalid", "enable": true,
+          "use_proxy": false, "type": "slack", "cfg_type": "local"}
+      }
+    },
+    {
+      "id": "webhook-delete",
+      "request": {"method": "DELETE", "path": "/webhook?name=alerts&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "config-get",
+      "request": {"method": "GET", "path": "/config?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "config-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/config?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"cluster_name": "fixture-cluster"}
+      }
+    },
+    {
+      "id": "config-v2-get",
+      "request": {"method": "GET", "path": "/config-v2?scope=fed&source=settings", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "config-v2-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/config-v2", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config_v2": {"misc_cfg": {"cluster_name": "fixture-cluster"}}}
+      }
+    },
+    {
+      "id": "file-config-all-get",
+      "request": {"method": "GET", "path": "/file/config?id=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "file-config-policy-get",
+      "request": {"method": "GET", "path": "/file/config?id=policy", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "file-export-config-fed-post",
+      "request": {
+        "method": "POST", "path": "/file/export-config-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"remote_export_options": {"remote_repository_nickname": "repo-one",
+          "file_path": "exports/fed.yaml", "comment": null}}
+      }
+    },
+    {
+      "id": "file-config-transaction-post",
+      "request": {"method": "POST", "path": "/file/config", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-local", "X-As-Standalone": "true"},
+        "body_text": "fixture-temporary-token"}
+    },
+    {
+      "id": "file-config-multipart-post",
+      "request": {"method": "POST", "path": "/file/config", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-As-Standalone": "false",
+        "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\r\nContent-Disposition: form-data; name=\"file\"; filename=\"config.yaml\"\r\nContent-Type: application/octet-stream\r\n\r\nfixture-config\r\n--fixture--\r\n"}
+    },
+    {
+      "id": "file-config-fed-transaction-post",
+      "request": {"method": "POST", "path": "/file/config-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-fed"}}
+    },
+    {
+      "id": "file-config-fed-form-post",
+      "request": {"method": "POST", "path": "/file/config-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\nline-one\nline-two\n--fixture--\n"}
+    },
+    {
+      "id": "group-export-post",
+      "request": {"method": "POST", "path": "/group/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"groups": ["group-one"], "policy_mode": null, "profile_mode": null,
+          "use_name_referral": true, "remote_export_options": null}}
+    },
+    {
+      "id": "group-export-fed-post",
+      "request": {"method": "POST", "path": "/group/export-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"groups": ["group-one"], "policy_mode": "Discover", "profile_mode": null,
+          "use_name_referral": false, "remote_export_options": null}}
+    },
+    {
+      "id": "group-import-transaction-post",
+      "request": {"method": "POST", "path": "/group/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-group-local"}}
+    },
+    {
+      "id": "group-import-form-post",
+      "request": {"method": "POST", "path": "/group/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\nlocal-group-config\n--fixture--\n"}
+    },
+    {
+      "id": "group-import-fed-transaction-post",
+      "request": {"method": "POST", "path": "/group/import-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-group-fed"}}
+    },
+    {
+      "id": "group-import-fed-form-post",
+      "request": {"method": "POST", "path": "/group/import-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\nfed-group-config\n--fixture--\n"}
+    },
+    {
+      "id": "response-policy-export-post",
+      "request": {"method": "POST", "path": "/responsePolicy/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"ids": [1, 7], "remote_export_options": null}}
+    },
+    {
+      "id": "response-policy-export-fed-post",
+      "request": {"method": "POST", "path": "/responsePolicy/export-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"ids": [2], "remote_export_options": null}}
+    },
+    {
+      "id": "response-policy-import-transaction-post",
+      "request": {"method": "POST", "path": "/responsePolicy/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-response-local"}}
+    },
+    {
+      "id": "response-policy-import-form-post",
+      "request": {"method": "POST", "path": "/responsePolicy/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\nlocal-response-config\n--fixture--\n"}
+    },
+    {
+      "id": "response-policy-import-fed-transaction-post",
+      "request": {"method": "POST", "path": "/responsePolicy/import-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-response-fed"}}
+    },
+    {
+      "id": "response-policy-import-fed-form-post",
+      "request": {"method": "POST", "path": "/responsePolicy/import-fed", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\nfed-response-config\n--fixture--\n"}
+    },
+    {"id": "response-rule-get", "request": {"method": "GET", "path": "/responseRule?id=7", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "response-policy-get-local", "request": {"method": "GET", "path": "/responsePolicy?scope=local", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "response-policy-get-fed", "request": {"method": "GET", "path": "/responsePolicy?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "response-policy-create-fed", "request": {"method": "POST", "path": "/responsePolicy", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"insert": {"after": null, "rules": [{"id": null, "event": "event", "comment": null, "group": null, "conditions": null, "actions": ["webhook"], "webhooks": null, "disable": false, "cfg_type": "federal"}]}}}},
+    {"id": "response-policy-update-local", "request": {"method": "PATCH", "path": "/responsePolicy", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"id": 7, "event": "event", "comment": null, "group": null, "conditions": null, "actions": ["webhook"], "webhooks": null, "disable": false, "cfg_type": "user_created"}}}},
+    {"id": "response-policy-delete-fed", "request": {"method": "DELETE", "path": "/responsePolicy?id=7&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "condition-options-fed-get", "request": {"method": "GET", "path": "/conditionOption?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "unquarantine-post", "request": {"method": "POST", "path": "/unquarantine", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"request": {"unquarantine": {"response_rule": 7}}}}},
+    {"id": "policy-fed-deploy-post", "request": {"method": "POST", "path": "/fed-deploy", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"force": true, "ids": [1]}}},
+    {"id": "policy-application-get", "request": {"method": "GET", "path": "/policy/application", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "policy-rule-get", "request": {"method": "GET", "path": "/policy/rule?id=7", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "policy-rule-create", "request": {"method": "POST", "path": "/policy/rule", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"id": null, "comment": null, "from": "a", "to": "b", "applications": null, "ports": null, "action": "allow", "learned": false, "cfg_type": "user_created", "disable": false, "last_modified_timestamp": null}}},
+    {"id": "policy-rule-update", "request": {"method": "PATCH", "path": "/policy/rule", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"id": 7, "comment": null, "from": null, "to": null, "applications": null, "ports": null, "action": "deny", "disable": false}}},
+    {"id": "policy-delete", "request": {"method": "DELETE", "path": "/policy?id=7", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "policy-update-fed", "request": {"method": "PATCH", "path": "/policy?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"rules": null, "delete": [7]}}},
+    {"id": "admission-rules-get", "request": {"method": "GET", "path": "/admission/rules?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "admission-rule-create", "request": {"method": "POST", "path": "/admission/rule", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"id": 0, "category": "k8s", "comment": null, "criteria": null, "disable": false, "critical": null, "cfg_type": "federal", "rule_type": null, "rule_mode": null, "containers": null}}}},
+    {"id": "admission-rule-update", "request": {"method": "PATCH", "path": "/admission/rule", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"id": 7, "category": "k8s", "comment": null, "criteria": null, "disable": false, "critical": null, "cfg_type": "user_created", "rule_type": null, "rule_mode": null, "containers": null}}}},
+    {"id": "admission-rule-delete", "request": {"method": "DELETE", "path": "/admission/rule?id=7&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "admission-options-get", "request": {"method": "GET", "path": "/admission/options?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "admission-state-get", "request": {"method": "GET", "path": "/admission/state", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "admission-state-update", "request": {"method": "PATCH", "path": "/admission/state", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"state": {"enable": true, "mode": "protect", "default_action": "allow", "adm_client_mode": "service", "adm_client_mode_options": {}}}}},
+    {"id": "admission-test-get", "request": {"method": "GET", "path": "/admission/test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "admission-matching-test", "request": {"method": "POST", "path": "/admission/matching-test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "--b\nDisposition\nType\n\nfixture-admission\n--b--\n"}},
+    {"id": "admission-export", "request": {"method": "POST", "path": "/admission/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"ids": [7], "export_config": true, "remote_export_options": null}}},
+    {"id": "admission-import", "request": {"method": "POST", "path": "/admission/import", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-admission"}}},
+    {"id": "admission-export-fed", "request": {"method": "POST", "path": "/admission/export-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"ids": [7], "export_config": true, "remote_export_options": null}}},
+    {"id": "admission-import-fed", "request": {"method": "POST", "path": "/admission/import-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "--b\nDisposition\nType\n\nfixture-admission\n--b--\n"}},
+    {"id": "admission-promote", "request": {"method": "POST", "path": "/admission/promote", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"request": {"ids": [7]}}}},
+    {"id": "scan-status-get", "request": {"method": "GET", "path": "/scan/status", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-host-get", "request": {"method": "GET", "path": "/scan/host?id=host-one&show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-host-post", "request": {"method": "POST", "path": "/scan/host", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "host-one"}},
+    {"id": "scan-platform-get", "request": {"method": "GET", "path": "/scan/platform?platform=platform&show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-platform-post", "request": {"method": "POST", "path": "/scan/platform", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "ignored"}},
+    {"id": "scan-config-get", "request": {"method": "GET", "path": "/scan/config", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-config-post", "request": {"method": "POST", "path": "/scan/config", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"auto_scan": true, "enable_auto_scan_workload": null, "enable_auto_scan_host": null}}}},
+    {"id": "scan-registry-type-get", "request": {"method": "GET", "path": "/scan/registry/type", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "policy-promote", "request": {"method": "POST", "path": "/policy/promote", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"request": {"ids": [7]}}}},
+    {"id": "scan-workload-post", "request": {"method": "POST", "path": "/scan/workload", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "workload-one"}},
+    {"id": "scan-registry-get", "request": {"method": "GET", "path": "/scan/registry?name=repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-delete", "request": {"method": "DELETE", "path": "/scan/registry?name=repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-repo-get", "request": {"method": "GET", "path": "/scan/registry/repo?name=repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-repo-post", "request": {"method": "POST", "path": "/scan/registry/repo", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "repo-one"}},
+    {"id": "scan-registry-repo-delete", "request": {"method": "DELETE", "path": "/scan/registry/repo?name=repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-fed-repo-get", "request": {"method": "GET", "path": "/scan/registry/fed-repo?fed_repo=fed-repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-image-get", "request": {"method": "GET", "path": "/scan/registry/image?name=repo-one&imageId=image-one&show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-layer-get", "request": {"method": "GET", "path": "/scan/registry/layer?name=repo-one&imageId=image-one&show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-top-get", "request": {"method": "GET", "path": "/scan/top", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scan-registry-create", "request": {"method": "POST", "path": "/scan/registry", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "repo-two", "registry_type": "docker", "cfg_type": "user_created"}}}},
+    {"id": "scan-registry-update", "request": {"method": "PATCH", "path": "/scan/registry", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"name": "repo-two", "wrap": {"config": {"name": "repo-two", "registry_type": "docker"}}}}},
+    {"id": "scan-registry-test", "request": {"method": "POST", "path": "/scan/registry/test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-registry"}, "body_json": {"config": {"name": "repo-test", "registry_type": "docker"}}}},
+    {"id": "scan-registry-test-delete", "request": {"method": "DELETE", "path": "/scan/registry/test?name=repo-test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-registry"}}},
+    {"id": "risk-cve-get", "request": {"method": "GET", "path": "/risk/cve?show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "risk-cve-assets-view", "request": {"method": "PATCH", "path": "/risk/cve/assets-view?queryToken=query-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"last_modified_timestamp": 123, "include_no_vul_assets": null}}},
+    {"id": "risk-compliance-get", "request": {"method": "GET", "path": "/risk/compliance", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "risk-compliance-template-get", "request": {"method": "GET", "path": "/risk/compliance/template", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "risk-compliance-filter-get", "request": {"method": "GET", "path": "/risk/compliance/available_filter", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "scanned-assets-query", "request": {"method": "POST", "path": "/scanned-assets", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"type": "image"}}},
+    {"id": "scanned-assets-page", "request": {"method": "GET", "path": "/scanned-assets?token=page-one&start=0&row=20&orderby=desc&orderbyColumn=severity&qf=name%3Dfixture+image", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "vulasset-query", "request": {"method": "POST", "path": "/vulasset", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"last_modified_timestamp": null, "viewType": "image"}}},
+    {"id": "vulasset-page", "request": {"method": "GET", "path": "/vulasset?token=vul-page-one&start=20&row=10&lastmtime=123&orderby=asc&orderbyColumn=name&qf=domain%3Dprod&scoretype=v3", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "risk-compliance-nist", "request": {"method": "POST", "path": "/risk/complianceNIST", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"names": ["D.1.1.2", "missing"]}}}},
+    {
+      "id": "risk-cve-profile-export-post",
+      "request": {"method": "POST", "path": "/risk/cve/profile/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"names": ["profile-one"], "remote_export_options": null}}
+    },
+    {
+      "id": "risk-cve-profile-import-transaction-post",
+      "request": {"method": "POST", "path": "/risk/cve/profile/import?option=replace", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-cve-profile"}}
+    },
+    {
+      "id": "risk-cve-profile-import-form-post",
+      "request": {"method": "POST", "path": "/risk/cve/profile/import?option=merge", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\ncve-profile-config\n--fixture--\n"}
+    },
+    {
+      "id": "risk-compliance-profile-export-post",
+      "request": {"method": "POST", "path": "/risk/compliance/profile/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"names": ["profile-one"], "remote_export_options": null}}
+    },
+    {
+      "id": "risk-compliance-profile-import-transaction-post",
+      "request": {"method": "POST", "path": "/risk/compliance/profile/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-compliance-profile"}}
+    },
+    {
+      "id": "risk-compliance-profile-import-form-post",
+      "request": {"method": "POST", "path": "/risk/compliance/profile/import", "headers": {
+        "Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "multipart/form-data; boundary=fixture"},
+        "body_text": "--fixture\nContent-Disposition: form-data; name=\"file\"\nContent-Type: application/octet-stream\n\ncompliance-profile-config\n--fixture--\n"}
+    },
+    {
+      "id": "risk-cve-profile-list-get",
+      "request": {"method": "GET", "path": "/risk/cve/profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "risk-cve-profile-update-patch",
+      "request": {"method": "PATCH", "path": "/risk/cve/profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "profile-one", "entries": null}}}
+    },
+    {
+      "id": "risk-cve-profile-entry-create-post",
+      "request": {"method": "POST", "path": "/risk/cve/profile/entry", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"name": "profile-one", "entries": [{"id": null, "name": "entry-one",
+          "comment": "fixture", "days": 7, "domains": [], "images": ["image:tag"]}]}}}
+    },
+    {
+      "id": "risk-cve-profile-entry-update-patch",
+      "request": {"method": "PATCH", "path": "/risk/cve/profile/entry?name=profile-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"id": 7, "name": "entry-one", "comment": "updated", "days": 14,
+          "domains": ["prod"], "images": []}}}
+    },
+    {
+      "id": "risk-cve-profile-entry-delete",
+      "request": {"method": "DELETE", "path": "/risk/cve/profile/entry?profile_name=profile-one&entry_id=7", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "risk-compliance-profile-list-get",
+      "request": {"method": "GET", "path": "/risk/compliance/profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "risk-compliance-profile-single-get",
+      "request": {"method": "GET", "path": "/risk/compliance/profile?name=profile-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "risk-compliance-profile-update-patch",
+      "request": {"method": "PATCH", "path": "/risk/compliance/profile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "profile-one", "disable_system": null,
+          "entries": [{"test_number": "I.4.1", "tags": ["PCI"]}]}}
+    },
+    {
+      "id": "group-list-get",
+      "request": {"method": "GET", "path": "/group-list?scope=local&f_kind=container", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-list",
+      "request": {"method": "GET", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-list-federal",
+      "request": {"method": "GET", "path": "/group?scope=fed&with_cap=true", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-single",
+      "request": {"method": "GET", "path": "/group?name=group-one&with_cap=true", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-single-scoped",
+      "request": {"method": "GET", "path": "/group?name=group-one&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-page-first",
+      "request": {"method": "GET", "path": "/group?start=0&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-get-page-last",
+      "request": {"method": "GET", "path": "/group?start=1&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "service-list-get",
+      "request": {"method": "GET", "path": "/service", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "service-single-get",
+      "request": {"method": "GET", "path": "/service?name=service-one&with_cap=true", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "service-update-patch",
+      "request": {"method": "PATCH", "path": "/service", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"policy_mode": "Monitor", "profile_mode": "Basic", "baseline_profile": "zero-drift", "services": ["service-one"], "not_scored": false}}}
+    },
+    {
+      "id": "service-create-post",
+      "request": {"method": "POST", "path": "/service", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"policy_mode": "Monitor", "profile_mode": null, "baseline_profile": null, "services": null, "not_scored": null}}
+    },
+    {
+      "id": "service-all-patch",
+      "request": {"method": "PATCH", "path": "/service/all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"policy_mode": "Monitor", "profile_mode": null, "baseline_profile": null}}
+    },
+    {
+      "id": "process-profile-single-get",
+      "covers": ["group:GET:/processProfile#1"],
+      "request": {"method": "GET", "path": "/processProfile?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "process-profile-list-get",
+      "covers": ["group:GET:/processProfile#2"],
+      "request": {"method": "GET", "path": "/processProfile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "process-profile-list-federal-get",
+      "covers": ["group:GET:/processProfile#2"],
+      "request": {"method": "GET", "path": "/processProfile?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "process-profile-update-patch",
+      "request": {"method": "PATCH", "path": "/processProfile?scope=local", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"process_profile_config": {"group": "group-one", "alert_disabled": false, "hash_enabled": true,
+          "process_delete_list": null, "process_change_list": [{"name": "sh", "path": "/bin/sh", "user": null, "uid": null, "action": "allow"}], "process_replace_list": null}}}
+    },
+    {
+      "id": "process-profile-update-federal-patch",
+      "request": {"method": "PATCH", "path": "/processProfile?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"process_profile_config": {"group": "group-one", "alert_disabled": false, "hash_enabled": true,
+          "process_delete_list": null, "process_change_list": [{"name": "sh", "path": "/bin/sh", "user": null, "uid": null, "action": "allow"}], "process_replace_list": null}}}
+    },
+    {
+      "id": "file-profile-single-get",
+      "covers": ["group:GET:/fileProfile#1"],
+      "request": {"method": "GET", "path": "/fileProfile?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "file-profile-list-get",
+      "covers": ["group:GET:/fileProfile#2"],
+      "request": {"method": "GET", "path": "/fileProfile", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "file-profile-list-federal-get",
+      "covers": ["group:GET:/fileProfile#2"],
+      "request": {"method": "GET", "path": "/fileProfile?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "file-profile-update-patch",
+      "request": {"method": "PATCH", "path": "/fileProfile?scope=local", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"group": "group-one", "fileMonitorConfigData": {"config": {"add_filters": [{"filter": "/etc/*", "recursive": true, "behavior": "monitor", "applications": null}], "delete_filters": null, "update_filters": null}}}}
+    },
+    {
+      "id": "file-profile-update-federal-patch",
+      "request": {"method": "PATCH", "path": "/fileProfile?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"group": "group-one", "fileMonitorConfigData": {"config": {"add_filters": [{"filter": "/etc/*", "recursive": true, "behavior": "monitor", "applications": null}], "delete_filters": null, "update_filters": null}}}}
+    },
+    {
+      "id": "file-pre-profile-get",
+      "request": {"method": "GET", "path": "/filePreProfile?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {"id": "dlp-sensor-list-get", "request": {"method": "GET", "path": "/dlp/sensor?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "dlp-sensor-single-get", "request": {"method": "GET", "path": "/dlp/sensor?name=sensor-one&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "dlp-sensor-create-post", "request": {"method": "POST", "path": "/dlp/sensor", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "sensor-one", "comment": "fixture", "cfg_type": "user_created", "change": null, "delete": null, "rules": [], "predefine": false, "prerules": null}}}},
+    {"id": "dlp-sensor-update-patch", "request": {"method": "PATCH", "path": "/dlp/sensor", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "sensor-one", "comment": "fixture", "cfg_type": "user_created", "change": null, "delete": null, "rules": [], "predefine": false, "prerules": null}}}},
+    {"id": "dlp-sensor-delete", "request": {"method": "DELETE", "path": "/dlp/sensor?name=sensor-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "dlp-sensor-export", "request": {"method": "POST", "path": "/dlp/sensor/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"names": ["sensor-one"], "remote_export_options": null}}},
+    {"id": "dlp-sensor-export-fed", "request": {"method": "POST", "path": "/dlp/sensor/export-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"names": ["sensor-one"], "remote_export_options": null}}},
+    {"id": "dlp-sensor-import-transaction", "request": {"method": "POST", "path": "/dlp/sensor/import", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-dlp"}}},
+    {"id": "dlp-sensor-import-fed-form", "request": {"method": "POST", "path": "/dlp/sensor/import-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "--b\nDisposition\nType\n\nfixture-dlp\n--b--\n"}},
+    {"id": "dlp-group-get", "request": {"method": "GET", "path": "/dlp/group?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "dlp-group-update-patch", "request": {"method": "PATCH", "path": "/dlp/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "group-one", "status": true, "delete": null, "sensors": [{"name": "sensor-one", "action": "allow"}], "replace": null}}}},
+    {"id": "waf-sensor-list-get", "request": {"method": "GET", "path": "/waf/sensor?scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "waf-sensor-single-get", "request": {"method": "GET", "path": "/waf/sensor?name=sensor-one&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "waf-sensor-create-post", "request": {"method": "POST", "path": "/waf/sensor", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "sensor-one", "comment": "fixture", "cfg_type": "user_created", "change": null, "delete": null, "rules": []}}}},
+    {"id": "waf-sensor-update-patch", "request": {"method": "PATCH", "path": "/waf/sensor", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "sensor-one", "comment": "fixture", "cfg_type": "user_created", "change": null, "delete": null, "rules": []}}}},
+    {"id": "waf-sensor-delete", "request": {"method": "DELETE", "path": "/waf/sensor?name=sensor-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "waf-sensor-export", "request": {"method": "POST", "path": "/waf/sensor/export", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"names": ["sensor-one"], "remote_export_options": null}}},
+    {"id": "waf-sensor-export-fed", "request": {"method": "POST", "path": "/waf/sensor/export-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"names": ["sensor-one"], "remote_export_options": null}}},
+    {"id": "waf-sensor-import-transaction", "request": {"method": "POST", "path": "/waf/sensor/import", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-waf"}}},
+    {"id": "waf-sensor-import-fed-form", "request": {"method": "POST", "path": "/waf/sensor/import-fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "--b\nDisposition\nType\n\nfixture-waf\n--b--\n"}},
+    {"id": "waf-group-get", "request": {"method": "GET", "path": "/waf/group?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "waf-group-update-patch", "request": {"method": "PATCH", "path": "/waf/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"name": "group-one", "status": true, "delete": null, "sensors": [{"name": "sensor-one", "action": "allow"}], "replace": null}}}},
+    {"id": "bench-docker-get", "request": {"method": "GET", "path": "/bench/docker?id=host-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "bench-docker-post", "request": {"method": "POST", "path": "/bench/docker", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "host-one"}},
+    {"id": "bench-kubernetes-get", "request": {"method": "GET", "path": "/bench/kubernetes?id=host-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "bench-kubernetes-post", "request": {"method": "POST", "path": "/bench/kubernetes", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_text": "host-one"}},
+    {"id": "csp-support-post", "request": {"method": "POST", "path": "/csp-support", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "event-get", "request": {"method": "GET", "path": "/event", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "incident-get", "request": {"method": "GET", "path": "/incident", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "audit-get", "request": {"method": "GET", "path": "/audit", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "violation-get", "request": {"method": "GET", "path": "/violation", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "violation-top-get", "request": {"method": "GET", "path": "/violation/top?category=client", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "network-session-get", "request": {"method": "GET", "path": "/network/session?id=endpoint-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "network-conversation-delete", "request": {"method": "DELETE", "path": "/network/conversation?from=from-one&to=to-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "network-history-get", "request": {"method": "GET", "path": "/network/history?from=from-one&to=to-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "network-endpoint-delete", "request": {"method": "DELETE", "path": "/network/endpoint?id=endpoint-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
+    {"id": "network-endpoint-update", "request": {"method": "PATCH", "path": "/network/endpoint", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"config": {"id": "endpoint-one", "display_name": null}}}},
+    {"id": "notification-accept", "request": {"method": "POST", "path": "/notification/accept", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"manager_alerts": ["alert-one"], "controller_alerts": null, "user_alerts": []}}},
+    {
+      "id": "group-custom-check-get",
+      "request": {"method": "GET", "path": "/group/custom_check?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-custom-check-update-patch",
+      "request": {"method": "PATCH", "path": "/group/custom_check", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"group": "group-one", "config": {"add": {"scripts": [{"name": "check-one", "script": "echo fixture"}]}, "delete": null, "update": null}}}
+    },
+    {
+      "id": "group-create-post",
+      "request": {"method": "POST", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "group-one", "comment": "fixture", "criteria": [{"name": "image=nginx"}],
+          "cfg_type": "user_created", "monitor_metric": true, "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30}}
+    },
+    {
+      "id": "group-create-federal-post",
+      "request": {"method": "POST", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "fed-group", "comment": "fixture", "criteria": [{"name": "domain!=prod"}],
+          "cfg_type": "federal", "monitor_metric": false, "group_sess_cur": 0, "group_sess_rate": 0, "group_band_width": 0}}
+    },
+    {
+      "id": "group-update-patch",
+      "request": {"method": "PATCH", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "group-one", "comment": "updated", "criteria": [{"name": "image=nginx"}],
+          "cfg_type": "user_created", "monitor_metric": true, "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30}}
+    },
+    {
+      "id": "group-update-learned-patch",
+      "request": {"method": "PATCH", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "learned-group", "comment": "ignored", "criteria": [{"name": "image=nginx"}],
+          "cfg_type": "learned", "monitor_metric": true, "group_sess_cur": 1, "group_sess_rate": 2, "group_band_width": 3}}
+    },
+    {
+      "id": "group-update-federal-patch",
+      "request": {"method": "PATCH", "path": "/group", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "fed-group", "comment": "updated", "criteria": [{"name": "domain!=prod"}],
+          "cfg_type": "federal", "monitor_metric": false, "group_sess_cur": 0, "group_sess_rate": 0, "group_band_width": 0}}
+    },
+    {
+      "id": "group-delete",
+      "request": {"method": "DELETE", "path": "/group?name=group-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "group-delete-federal",
+      "request": {"method": "DELETE", "path": "/group?name=fed-group&scope=fed", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "remote-repository-create-post",
+      "request": {
+        "method": "POST", "path": "/remote_repository", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"nickname": "repo-one", "provider": "github", "comment": null, "enable": true,
+          "github_configuration": {"repository_owner_username": "fixture-owner", "repository_name": "fixture-repo"},
+          "azure_devops_configuration": null}
+      }
+    },
+    {
+      "id": "remote-repository-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/remote_repository", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"config": {"nickname": "repo-one", "provider": "github", "comment": null,
+          "enable": true, "github_configuration": {"repository_owner_username": "fixture-owner",
+          "repository_name": "fixture-repo"}, "azure_devops_configuration": null}}
+      }
+    },
+    {
+      "id": "remote-repository-delete",
+      "request": {"method": "DELETE", "path": "/remote_repository?name=repo-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "sigstore-list-get",
+      "request": {"method": "GET", "path": "/sigstore", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "sigstore-create-post",
+      "request": {
+        "method": "POST", "path": "/sigstore", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "root-one", "comment": null, "is_private": false,
+          "rootless_keypairs_only": true, "rekor_public_key": null, "root_cert": "fixture-root-cert",
+          "sct_public_key": null, "verifiers": null, "cfg_type": "user_created"}
+      }
+    },
+    {
+      "id": "sigstore-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/sigstore", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "root-one", "comment": "fixture", "is_private": false,
+          "rootless_keypairs_only": true, "rekor_public_key": null, "root_cert": "fixture-root-cert",
+          "sct_public_key": null, "verifiers": null, "cfg_type": "user_created"}
+      }
+    },
+    {
+      "id": "sigstore-delete",
+      "request": {"method": "DELETE", "path": "/sigstore?rootOfTrustName=root-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "verifier-list-get",
+      "request": {"method": "GET", "path": "/verifier?rootOfTrustName=root-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "verifier-create-post",
+      "request": {
+        "method": "POST", "path": "/verifier", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "verifier-one", "root_of_trust_name": "root-one", "comment": null,
+          "is_private": false, "verifier_type": "keypair", "ignore_tlog": true, "ignore_sct": false,
+          "public_key": "fixture-public-key", "cert_issuer": null, "cert_subject": null}
+      }
+    },
+    {
+      "id": "verifier-update-patch",
+      "request": {
+        "method": "PATCH", "path": "/verifier", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "verifier-one", "root_of_trust_name": "root-one", "comment": "fixture",
+          "is_private": false, "verifier_type": "keypair", "ignore_tlog": true, "ignore_sct": false,
+          "public_key": "fixture-public-key", "cert_issuer": null, "cert_subject": null}
+      }
+    },
+    {
+      "id": "verifier-delete",
+      "request": {"method": "DELETE", "path": "/verifier?rootOfTrustName=root-one&verifierName=verifier-one",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-list-get",
+      "request": {"method": "GET", "path": "/workload", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-stats-get",
+      "request": {"method": "GET", "path": "/workload?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-quarantine-post",
+      "request": {"method": "POST", "path": "/workload", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"id": "workload-one", "quarantine": true}}
+    },
+    {
+      "id": "workload-by-id-get",
+      "request": {"method": "GET", "path": "/workload/workload-by-id?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-monitor-get",
+      "request": {"method": "GET", "path": "/workload/monitor?id=workload-one&monitor=true", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-compliance-get",
+      "request": {"method": "GET", "path": "/workload/compliance?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-scanned-first-page-get",
+      "request": {"method": "GET", "path": "/workload/scanned?start=0&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-scanned-last-page-get",
+      "request": {"method": "GET", "path": "/workload/scanned?start=1&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-scanned-exhausted-page-get",
+      "request": {"method": "GET", "path": "/workload/scanned?start=2&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "workload-scan-report-post",
+      "request": {
+        "method": "POST", "path": "/workload/scan-report", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"show_accepted": false, "max_cve_records": 25,
+          "cursor": {"name": "workload-one", "cve_name": "CVE-2026-0001"}, "view_pod": "pod",
+          "vul_score_filter": {"score_version": "v3", "score_bottom": 4},
+          "filters": [{"name": "severity", "op": "eq", "value": ["high", "critical"]}],
+          "severity_filter": "high"}
+      }
+    },
+    {
+      "id": "container-list-get",
+      "request": {"method": "GET", "path": "/container", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "container-detail-get",
+      "request": {"method": "GET", "path": "/container?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "container-process-get",
+      "request": {"method": "GET", "path": "/container/process?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "container-process-history-get",
+      "request": {"method": "GET", "path": "/container/processHistory?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "domain-list-get",
+      "request": {"method": "GET", "path": "/domain", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "domain-update-patch",
+      "request": {"method": "PATCH", "path": "/domain", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"name": "team-one", "tags": ["production"]}}
+    },
+    {
+      "id": "domain-settings-post",
+      "request": {"method": "POST", "path": "/domain", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"tag_per_domain": false}}
+    },
+    {
+      "id": "sniffer-list-get",
+      "request": {"method": "GET", "path": "/sniffer?id=workload-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "sniffer-create-post",
+      "request": {
+        "method": "POST", "path": "/sniffer", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"},
+        "body_json": {"workloadId": "workload-one", "snifferParamWarp": {"sniffer": {
+          "file_number": 2, "duration": 60, "filter": null}}}
+      }
+    },
+    {
+      "id": "sniffer-stop-patch",
+      "request": {"method": "PATCH", "path": "/sniffer",
+        "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "Content-Type": "text/plain; charset=UTF-8"},
+        "body_text": "sniffer-one"}
+    },
+    {
+      "id": "sniffer-delete",
+      "request": {"method": "DELETE", "path": "/sniffer?id=sniffer-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "sniffer-pcap-get",
+      "request": {"method": "GET", "path": "/sniffer/pcap?id=sniffer-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "logout-delete",
+      "request": {
+        "method": "DELETE",
+        "path": "/auth",
+        "headers": {
+          "Token": "${ENV:MANAGER_TEST_TOKEN}"
+        }
+      }
+    }
+  ]
+}

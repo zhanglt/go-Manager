@@ -91,6 +91,7 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Sensors = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -110,6 +111,7 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Rules = params.api;
+        this.updateRuleGrid();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -129,6 +131,7 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Patterns = params.api;
+        this.updatePatternGrid();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -148,8 +151,6 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
       this.onSelectionChanged4Sensor;
     this.gridOptions4Rules.onSelectionChanged = this.onSelectionChanged4Rule;
 
-    this.refresh();
-
     //refresh the page when it switched to a remote cluster
     this._switchClusterSubscription =
       this.multiClusterService.onClusterSwitchedEvent$.subscribe(data => {
@@ -164,6 +165,8 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
   }
 
   refresh = (index: number = 0) => {
+    if (!this.gridApi4Sensors) return;
+
     this.refreshing$.next(true);
     this.getDlpSensors(index);
   };
@@ -321,10 +324,9 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
         response => {
           this.dlpSensors = response as Array<DlpSensor>;
           this.filteredCount = this.dlpSensors.length;
-          setTimeout(() => {
-            let rowNode = this.gridApi4Sensors!.getDisplayedRowAtIndex(index);
-            rowNode?.setSelected(true);
-          }, 200);
+          this.gridApi4Sensors.setGridOption('rowData', this.dlpSensors);
+          const rowNode = this.gridApi4Sensors.getDisplayedRowAtIndex(index);
+          rowNode?.setSelected(true);
         },
         error => {}
       );
@@ -337,27 +339,34 @@ export class DlpSensorsComponent implements OnInit, OnDestroy {
       sensor => sensor.name === (this.selectedSensor?.name || '')
     );
     this.isPredefine = this.selectedSensor?.predefine || false;
-    setTimeout(() => {
-      this.gridApi4Rules!.setGridOption(
-        'rowData',
-        this.selectedSensor?.rules || []
-      );
-      this.gridApi4Patterns!.setGridOption('rowData', []);
-      if (this.selectedSensor?.rules?.length > 0) {
-        let rowNode = this.gridApi4Rules!.getDisplayedRowAtIndex(0);
-        rowNode!.setSelected(true);
-        this.gridApi4Rules!.sizeColumnsToFit();
-      }
-    }, 200);
+    this.updateRuleGrid();
+    if (this.gridApi4Patterns) {
+      this.gridApi4Patterns.setGridOption('rowData', []);
+    }
   };
   private onSelectionChanged4Rule = () => {
     this.selectedRule = this.gridApi4Rules!.getSelectedRows()[0];
-    this.gridApi4Patterns!.setGridOption(
+    this.updatePatternGrid();
+  };
+
+  private updateRuleGrid = () => {
+    if (!this.gridApi4Rules) return;
+
+    const rules = this.selectedSensor?.rules || [];
+    this.gridApi4Rules.setGridOption('rowData', rules);
+    if (rules.length > 0) {
+      this.gridApi4Rules.getDisplayedRowAtIndex(0)?.setSelected(true);
+      this.gridApi4Rules.sizeColumnsToFit();
+    }
+  };
+
+  private updatePatternGrid = () => {
+    if (!this.gridApi4Patterns) return;
+
+    this.gridApi4Patterns.setGridOption(
       'rowData',
       this.selectedRule?.patterns || []
     );
-    setTimeout(() => {
-      this.gridApi4Patterns!.sizeColumnsToFit();
-    }, 200);
+    this.gridApi4Patterns.sizeColumnsToFit();
   };
 }

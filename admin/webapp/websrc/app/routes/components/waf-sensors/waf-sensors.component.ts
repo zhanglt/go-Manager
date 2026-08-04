@@ -88,6 +88,7 @@ export class WafSensorsComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Sensors = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -107,6 +108,7 @@ export class WafSensorsComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Rules = params.api;
+        this.updateRuleGrid();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -126,6 +128,7 @@ export class WafSensorsComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi4Patterns = params.api;
+        this.updatePatternGrid();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -144,11 +147,11 @@ export class WafSensorsComponent implements OnInit {
     this.gridOptions4Sensors.onSelectionChanged =
       this.onSelectionChanged4Sensor;
     this.gridOptions4Rules.onSelectionChanged = this.onSelectionChanged4Rule;
-
-    this.refresh();
   }
 
   refresh = (index: number = 0) => {
+    if (!this.gridApi4Sensors) return;
+
     this.getWafSensors(index);
   };
 
@@ -300,10 +303,9 @@ export class WafSensorsComponent implements OnInit {
         response => {
           this.wafSensors = response as Array<WafSensor>;
           this.filteredCount = this.wafSensors.length;
-          setTimeout(() => {
-            let rowNode = this.gridApi4Sensors!.getDisplayedRowAtIndex(index);
-            rowNode?.setSelected(true);
-          }, 200);
+          this.gridApi4Sensors.setGridOption('rowData', this.wafSensors);
+          const rowNode = this.gridApi4Sensors.getDisplayedRowAtIndex(index);
+          rowNode?.setSelected(true);
         },
         error => {}
       );
@@ -316,27 +318,34 @@ export class WafSensorsComponent implements OnInit {
       sensor => sensor.name === (this.selectedSensor?.name || '')
     );
     this.isPredefine = this.selectedSensor?.predefine || false;
-    setTimeout(() => {
-      this.gridApi4Rules!.setGridOption(
-        'rowData',
-        this.selectedSensor?.rules || []
-      );
-      this.gridApi4Patterns!.setGridOption('rowData', []);
-      if (this.selectedSensor?.rules?.length > 0) {
-        let rowNode = this.gridApi4Rules!.getDisplayedRowAtIndex(0);
-        rowNode!.setSelected(true);
-        this.gridApi4Rules!.sizeColumnsToFit();
-      }
-    }, 200);
+    this.updateRuleGrid();
+    if (this.gridApi4Patterns) {
+      this.gridApi4Patterns.setGridOption('rowData', []);
+    }
   };
   private onSelectionChanged4Rule = () => {
     this.selectedRule = this.gridApi4Rules!.getSelectedRows()[0];
-    this.gridApi4Patterns!.setGridOption(
+    this.updatePatternGrid();
+  };
+
+  private updateRuleGrid = () => {
+    if (!this.gridApi4Rules) return;
+
+    const rules = this.selectedSensor?.rules || [];
+    this.gridApi4Rules.setGridOption('rowData', rules);
+    if (rules.length > 0) {
+      this.gridApi4Rules.getDisplayedRowAtIndex(0)?.setSelected(true);
+      this.gridApi4Rules.sizeColumnsToFit();
+    }
+  };
+
+  private updatePatternGrid = () => {
+    if (!this.gridApi4Patterns) return;
+
+    this.gridApi4Patterns.setGridOption(
       'rowData',
       this.selectedRule?.patterns || []
     );
-    setTimeout(() => {
-      this.gridApi4Patterns!.sizeColumnsToFit();
-    }, 200);
+    this.gridApi4Patterns.sizeColumnsToFit();
   };
 }

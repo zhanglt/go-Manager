@@ -41,6 +41,7 @@ export class GroupDlpConfigModalComponent implements OnInit {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -59,7 +60,6 @@ export class GroupDlpConfigModalComponent implements OnInit {
       this.selectedDlpSensors = this.gridApi!.getSelectedRows();
       this.selectedDLPSensorNodes = this.gridApi!.getSelectedNodes();
     };
-    this.refresh();
   }
 
   onCancel = () => {
@@ -67,6 +67,8 @@ export class GroupDlpConfigModalComponent implements OnInit {
   };
 
   refresh = () => {
+    if (!this.gridApi) return;
+
     this.groupsService.getDlpSensorData(this.data.source).subscribe(
       (response: any) => {
         this.dlpSensorOption = response;

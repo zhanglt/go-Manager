@@ -83,6 +83,7 @@ export class ResponseRulesComponent implements OnInit, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -108,8 +109,6 @@ export class ResponseRulesComponent implements OnInit, OnDestroy {
     };
     this.context = { componentParent: this };
     this.responseRulesService.scope = getScope(this.source);
-    this.refresh();
-
     //refresh the page when it switched to a remote cluster
     this.switchClusterSubscription =
       this.multiClusterService.onClusterSwitchedEvent$.subscribe(data => {
@@ -124,6 +123,8 @@ export class ResponseRulesComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
+    if (!this.gridApi) return;
+
     this.refreshing$.next(true);
     if (
       this.source === GlobalConstant.NAV_SOURCE.GROUP ||

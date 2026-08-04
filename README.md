@@ -12,6 +12,57 @@ The images are on the NeuVector Docker Hub registry. Use the appropriate version
 
 Note: Deploying from the Rancher Manager 2.6.5+ NeuVector chart pulls from the rancher-mirrored repo and deploys into the cattle-neuvector-system namespace.
 
+## Build, Test, and Package
+
+The root `Makefile` builds the Angular UI and Go Manager introduced by the Admin backend migration.
+Local source builds require Go 1.25+, Node.js/npm, and `rsync`; image targets require Docker with
+Buildx.
+
+```bash
+make test                 # Run all Go tests.
+make ui-build             # Install UI dependencies and create the Angular production build.
+make manager              # Build the UI and Go Manager binary into bin/manager.
+make package              # Create the non-container distribution under stage/.
+```
+
+Build and verify the production images locally:
+
+```bash
+make build-image VERSION=dev TAG=dev
+make verify-image TAG=dev
+
+make build-fips-image VERSION=dev TAG=dev
+make verify-fips-image TAG=dev
+```
+
+`make test-images` performs non-publishing builds for both `linux/amd64` and `linux/arm64`, including
+the normal and FIPS-only targets. Cross-architecture builds require arm64 binfmt/QEMU support; the
+release workflow configures it automatically. `runtime-fips` enforces `GODEBUG=fips140=only`, but the
+result is not a certified FIPS artifact until the approved toolchain and release evidence are signed
+off by the Security/FIPS owner.
+
+`make verify-image` and `make verify-fips-image` run the container as UID/GID `1000:1000` with all
+Linux capabilities dropped, a read-only root filesystem, and a bounded `/tmp` tmpfs. The smoke test
+also verifies the support executable and the IP geolocation and CIS/NIST data files at their final
+runtime paths.
+
+The `make push-image` and `make push-fips-image` targets publish multi-architecture images with SPDX
+SBOM and SLSA provenance attestations. Common overrides include:
+
+- `VERSION` and `TAG`: binary/OCI version metadata and image tag.
+- `REPO` and `IMAGE_PREFIX`: destination repository and image-name prefix.
+- `TARGET_PLATFORMS`: comma-separated platforms; defaults to `linux/amd64,linux/arm64`.
+- `GOPROXY` and `PIP_INDEX_URL`: dependency mirrors for restricted build environments.
+- `IMAGE_ARGS`: additional arguments passed to `docker buildx build`.
+
+For example, to use regional dependency mirrors:
+
+```bash
+make build-image TAG=dev \
+  GOPROXY=https://goproxy.cn,direct \
+  PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
 # Bugs & Issues
 Please submit bugs and issues to [neuvector/neuvector](//github.com/neuvector/neuvector/issues) with a title starting with `[UI] `.
 

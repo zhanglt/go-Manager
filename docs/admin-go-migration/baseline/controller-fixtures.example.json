@@ -1,0 +1,1310 @@
+{
+  "schema_version": 1,
+  "max_request_bytes": 52428800,
+  "rules": [
+    {
+      "id": "login-success",
+      "match": {
+        "method": "POST",
+        "path": "/v1/auth"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "json": {
+          "password_days_until_expire": -1,
+          "need_to_reset_password": false,
+          "token": {
+            "token": "fixture-token-1234567890",
+            "fullname": "Fixture User",
+            "server": "local",
+            "username": "fixture-user",
+            "email": "fixture@example.invalid",
+            "role": "admin",
+            "locale": "en",
+            "timeout": 300,
+            "default_password": false,
+            "modify_password": false,
+            "role_domains": {},
+            "extra_permissions": [],
+            "global_permissions": [],
+            "remote_global_permissions": [],
+            "domain_permissions": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "controller-unavailable",
+      "match": {
+        "method": "GET",
+        "path": "/v1/test/unavailable"
+      },
+      "response": {
+        "close_connection": true
+      }
+    },
+    {
+      "id": "local-saml-auth-server-success",
+      "match": {"method": "GET", "path": "/v1/token_auth_server", "headers": {"X-R-SSO": "false"}},
+      "response": {"status": 200, "json": {"saml": {"enabled": true, "issuer": "fixture"}}}
+    },
+    {"id": "saml-login-success", "match": {"method": "POST", "path": "/v1/auth/saml1"}, "response": {"status": 200, "json": {"password_days_until_expire": -1, "need_to_reset_password": false, "token": {"token": "fixture-token-1234567890", "fullname": "Fixture User", "server": "local", "username": "fixture-user", "email": "fixture@example.invalid", "role": "admin", "locale": "en", "timeout": 300, "default_password": false, "modify_password": false, "role_domains": {}, "extra_permissions": [], "global_permissions": [], "remote_global_permissions": [], "domain_permissions": {}}}}},
+    {"id": "openid-login-success", "match": {"method": "POST", "path": "/v1/auth/openId1"}, "response": {"status": 200, "json": {"password_days_until_expire": -1, "need_to_reset_password": false, "token": {"token": "fixture-token-1234567890", "fullname": "Fixture User", "server": "local", "username": "fixture-user", "email": "fixture@example.invalid", "role": "admin", "locale": "en", "timeout": 300, "default_password": false, "modify_password": false, "role_domains": {}, "extra_permissions": [], "global_permissions": [], "remote_global_permissions": [], "domain_permissions": {}}}}},
+    {
+      "id": "local-saml-auth-server-slo-success",
+      "match": {"method": "GET", "path": "/v1/token_auth_server/saml1/slo"},
+      "response": {"status": 200, "json": {"logout_url": "https://idp.example.invalid/logout"}}
+    },
+    {
+      "id": "self-user-success",
+      "match": {
+        "method": "GET",
+        "path": "/v1/selfuser"
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "global_permissions": [],
+          "remote_global_permissions": [],
+          "domain_permissions": {},
+          "password_days_until_expire": -1,
+          "user": {
+            "fullname": "Fixture User",
+            "server": "local",
+            "username": "fixture-user",
+            "password": "",
+            "email": "fixture@example.invalid",
+            "role": "admin",
+            "locale": "en",
+            "timeout": 300,
+            "default_password": false,
+            "modify_password": false,
+            "password_resettable": true,
+            "blocked_for_failed_login": false,
+            "blocked_for_password_expired": false,
+            "role_domains": {},
+            "extra_permissions": [],
+            "extra_permissions_domains": []
+          }
+        }
+      }
+    },
+    {
+      "id": "heartbeat-success",
+      "match": {
+        "method": "PATCH",
+        "path": "/v1/auth",
+        "headers": {
+          "X-Auth-Token": "fixture-token-1234567890"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "status": "ok"
+        }
+      }
+    },
+    {"id": "remote-auth-validation-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/auth"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "dashboard-details-hosts", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/host", "query": {"start": "0", "limit": "0", "f_domain": "team"}}, "response": {"status": 200, "json": {"hosts": [{"id": "host-one", "name": "node-one", "os": "linux", "scan_summary": {"status": "finished", "critical": 0, "high": 2, "medium": 1}}], "error": null}}},
+    {"id": "dashboard-details-groups", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group", "query": {"view": "pod", "scope": "local", "f_domain": "team"}}, "response": {"status": 200, "json": {"groups": [{"domain": "team", "name": "nv.web", "policy_mode": "protect", "platform_role": "", "members": [{"id": "workload-one", "name": "web", "display_name": "Web", "domain": "team", "policy_mode": "protect", "image": "nginx", "state": "protect"}], "not_scored": false, "kind": "container"}], "error": null}}},
+    {"id": "dashboard-details-rules", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/policy/rule", "query": {"f_domain": "team"}}, "response": {"status": 200, "json": {"rules": [{"id": 1, "from": "nv.web", "to": "external", "applications": ["https"]}], "error": null}}},
+    {"id": "dashboard-details-workloads", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload", "query": {"view": "pod"}, "headers": {"X-Nv-Page": "dashboard"}}, "response": {"status": 200, "json": {"workloads": [{"id": "workload-one", "display_name": "Web", "state": "protect", "service": "web", "platform_role": "", "domain": "team", "critical4Dashboard": null, "high4Dashboard": null, "medium4Dashboard": null, "scan_summary": {"status": "finished", "critical": 1, "high": 2, "medium": 0}, "children": null}], "error": null}}},
+    {"id": "dashboard-details-conversations", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/conversation", "query": {"f_domain": "team"}}, "response": {"status": 200, "json": {"endpoints": [], "conversations": [{"from": "workload-one", "to": "external", "bytes": 42, "sessions": 1, "severity": null, "policy_action": "allow", "event_type": null, "protocols": ["tcp"], "applications": ["https"], "ports": ["443"], "sidecar_proxy": null}], "error": null}}},
+    {"id": "dashboard-details-scan-config", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/config", "headers": {"X-Nv-Page": "dashboard"}}, "response": {"status": 200, "json": {"config": {"auto_scan": true, "enable_auto_scan_workload": true, "enable_auto_scan_host": true}, "error": null}}},
+    {"id": "network-graph-conversation", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/conversation"}, "response": {"status": 200, "json": {"endpoints": [{"id": "workload-a", "name": "backend", "display_name": "", "state": "protect", "kind": "container", "platform_role": "controller", "service_group": "ns.team.app", "domain": "team", "share_ns_with": null, "policy_mode": "enforce", "scan_summary": {"status": "finished", "critical": 1, "high": 2, "medium": 3}, "cap_quarantine": true, "cap_change_mode": true, "cap_sniff": false, "service_mesh": false, "service_mesh_sidecar": null, "children": null}, {"id": "workload-b", "name": "db", "display_name": "Database", "state": "monitor", "kind": "container", "platform_role": null, "service_group": "ns.team.app", "domain": "team", "share_ns_with": null, "policy_mode": "monitor", "scan_summary": null, "cap_quarantine": false, "cap_change_mode": false, "cap_sniff": false, "service_mesh": null, "service_mesh_sidecar": null, "children": null}], "conversations": [{"from": "workload-a", "to": "workload-b", "bytes": 9, "sessions": 1, "severity": "", "policy_action": "allow", "event_type": ["dlp"], "protocols": ["tcp"], "applications": ["https"], "ports": ["443"], "sidecar_proxy": true}], "error": null}}},
+    {
+      "id": "logout-success",
+      "match": {
+        "method": "DELETE",
+        "path": "/v1/auth",
+        "headers": {
+          "X-Auth-Token": "fixture-token-1234567890"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "status": "ok"
+        }
+      }
+    },
+    {
+      "id": "eula-success",
+      "match": {
+        "method": "GET",
+        "path": "/v1/eula",
+        "headers": {
+          "X-R-SSO": "false"
+        }
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "eula": {
+            "accepted": false
+          }
+        }
+      }
+    },
+    {
+      "id": "remote-permission-options-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/user_role_permission/options"},
+      "response": {"status": 200, "json": {"permissions": []}}
+    },
+    {
+      "id": "remote-role-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/user_role"},
+      "response": {"status": 200, "json": {"roles": []}}
+    },
+    {
+      "id": "remote-role-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/user_role"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-role-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/user_role/custom-role"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-role-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/user_role/custom-role"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-api-key-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/api_key"},
+      "response": {"status": 200, "json": {"apikeys": []}}
+    },
+    {
+      "id": "remote-api-key-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/api_key"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-api-key-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/api_key/ci-key"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "single-user-success",
+      "match": {"method": "GET", "path": "/v1/user/fixture-user"},
+      "response": {
+        "status": 200,
+        "json": {
+          "user": {
+            "fullname": "Fixture User", "server": "local", "username": "fixture-user",
+            "password": "", "email": "fixture@example.invalid", "role": "admin",
+            "locale": "en", "timeout": 120, "default_password": false,
+            "modify_password": false, "password_resettable": true,
+            "blocked_for_failed_login": false, "blocked_for_password_expired": false,
+            "role_domains": {}, "extra_permissions": [], "extra_permissions_domains": []
+          }
+        }
+      }
+    },
+    {
+      "id": "remote-user-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/user"},
+      "response": {
+        "status": 200,
+        "json": {
+          "domain_roles": ["reader"], "global_roles": ["admin"],
+          "roles_not_for_domain": ["fedAdmin"],
+          "users": [{
+            "fullname": "Fixture User", "server": "local", "username": "fixture-user",
+            "password": "", "email": "fixture@example.invalid", "role": "admin",
+            "locale": "en", "timeout": 120, "default_password": false,
+            "modify_password": false, "password_resettable": true,
+            "blocked_for_failed_login": false, "blocked_for_password_expired": false,
+            "role_domains": {}, "extra_permissions": [], "extra_permissions_domains": []
+          }]
+        }
+      }
+    },
+    {
+      "id": "remote-user-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/user"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-user-update-success",
+      "match": {"method": "PATCH", "path": "/v1/user/Fixture%20User"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-user-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/user/fixture-user"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-password-public-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/password_profile/nvsyspwdprofile"},
+      "response": {"status": 200, "json": {"config": {"name": "nvsyspwdprofile", "min_len": 8}}}
+    },
+    {
+      "id": "remote-password-profile-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/password_profile"},
+      "response": {"status": 200, "json": {"config": {"name": "default", "min_len": 8}}}
+    },
+    {
+      "id": "remote-user-block-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/user/fixture-user/password"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-password-profile-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/password_profile/default"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-eula-update-success",
+      "match": {"method": "POST", "path": "/v1/eula"},
+      "response": {"status": 200, "json": {"eula": {"accepted": true}}}
+    },
+    {
+      "id": "remote-license-get-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/system/license"},
+      "response": {"status": 200, "json": {"license": {"name": "fixture-license"}}}
+    },
+    {
+      "id": "remote-license-request-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/license/request"},
+      "response": {"status": 200, "json": {"license_code": "fixture-code"}}
+    },
+    {
+      "id": "remote-license-update-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/license/update"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-server-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/server"},
+      "response": {"status": 200, "json": {"servers": []}}
+    },
+    {
+      "id": "remote-server-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/server"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-server-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/server/ldap1"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-server-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/server/ldap1"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-server-test-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/debug/server/test"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-member-success",
+      "match": {"method": "GET", "path": "/v1/fed/member"},
+      "response": {"status": 200, "json": {
+        "fed_role": "master",
+        "local_rest_info": {"server": "controller.example.invalid", "port": 10443},
+        "master_cluster": {
+          "disabled": false, "name": "primary", "id": "master-one", "secret": "fixture-master-secret",
+          "user": "fixture-user", "status": "connected", "rest_version": "v1",
+          "rest_info": {"server": "master.example.invalid", "port": 10443}
+        },
+        "joint_clusters": [{
+          "disabled": false, "name": "member", "id": "member-one", "secret": "fixture-member-secret",
+          "user": null, "status": "connected", "rest_version": "v1",
+          "rest_info": {"server": "member.example.invalid", "port": 10443}, "proxy_required": true
+        }],
+        "use_proxy": null, "deploy_repo_scan_data": true
+      }}
+    },
+    {
+      "id": "local-fed-summary-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/system/summary"},
+      "response": {"status": 200, "json": {"summary": {"cluster_id": "member-one"}}}
+    },
+    {
+      "id": "local-fed-promote-success",
+      "match": {"method": "POST", "path": "/v1/fed/promote"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-demote-success",
+      "match": {"method": "POST", "path": "/v1/fed/demote"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-join-token-success",
+      "match": {"method": "GET", "path": "/v1/fed/join_token"},
+      "response": {"status": 200, "json": {"join_token": "fixture-federation-join-token"}}
+    },
+    {
+      "id": "local-fed-join-success",
+      "match": {"method": "POST", "path": "/v1/fed/join"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-leave-success",
+      "match": {"method": "POST", "path": "/v1/fed/leave"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-config-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-fed-deploy-success",
+      "match": {"method": "POST", "path": "/v1/fed/deploy"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-enforcer-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/enforcer"},
+      "response": {"status": 200, "json": {"enforcers": []}}
+    },
+    {
+      "id": "remote-enforcer-stats-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/enforcer/enforcer-one/stats"},
+      "response": {"status": 200, "json": {"stats": {"id": "enforcer-one"}}}
+    },
+    {
+      "id": "remote-enforcer-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/enforcer/enforcer-one"},
+      "response": {"status": 200, "json": {"enforcer": {"id": "enforcer-one"}}}
+    },
+    {
+      "id": "remote-controller-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/controller"},
+      "response": {"status": 200, "json": {"controllers": []}}
+    },
+    {
+      "id": "remote-controller-stats-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/controller/controller-one/stats"},
+      "response": {"status": 200, "json": {"stats": {"id": "controller-one"}}}
+    },
+    {
+      "id": "remote-scanner-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/scanner"},
+      "response": {"status": 200, "json": {"scanners": []}}
+    },
+    {
+      "id": "remote-system-summary-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/system/summary"},
+      "response": {"status": 200, "json": {"summary": {"hosts": 0, "workloads": 0}}}
+    },
+    {
+      "id": "local-ibm-sa-setup-success",
+      "match": {"method": "GET", "path": "/v1/partner/ibm_sa_ep"},
+      "response": {"status": 200, "json": {"configured": false}}
+    },
+    {
+      "id": "local-system-usage-success",
+      "match": {"method": "GET", "path": "/v1/system/usage"},
+      "response": {"status": 200, "json": {"usage": {"hosts": 0}}}
+    },
+    {
+      "id": "remote-host-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/host"},
+      "response": {"status": 200, "json": {"hosts": []}}
+    },
+    {
+      "id": "remote-host-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/host/host-one"},
+      "response": {"status": 200, "json": {"host": {"id": "host-one"}}}
+    },
+    {
+      "id": "remote-host-workloads-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload",
+        "query": {"view": "pod", "f_host_id": "host-one"}
+      },
+      "response": {"status": 200, "json": {"workloads": []}}
+    },
+    {
+      "id": "remote-host-compliance-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/host/host-one/compliance"},
+      "response": {"status": 200, "json": {"items": []}}
+    },
+    {
+      "id": "remote-host-scan-report-success",
+      "match": {
+        "method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/hosts/scan_report",
+        "body_sha256": "090abc9f05741b35ff8b4ffa67366021192ae2ad9181fe4bad3272539f247b12"
+      },
+      "response": {"status": 200, "json": {"report": {"hosts": []}}}
+    },
+    {
+      "id": "local-webhook-create-success",
+      "match": {"method": "POST", "path": "/v1/system/config/webhook"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-webhook-update-success",
+      "match": {
+        "method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/system/config/webhook/alerts",
+        "query": {"scope": "local"}
+      },
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-webhook-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/system/config/webhook/alerts", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-system-config-success",
+      "match": {"method": "GET", "path": "/v1/system/config", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"config": {"cluster_name": "fixture-cluster"}}}
+    },
+    {
+      "id": "remote-system-config-update-success",
+      "match": {
+        "method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/system/config",
+        "query": {"scope": "fed"}
+      },
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-system-config-v2-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v2/system/config",
+        "query": {"scope": "fed"}, "headers": {"X-Nv-Page": "settings"}
+      },
+      "response": {"status": 200, "json": {"config_v2": {"misc_cfg": {"cluster_name": "fixture-cluster"}}}}
+    },
+    {
+      "id": "remote-system-config-v2-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v2/system/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-config-all-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "query": {"raw": "true"}
+      },
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-all-config"}
+    },
+    {
+      "id": "remote-file-config-policy-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "query": {"section": "policy", "raw": "true"}
+      },
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-policy-config"}
+    },
+    {
+      "id": "remote-file-export-fed-scala-order-success",
+      "match": {
+        "method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/fed_config",
+        "body_sha256": "a5d285f564fd4ca3a1ca6a32814485f7511046499f869c87029d9bd01289f717"
+      },
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-fed-config"}
+    },
+    {
+      "id": "remote-file-export-fed-go-order-success",
+      "match": {
+        "method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/fed_config",
+        "body_sha256": "85384050e247c1a2984795d6a7094d69138e3bc0d3ea749793c675aad631e3b4"
+      },
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-fed-config"}
+    },
+    {
+      "id": "remote-file-config-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "headers": {"X-Transaction-Id": "tx-local", "X-As-Standalone": "true"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-config-multipart-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "headers": {"X-As-Standalone": "false"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-config-fed-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "query": {"scope": "fed"}, "headers": {"X-Transaction-Id": "tx-fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-config-fed-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/config",
+        "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-export-local-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group", "query": {"scope": "local"}},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-group-export"}
+    },
+    {
+      "id": "remote-group-export-fed-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group", "query": {"scope": "fed"}},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-group-export-fed"}
+    },
+    {
+      "id": "remote-group-import-local-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group/config",
+        "query": {"scope": "local"}, "headers": {"X-Transaction-Id": "tx-group-local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-import-local-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group/config", "query": {"scope": "local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-import-fed-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group/config",
+        "query": {"scope": "fed"}, "headers": {"X-Transaction-Id": "tx-group-fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-import-fed-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/group/config", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-response-policy-export-local-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule", "query": {"scope": "local"}},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-response-export"}
+    },
+    {
+      "id": "remote-response-policy-export-fed-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule", "query": {"scope": "fed"}},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-response-export-fed"}
+    },
+    {
+      "id": "remote-response-policy-import-local-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule/config",
+        "query": {"scope": "local"}, "headers": {"X-Transaction-Id": "tx-response-local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-response-policy-import-local-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule/config", "query": {"scope": "local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-response-policy-import-fed-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule/config",
+        "query": {"scope": "fed"}, "headers": {"X-Transaction-Id": "tx-response-fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-response-policy-import-fed-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/response/rule/config", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {"id": "remote-response-rule-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/response/rule/7"}, "response": {"status": 200, "json": {"response_rule": {"id": 7}}}},
+    {"id": "remote-response-policy-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/response/rule", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"response_rules": []}}},
+    {"id": "local-response-policy-get-fed-success", "match": {"method": "GET", "path": "/v1/response/rule", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"response_rules": []}}},
+    {"id": "local-response-policy-create-fed-success", "match": {"method": "PATCH", "path": "/v1/response/rule"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-response-policy-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/response/rule/7"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-response-policy-delete-fed-success", "match": {"method": "DELETE", "path": "/v1/response/rule/7", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-fed-deploy-success", "match": {"method": "POST", "path": "/v1/fed/deploy"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-condition-options-fed-success", "match": {"method": "GET", "path": "/v1/response/options", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"options": []}}},
+    {"id": "remote-unquarantine-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/request"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-policy-applications-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/list/application"}, "response": {"status": 200, "json": {"applications": []}}},
+    {"id": "remote-policy-rule-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/policy/rule/7"}, "response": {"status": 200, "json": {"rule": {"id": 7}}}},
+    {"id": "remote-policy-rule-create-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/policy/rule"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-policy-rule-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/policy/rule/7"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-policy-rule-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/policy/rule/7"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-policy-update-fed-success", "match": {"method": "PATCH", "path": "/v1/policy/rule", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {
+      "id": "remote-policy-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/policy/rule"},
+      "response": {"status": 200, "gzip": true, "json": {"rules": [
+        {"id": 7, "comment": null, "from": "group-one", "to": "nv.external", "applications": ["TLS"],
+          "ports": null, "action": "deny", "learned": false, "cfg_type": "user_created", "disable": false,
+          "last_modified_timestamp": null},
+        {"id": 8, "comment": "fixture", "from": "nv.external", "to": "group-one", "applications": null,
+          "ports": "443", "action": "allow", "learned": false, "cfg_type": "user_created", "disable": false,
+          "last_modified_timestamp": 100}
+      ]}}
+    },
+    {
+      "id": "local-policy-list-federal-success",
+      "match": {"method": "GET", "path": "/v1/policy/rule", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"rules": []}}
+    },
+    {"id": "local-admission-rules-fed-success", "match": {"method": "GET", "path": "/v1/admission/rules", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"rules": []}}},
+    {"id": "local-admission-rule-create-fed-success", "match": {"method": "POST", "path": "/v1/admission/rule"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-rule-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/admission/rule"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-admission-rule-delete-fed-success", "match": {"method": "DELETE", "path": "/v1/admission/rule/7", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-admission-options-fed-success", "match": {"method": "GET", "path": "/v1/admission/options", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"options": []}}},
+    {"id": "remote-admission-state-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/admission/state"}, "response": {"status": 200, "json": {"state": {"enable": true}}}},
+    {"id": "remote-admission-state-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/admission/state"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-test-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/debug/admission/test"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-matching-test-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/assess/admission/rule"}, "response": {"status": 200, "json": {"matched": false}}},
+    {"id": "remote-admission-export-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/admission", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-export-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/admission", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-import-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/admission/config", "query": {"scope": "local"}, "headers": {"X-Transaction-Id": "tx-admission"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-import-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/admission/config", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-admission-promote-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/admission/rule/promote"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-scan-status-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/status"}, "response": {"status": 200, "json": {"status": "idle"}}},
+    {"id": "remote-scan-host-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/host/host-one", "query": {"show": "all"}}, "response": {"status": 200, "json": {"host": {"id": "host-one"}}}},
+    {"id": "remote-scan-host-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/host/host-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-scan-platform-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/platform/platform", "query": {"show": "all"}}, "response": {"status": 200, "json": {"platform": {}}}},
+    {"id": "remote-scan-platform-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/platform/platform"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-scan-config-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/config"}, "response": {"status": 200, "json": {"config": {"auto_scan": true}}}},
+    {"id": "remote-scan-config-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/scan/config"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-types-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/list/registry_type"}, "response": {"status": 200, "json": {"types": []}}},
+    {"id": "remote-policy-promote-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/policy/rules/promote"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-scan-workload-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/workload/workload-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {
+      "id": "remote-scan-workload-summary-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/workload",
+        "query": {"view": "pod", "start": "0", "limit": "0"}},
+      "response": {"status": 200, "json": {"workloads": [{
+        "id": "workload-one", "name": "pod-one", "base_os": "alpine", "display_name": "Pod One",
+        "domain": "team-one", "critical": 1, "high": 2, "medium": 3, "host": "host-one",
+        "image": "repo/image:one", "platform_role": "", "policy_mode": null, "result": "finished",
+        "service": "service-one", "service_group": "nv.service-one", "state": "running", "status": "scanned",
+        "scanner_version": "fixture", "children": [{"id": "child-one", "name": "container-one",
+          "base_os": "alpine", "display_name": "Container One", "domain": "team-one", "critical": 4,
+          "high": 5, "medium": 6, "host": "host-one", "image": "repo/image:one", "platform_role": "",
+          "policy_mode": null, "result": "finished", "service": "service-one",
+          "service_group": "nv.service-one", "state": "running", "status": "scanned",
+          "scanner_version": "fixture", "scanned_timestamp": 100, "scanned_at": "fixture-time"}],
+        "scanned_timestamp": 100, "scanned_at": "fixture-time"
+      }], "status": {"scanned": 1, "scheduled": 0, "scanning": 0, "failed": 0,
+        "cvedb_version": "fixture", "cvedb_create_time": "fixture-time"}}}
+    },
+    {
+      "id": "remote-scan-workload-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/workload/workload-one",
+        "query": {"show": "all"}},
+      "response": {"status": 200, "json": {"report": {"id": "workload-one"}}}
+    },
+    {"id": "remote-registry-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one"}, "response": {"status": 200, "json": {"registry": {"name": "repo-one"}}}},
+    {"id": "remote-registry-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-repo-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one/images"}, "response": {"status": 200, "json": {"images": []}}},
+    {"id": "remote-registry-repo-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one/scan"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-repo-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one/scan"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-fed-repo-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/registry/fed-repo-one/images"}, "response": {"status": 200, "json": {"images": []}}},
+    {"id": "remote-registry-image-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one/image/image-one", "query": {"show": "all"}}, "response": {"status": 200, "json": {"report": {}}}},
+    {"id": "remote-registry-layer-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-one/layers/image-one", "query": {"show": "Some(all)"}}, "response": {"status": 200, "json": {"report": {}}}},
+    {"id": "remote-scan-top-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/image", "query": {"s_severity": "desc", "start": "0", "limit": "5"}}, "response": {"status": 200, "json": {"images": []}}},
+    {"id": "remote-registry-create-v2-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v2/scan/registry"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-update-v2-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v2/scan/registry/repo-two"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-test-v1-transaction-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-test/test", "headers": {"X-Transaction-Id": "tx-registry"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-registry-test-delete-v1-transaction-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/scan/registry/repo-test/test", "headers": {"X-Transaction-Id": "tx-registry"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-risk-cve-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/asset", "query": {"show": "all"}}, "response": {"status": 200, "json": {"assets": []}}},
+    {"id": "remote-risk-cve-assets-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/assetvul", "query": {"token": "query-one"}}, "response": {"status": 200, "json": {"token": "result-one"}}},
+    {"id": "remote-risk-compliance-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/compliance/asset"}, "response": {"status": 200, "json": {"compliances": []}}},
+    {"id": "remote-risk-compliance-template-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/list/compliance"}, "response": {"status": 200, "json": {"items": []}}},
+    {"id": "remote-risk-compliance-filter-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/compliance/available_filter"}, "response": {"status": 200, "json": {"filters": []}}},
+    {"id": "remote-scanned-assets-query-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/asset/images"}, "response": {"status": 200, "json": {"token": "page-one"}}},
+    {"id": "remote-scanned-assets-page-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/asset/images", "query": {"token": "page-one", "start": "0", "row": "20", "orderby": "desc", "orderbyColumn": "severity", "qf": "name=fixture image"}}, "response": {"status": 200, "json": {"images": []}}},
+    {"id": "remote-vulasset-query-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/vulasset"}, "response": {"status": 200, "json": {"token": "vul-page-one"}}},
+    {"id": "remote-vulasset-page-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/vulasset", "query": {"token": "vul-page-one", "start": "20", "row": "10", "lastmtime": "123", "orderby": "asc", "orderbyColumn": "name", "qf": "domain=prod", "scoretype": "v3"}}, "response": {"status": 200, "json": {"assets": []}}},
+    {
+      "id": "remote-risk-cve-profile-export-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/vulnerability/profile"},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-cve-profile-export"}
+    },
+    {
+      "id": "remote-risk-cve-profile-import-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/vulnerability/profile/config",
+        "query": {"option": "replace"}, "headers": {"X-Transaction-Id": "tx-cve-profile"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-cve-profile-import-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/vulnerability/profile/config", "query": {"option": "merge"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-compliance-profile-export-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/compliance/profile"},
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-compliance-profile-export"}
+    },
+    {
+      "id": "remote-risk-compliance-profile-import-transaction-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/compliance/profile/config",
+        "headers": {"X-Transaction-Id": "tx-compliance-profile"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-compliance-profile-import-form-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/compliance/profile/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-cve-profile-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/vulnerability/profile"},
+      "response": {"status": 200, "json": {"profiles": []}}
+    },
+    {
+      "id": "remote-risk-cve-profile-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/vulnerability/profile/profile-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-cve-profile-entry-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/vulnerability/profile/profile-one/entry"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-cve-profile-entry-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/vulnerability/profile/profile-one/entry/7"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-cve-profile-entry-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/vulnerability/profile/profile-one/entry/7"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-risk-compliance-profile-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/compliance/profile"},
+      "response": {"status": 200, "json": {"profiles": []}}
+    },
+    {
+      "id": "remote-risk-compliance-profile-single-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/compliance/profile/profile-one"},
+      "response": {"status": 200, "json": {"profile": {"name": "profile-one", "disable_system": false, "entries": []}}}
+    },
+    {
+      "id": "remote-risk-compliance-profile-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/compliance/profile/profile-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group",
+        "query": {"start": "0", "brief": "true", "scope": "local", "f_kind": "container"}},
+      "response": {"status": 200, "json": {"groups": []}}
+    },
+    {
+      "id": "remote-group-query-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group",
+        "query": {"view": "pod", "with_cap": "false"}},
+      "response": {"status": 200, "json": {"groups": [{"name": "group-one", "comment": "fixture",
+        "domain": "prod", "learned": false, "reserved": false,
+        "criteria": [{"key": "image", "value": "nginx", "op": "contains"}], "members": [],
+        "policy_rules": [1], "response_rules": null, "policy_mode": null, "profile_mode": "basic",
+        "baseline_profile": null, "platform_role": "", "cap_change_mode": true, "cap_scorable": null,
+        "kind": "container", "cfg_type": "user_created", "not_scored": false, "monitor_metric": true,
+        "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30}]}}
+    },
+    {
+      "id": "local-group-query-list-federal-success",
+      "match": {"method": "GET", "path": "/v1/group", "query": {"view": "pod", "scope": "fed"}},
+      "response": {"status": 200, "json": {"groups": []}}
+    },
+    {
+      "id": "remote-policy-graph-groups-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group"},
+      "response": {"status": 200, "json": {"groups": [
+        {"name": "group-one", "comment": "fixture", "domain": "prod", "learned": false, "reserved": false,
+          "criteria": [], "members": [], "policy_rules": [7], "response_rules": null, "policy_mode": null,
+          "profile_mode": "basic", "baseline_profile": null, "platform_role": "", "cap_change_mode": true,
+          "cap_scorable": null, "kind": "container", "cfg_type": "user_created", "not_scored": false,
+          "monitor_metric": true, "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30},
+        {"name": "nv.external", "comment": "external", "domain": "", "learned": false, "reserved": true,
+          "criteria": [], "members": [], "policy_rules": [], "response_rules": null, "policy_mode": null,
+          "profile_mode": null, "baseline_profile": null, "platform_role": "", "cap_change_mode": false,
+          "cap_scorable": null, "kind": "address", "cfg_type": "ground", "not_scored": false,
+          "monitor_metric": false, "group_sess_cur": 0, "group_sess_rate": 0, "group_band_width": 0}
+      ]}}
+    },
+    {
+      "id": "remote-service-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/service",
+        "query": {"view": "pod", "with_cap": "false"}},
+      "response": {"status": 200, "json": {"services": []}}
+    },
+    {
+      "id": "remote-service-single-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/service/service-one",
+        "query": {"view": "pod", "with_cap": "true"}},
+      "response": {"status": 200, "json": {"service": {"name": "service-one"}}}
+    },
+    {
+      "id": "remote-service-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/service/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-service-create-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/system/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-service-all-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/request"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-process-profile-single-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/process_profile/group-one"},
+      "response": {"status": 200, "json": {"process_profile": {"group": "group-one"}}}
+    },
+    {
+      "id": "remote-process-profile-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/process_profile",
+        "query": {"start": "0", "limit": "1000"}},
+      "response": {"status": 200, "json": {"process_profiles": []}}
+    },
+    {
+      "id": "local-process-profile-list-federal-success",
+      "match": {"method": "GET", "path": "/v1/process_profile",
+        "query": {"start": "0", "limit": "1000", "scope": "fed"}},
+      "response": {"status": 200, "json": {"process_profiles": []}}
+    },
+    {
+      "id": "remote-process-profile-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/process_profile/group-one",
+        "query": {"scope": "local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-process-profile-update-federal-success",
+      "match": {"method": "PATCH", "path": "/v1/process_profile/group-one", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-profile-single-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/file_monitor/group-one"},
+      "response": {"status": 200, "json": {"profile": {"group": "group-one", "filters": []}}}
+    },
+    {
+      "id": "remote-file-profile-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/file_monitor",
+        "query": {"start": "0", "limit": "1000"}},
+      "response": {"status": 200, "json": {"profiles": []}}
+    },
+    {
+      "id": "local-file-profile-list-federal-success",
+      "match": {"method": "GET", "path": "/v1/file_monitor",
+        "query": {"start": "0", "limit": "1000", "scope": "fed"}},
+      "response": {"status": 200, "json": {"profiles": []}}
+    },
+    {
+      "id": "remote-file-profile-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/file_monitor/group-one",
+        "query": {"scope": "local"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-file-profile-update-federal-success",
+      "match": {"method": "PATCH", "path": "/v1/file_monitor/group-one", "query": {"scope": "fed"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-file-pre-profile-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/file_monitor/group-one",
+        "query": {"predefined": ""}},
+      "response": {"status": 200, "json": {"profile": {"group": "group-one", "filters": []}}}
+    },
+    {"id": "remote-dlp-sensor-list-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/dlp/sensor", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"sensors": []}}},
+    {"id": "remote-dlp-sensor-single-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/dlp/sensor/sensor-one"}, "response": {"status": 200, "json": {"sensor": {"name": "sensor-one"}}}},
+    {"id": "remote-dlp-sensor-create-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/dlp/sensor"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/dlp/sensor/sensor-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/dlp/sensor/sensor-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-export-local-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/dlp", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-export-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/dlp", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-import-local-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/dlp/config", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-sensor-import-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/dlp/config", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dlp-group-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/dlp/group/group-one"}, "response": {"status": 200, "json": {"dlp_group": {"name": "group-one", "status": true, "sensors": []}}}},
+    {"id": "remote-dlp-group-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/dlp/group/group-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-list-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/waf/sensor", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"sensors": []}}},
+    {"id": "remote-waf-sensor-single-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/waf/sensor/sensor-one"}, "response": {"status": 200, "json": {"sensor": {"name": "sensor-one"}}}},
+    {"id": "remote-waf-sensor-create-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/waf/sensor"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/waf/sensor/sensor-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/waf/sensor/sensor-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-export-local-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/waf", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-export-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/waf", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-import-local-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/waf/config", "query": {"scope": "local"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-sensor-import-fed-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/file/waf/config", "query": {"scope": "fed"}}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-waf-group-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/waf/group/group-one"}, "response": {"status": 200, "json": {"waf_group": {"name": "group-one", "status": true, "sensors": []}}}},
+    {"id": "remote-waf-group-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/waf/group/group-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-bench-docker-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/bench/host/host-one/docker"}, "response": {"status": 200, "json": {"items": []}}},
+    {"id": "remote-bench-docker-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/bench/host/host-one/docker"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-bench-kubernetes-get-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/bench/host/host-one/kubernetes"}, "response": {"status": 200, "json": {"items": []}}},
+    {"id": "remote-bench-kubernetes-post-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/bench/host/host-one/kubernetes"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-csp-support-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/csp/file/support"}, "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "support-file"}},
+    {"id": "remote-dashboard-alerts-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/system/alerts", "headers": {"X-Nv-Page": "globalAlerts"}}, "response": {"status": 200, "json": {"alerts": [{"id": "alert-one", "message": "fixture alert"}]}}},
+    {"id": "remote-dashboard-scores-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/system/score/metrics", "query": {"f_domain": "fixture-domain", "isGlobalUser": "false"}}, "response": {"status": 200, "json": {"security_scores": {"new_service_mode_score": 1}}}},
+    {"id": "remote-dashboard-scores-update-success", "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/score/metrics"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-dashboard-child-summary-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/fed/cluster/child-one/v1/system/summary"}, "response": {"status": 200, "json": {"summary": {"cluster_id": "child-one", "hosts": 2}}}},
+    {"id": "remote-dashboard-child-score-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/fed/cluster/child-one/v1/system/score/metrics"}, "response": {"status": 200, "json": {
+      "security_scores": {"admission_rule_score": 1, "exposure_score": 2, "exposure_score_by_100": 3, "new_service_mode_score": 4, "privileged_container_score": 5, "run_as_root_score": 6, "security_risk_score": 7, "service_mode_score": 8, "service_mode_score_by_100": 9, "vulnerability_score": 10, "vulnerability_score_by_100": 11},
+      "metrics": {"platform": "kubernetes", "kube_version": "1.30", "openshift_version": "", "new_service_policy_mode": "discover", "new_service_profile_mode": "learn", "adm_mode": null, "enabled_deny_adm_ctrl_rules": null, "deny_adm_ctrl_rules": 1, "hosts": 2,
+        "workloads": {"running_pods": 4, "privileged_wls": 0, "root_wls": 1, "discover_ext_eps": 2, "monitor_ext_eps": 3, "protect_ext_eps": 4, "threat_ext_eps": 5, "violate_ext_eps": 6},
+        "groups": {"groups": 7, "discover_groups": 1, "monitor_groups": 2, "protect_groups": 3, "profile_discover_groups": 4, "profile_monitor_groups": 5, "profile_protect_groups": 6, "discover_groups_zero_drift": 7, "monitor_groups_zero_drift": 8, "protect_groups_zero_drift": 9},
+        "cves": {"discover_cves": 1, "monitor_cves": 2, "protect_cves": 3, "platform_cves": 4, "host_cves": 5}},
+      "ingress": [], "egress": []
+    }}},
+    {"id": "remote-log-event-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/event"}, "response": {"status": 200, "json": {"events": []}}},
+    {"id": "remote-log-incident-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/incident"}, "response": {"status": 200, "json": {"incidents": [{
+      "name": "fixture-incident", "level": "critical", "host_name": "",
+      "workload_id": "local-id", "workload_name": "shared-destination", "workload_domain": "local-domain",
+      "remote_workload_id": "remote-id", "remote_workload_name": "shared-source", "remote_workload_domain": "remote-domain",
+      "client_ip": null, "server_ip": "10.0.0.3", "client_port": null, "server_port": 8080,
+      "server_conn_port": 18080, "conn_ingress": true, "proc_path": "/bin/fixture",
+      "reported_timestamp": 1785637500, "reported_at": "2026-08-02T10:25:00+08:00",
+      "cluster_name": "fixture-cluster", "ether_type": 2048, "ip_proto": 6,
+      "proc_name": "fixture", "proc_cmd": null, "proc_real_uid": 1000, "proc_effective_uid": null,
+      "proc_real_user": "fixture", "proc_effective_user": null, "file_path": null, "file_name": null,
+      "message": "fixture incident message"
+    }]}}},
+    {"id": "remote-log-audit-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/audit"}, "response": {"status": 200, "gzip": true, "json": {"audits": [{"id": "audit-one", "message": "fixture one"}, {"id": "audit-two", "message": "fixture two"}]}}},
+    {
+      "id": "remote-log-threat-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/threat"},
+      "response": {"status": 200, "gzip": true, "json": {"threats": [{
+        "id": "threat-one", "name": "fixture-threat", "reported_timestamp": 1785637800,
+        "reported_at": "2026-08-02T10:30:00+08:00", "count": 2,
+        "level": "high", "host_name": "host-one", "cluster_name": "fixture-cluster",
+        "client_workload_id": "client-id", "client_workload_name": "shared-destination", "client_workload_domain": "client-domain",
+        "server_workload_id": "server-id", "server_workload_name": "shared-source", "server_workload_domain": "server-domain",
+        "severity": "high", "action": "allow", "client_port": 12345, "server_port": 443,
+        "server_conn_port": 8443, "client_ip": "10.0.0.1", "server_ip": "10.0.0.2",
+        "application": "TLS", "target": "client", "cap_len": 64, "message": "fixture message",
+        "workload_id": "server-id", "workload_name": "server-name", "src_ip": "10.0.0.1",
+        "dst_ip": "10.0.0.2", "src_port": 12345, "dst_port": 443, "sess_ingress": true
+      }]}}
+    },
+    {
+      "id": "remote-log-threat-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/threat/threat-one"},
+      "response": {"status": 200, "json": {"threat": {"id": "threat-one", "name": "fixture-threat"}}}
+    },
+    {
+      "id": "remote-log-violation-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/violation"},
+      "response": {"status": 200, "json": {"violations": [{
+        "client_id": "client-id", "client_name": "shared-source", "client_domain": "client-domain",
+        "server_id": "server-id", "server_name": "shared-destination", "server_domain": "server-domain",
+        "server_port": 443, "applications": ["TLS"], "reported_timestamp": 1785637200,
+        "reported_at": "2026-08-02T10:20:00+08:00", "policy_id": 7, "level": "medium",
+        "client_ip": "10.0.0.1", "server_ip": "10.0.0.2", "host_name": "host-one", "application": "TLS", "cluster_name": "fixture-cluster",
+        "client_image": "client:fixture", "server_image": "server:fixture", "ip_proto": 6,
+        "servers": null, "sessions": 3, "policy_action": "deny"
+      }]}}
+    },
+    {"id": "remote-log-violation-top-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/log/violation/workload", "query": {"s_client": "desc", "start": "0", "limit": "5"}}, "response": {"status": 200, "json": {"violations": []}}},
+    {"id": "remote-network-session-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/session", "query": {"f_workload": "endpoint-one", "limit": "256"}}, "response": {"status": 200, "json": {"sessions": []}}},
+    {"id": "remote-conversation-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/conversation/from-one/to-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-conversation-history-success", "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/conversation/from-one/to-one"}, "response": {"status": 200, "json": {"history": []}}},
+    {"id": "remote-conversation-endpoint-delete-success", "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/conversation_endpoint/endpoint-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "remote-conversation-endpoint-update-success", "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/conversation_endpoint/endpoint-one"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {"id": "local-notification-accept-success", "match": {"method": "POST", "path": "/v1/internal/alert"}, "response": {"status": 200, "json": {"status": "ok"}}},
+    {
+      "id": "remote-group-query-single-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group/group-one",
+        "query": {"view": "pod", "with_cap": "true"}},
+      "response": {"status": 200, "json": {"group": {"name": "group-one", "comment": "fixture",
+        "domain": "prod", "learned": false, "reserved": false,
+        "criteria": [{"key": "image", "value": "nginx", "op": "contains"}], "members": [],
+        "policy_rules": [], "response_rules": [], "policy_mode": null, "profile_mode": "basic",
+        "baseline_profile": null, "platform_role": "", "cap_change_mode": true, "cap_scorable": null,
+        "kind": "container", "cfg_type": "user_created", "not_scored": false, "monitor_metric": true,
+        "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30}}}
+    },
+    {
+      "id": "remote-group-query-single-scoped-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/group/group-one",
+        "query": {"view": "pod", "scope": "Some(fed)", "with_cap": "false"}},
+      "response": {"status": 200, "json": {"group": {"name": "group-one", "comment": "fixture",
+        "domain": "prod", "learned": false, "reserved": false,
+        "criteria": [{"key": "image", "value": "nginx", "op": "contains"}], "members": [],
+        "policy_rules": [1], "response_rules": [], "policy_mode": null, "profile_mode": "basic",
+        "baseline_profile": null, "platform_role": "", "cap_change_mode": true, "cap_scorable": null,
+        "kind": "container", "cfg_type": "user_created", "not_scored": false, "monitor_metric": true,
+        "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30}}}
+    },
+    {
+      "id": "remote-group-custom-check-get-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/custom_check/group-one"},
+      "response": {"status": 200, "json": {"config": {"scripts": []}}}
+    },
+    {
+      "id": "remote-group-custom-check-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/custom_check/group-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/group"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-group-create-federal-success",
+      "match": {"method": "POST", "path": "/v1/group"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/group/group-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-update-learned-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/group/learned-group"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-group-update-federal-success",
+      "match": {"method": "PATCH", "path": "/v1/group/fed-group"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-group-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/group/group-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "local-group-delete-federal-success",
+      "match": {"method": "DELETE", "path": "/v1/group/fed-group"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-repository-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/system/config/remote_repository"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-repository-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/system/config/remote_repository/repo-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-repository-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/system/config/remote_repository/repo-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sigstore-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust"},
+      "response": {"status": 200, "json": {"roots_of_trust": []}}
+    },
+    {
+      "id": "remote-sigstore-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sigstore-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sigstore-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-verifier-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one/verifier"},
+      "response": {"status": 200, "json": {"verifiers": []}}
+    },
+    {
+      "id": "remote-verifier-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one/verifier"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-verifier-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one/verifier/verifier-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-verifier-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/scan/sigstore/root_of_trust/root-one/verifier/verifier-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-workload-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload", "query": {"view": "pod"}},
+      "response": {"status": 200, "json": {"workloads": []}}
+    },
+    {
+      "id": "remote-workload-stats-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one/stats"},
+      "response": {"status": 200, "json": {"stats": {"id": "workload-one"}}}
+    },
+    {
+      "id": "remote-workload-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-container-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one", "query": {"view": "pod"}},
+      "response": {"status": 200, "json": {"workload": {"id": "workload-one"}}}
+    },
+    {
+      "id": "remote-workload-detail-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one"},
+      "response": {"status": 200, "json": {"workload": {"id": "workload-one"}}}
+    },
+    {
+      "id": "remote-workload-compliance-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one/compliance"},
+      "response": {"status": 200, "json": {"items": []}}
+    },
+    {
+      "id": "remote-scanned-workloads-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v2/workload", "query": {"view": "pod"}
+      },
+      "response": {
+        "status": 200,
+        "gzip": true,
+        "json": {
+          "workloads": [
+            {
+              "brief": {"id": "workload-one", "name": "pod-one", "display_name": "Pod One",
+                "host_name": "host-one", "host_id": "host-one", "image": "repo/image:one",
+                "image_id": "image-one", "domain": "team-one", "state": "running",
+                "service": "service-one", "author": "fixture", "service_group": "nv.service-one"},
+              "security": {"cap_sniff": true, "cap_quarantine": true, "cap_change_mode": true,
+                "service_mesh": false, "service_mesh_sidecar": false, "policy_mode": "Discover",
+                "profile_mode": "Learn", "baseline_profile": "basic",
+                "scan_summary": {"status": "scanned", "critical": 1, "high": 2, "medium": 3,
+                  "result": "finished", "scanned_timestamp": 100, "scanned_at": "fixture-time",
+                  "base_os": "alpine", "scanner_version": "fixture", "cvedb_create_time": "fixture-db"}},
+              "rt_attributes": {"pod_name": "pod-one", "privileged": false, "run_as_root": false,
+                "memory_limit": 1024, "cpus": "1", "service_account": "default", "network_mode": "bridge"},
+              "children": [{
+                "brief": {"id": "child-one", "name": "container-one", "display_name": "Container One",
+                  "host_name": "host-one", "host_id": "host-one", "image": "repo/image:one",
+                  "image_id": "image-one", "domain": "team-one", "state": "running",
+                  "service": "service-one", "author": "fixture", "service_group": "nv.service-one"},
+                "security": {"cap_sniff": true, "cap_quarantine": true, "cap_change_mode": true,
+                  "service_mesh": false, "service_mesh_sidecar": false, "policy_mode": "Discover",
+                  "profile_mode": "Learn", "baseline_profile": "basic",
+                  "scan_summary": {"status": "scanned", "critical": 4, "high": 5, "medium": 6,
+                    "result": "finished", "scanned_timestamp": 100, "scanned_at": "fixture-time",
+                    "base_os": "alpine", "scanner_version": "fixture", "cvedb_create_time": "fixture-db"}},
+                "rt_attributes": {"pod_name": "pod-one", "privileged": false, "run_as_root": false,
+                  "memory_limit": 512, "cpus": "1", "service_account": "default", "network_mode": "bridge"},
+                "enforcer_id": "enforcer-one", "enforcer_name": "enforcer-one", "platform_role": "",
+                "created_at": "fixture-time", "started_at": "fixture-time", "finished_at": "",
+                "secured_at": "fixture-time", "running": true, "exit_code": 0
+              }],
+              "enforcer_id": "enforcer-one", "enforcer_name": "enforcer-one", "platform_role": "",
+              "created_at": "fixture-time", "started_at": "fixture-time", "finished_at": "",
+              "secured_at": "fixture-time", "running": true, "exit_code": 0
+            },
+            {
+              "brief": {"id": "workload-two", "name": "pod-two", "display_name": "Pod Two",
+                "host_name": "host-two", "host_id": "host-two", "image": "repo/image:two",
+                "image_id": "image-two", "domain": "team-two", "state": "running",
+                "service": "service-two", "author": "fixture", "service_group": "nv.service-two"},
+              "security": {"cap_sniff": true, "cap_quarantine": true, "cap_change_mode": true,
+                "service_mesh": false, "service_mesh_sidecar": false, "policy_mode": "Discover",
+                "profile_mode": "Learn", "baseline_profile": "basic",
+                "scan_summary": {"status": "scanned", "critical": 7, "high": 8, "medium": 9,
+                  "result": "finished", "scanned_timestamp": 200, "scanned_at": "fixture-time",
+                  "base_os": "ubuntu", "scanner_version": "fixture", "cvedb_create_time": "fixture-db"}},
+              "rt_attributes": {"pod_name": "pod-two", "privileged": false, "run_as_root": false,
+                "memory_limit": 2048, "cpus": "2", "service_account": "default", "network_mode": "bridge"},
+              "children": [],
+              "enforcer_id": "enforcer-two", "enforcer_name": "enforcer-two", "platform_role": "",
+              "created_at": "fixture-time", "started_at": "fixture-time", "finished_at": "",
+              "secured_at": "fixture-time", "running": true, "exit_code": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "remote-workload-scan-report-success",
+      "match": {
+        "method": "POST", "path": "/v1/fed/cluster/member-one/v1/scan/workloads/scan_report",
+        "body_sha256": "a43cc3c1a571117665ddec5b06d299085395b3fe0b15fd1f48d3d887c358caf3"
+      },
+      "response": {"status": 200, "json": {"report": {"workloads": []}}}
+    },
+    {
+      "id": "remote-container-process-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one/process"},
+      "response": {"status": 200, "json": {"processes": []}}
+    },
+    {
+      "id": "remote-container-process-history-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/workload/workload-one/process_history"},
+      "response": {"status": 200, "json": {"process_history": []}}
+    },
+    {
+      "id": "remote-domain-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/domain"},
+      "response": {"status": 200, "json": {"domains": []}}
+    },
+    {
+      "id": "remote-domain-update-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/domain/team-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-domain-settings-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/domain"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sniffer-list-success",
+      "match": {"method": "GET", "path": "/v1/fed/cluster/member-one/v1/sniffer", "query": {"f_workload": "workload-one"}},
+      "response": {"status": 200, "json": {"sniffers": []}}
+    },
+    {
+      "id": "remote-sniffer-create-success",
+      "match": {"method": "POST", "path": "/v1/fed/cluster/member-one/v1/sniffer", "query": {"f_workload": "workload-one"}},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sniffer-stop-success",
+      "match": {"method": "PATCH", "path": "/v1/fed/cluster/member-one/v1/sniffer/stop/sniffer-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sniffer-delete-success",
+      "match": {"method": "DELETE", "path": "/v1/fed/cluster/member-one/v1/sniffer/sniffer-one"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "remote-sniffer-pcap-success",
+      "match": {
+        "method": "GET", "path": "/v1/fed/cluster/member-one/v1/sniffer/sniffer-one/pcap",
+        "query": {"limit": "104857600"}
+      },
+      "response": {
+        "status": 200,
+        "headers": {"Content-Type": "application/vnd.tcpdump.pcap", "Content-Disposition": "attachment; filename=fixture.pcap"},
+        "base64": "1MOyoQIABAAAAAAAAAAAAP//AAABAAAA"
+      }
+    },
+    {
+      "id": "gzip-example",
+      "match": {
+        "method": "GET",
+        "path": "/v1/test/gzip"
+      },
+      "response": {
+        "status": 200,
+        "gzip": true,
+        "json": {
+          "status": "ok"
+        }
+      }
+    }
+  ]
+}

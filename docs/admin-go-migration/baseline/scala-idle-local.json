@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-08-01T01:57:07.865331+00:00",
+  "scenario": "scala-idle-http",
+  "limitations": [
+    "Local workstation measurement; not a release performance result.",
+    "HTTP mode without Controller traffic.",
+    "Uses the locally installed Java runtime, which may differ from the production Java 17 image."
+  ],
+  "host": {
+    "kernel": "5.15.0-164-generic",
+    "machine": "x86_64",
+    "cpu_count": 8
+  },
+  "runtime": {
+    "java": "openjdk version \"21.0.11\" 2026-04-21",
+    "heap_min_mb": 256,
+    "heap_max_mb": 2048,
+    "ssl": false,
+    "port": 18443
+  },
+  "artifact": {
+    "path": "admin/target/scala-3.3.5/admin-assembly-1.0.jar",
+    "bytes": 104768942,
+    "sha256": "0b7c0295d2888985f8fe76217679c2f68372d50cf5b7bbdda63c6d326bb43bc3"
+  },
+  "measurement": {
+    "startup_seconds": 5.321,
+    "warmup_seconds": 5.0,
+    "sample_count": 8,
+    "sample_interval_seconds": 1.0,
+    "metrics": {
+      "VmSize": {
+        "min": 6271248,
+        "mean": 6271248,
+        "max": 6271248
+      },
+      "VmHWM": {
+        "min": 1004096,
+        "mean": 1004096,
+        "max": 1004096
+      },
+      "VmRSS": {
+        "min": 1004080,
+        "mean": 1004080,
+        "max": 1004080
+      },
+      "Threads": {
+        "min": 38,
+        "mean": 38,
+        "max": 38
+      },
+      "FileDescriptors": {
+        "min": 15,
+        "mean": 15,
+        "max": 15
+      },
+      "CpuTicks": {
+        "min": 949,
+        "mean": 950.12,
+        "max": 951
+      }
+    }
+  }
+}

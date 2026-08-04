@@ -1,0 +1,4468 @@
+{
+  "schema_version": 1,
+  "source": "admin/src/main/scala/com/neu/api",
+  "action_count": 263,
+  "dsl_method_occurrence_count": 262,
+  "actions": [
+    {
+      "domain": "authentication",
+      "method": "DELETE",
+      "path": "/api_key",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 98,
+      "dsl_lines": [
+        98
+      ],
+      "route_id": "authentication:DELETE:/api_key"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/api_key",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 81,
+      "dsl_lines": [
+        81
+      ],
+      "route_id": "authentication:GET:/api_key"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/api_key",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 88,
+      "dsl_lines": [
+        88
+      ],
+      "route_id": "authentication:POST:/api_key"
+    },
+    {
+      "domain": "authentication",
+      "method": "DELETE",
+      "path": "/auth",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SuseAuthApi.scala",
+      "line": 28,
+      "dsl_lines": [
+        28
+      ],
+      "route_id": "authentication:DELETE:/auth"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/auth",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SuseAuthApi.scala",
+      "line": 17,
+      "dsl_lines": [
+        17
+      ],
+      "route_id": "authentication:POST:/auth"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/debug",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 245,
+      "dsl_lines": [
+        245
+      ],
+      "route_id": "authentication:POST:/debug"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/eula",
+      "query_parameters": [
+        "isSSO"
+      ],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 24,
+      "dsl_lines": [
+        24
+      ],
+      "route_id": "authentication:GET:/eula"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/eula",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 150,
+      "dsl_lines": [
+        150
+      ],
+      "route_id": "authentication:POST:/eula"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/gravatar",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 17,
+      "dsl_lines": [
+        17
+      ],
+      "route_id": "authentication:GET:/gravatar"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/heartbeat",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SuseAuthApi.scala",
+      "line": 35,
+      "dsl_lines": [
+        35
+      ],
+      "route_id": "authentication:PATCH:/heartbeat"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/license",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 160,
+      "dsl_lines": [
+        160
+      ],
+      "route_id": "authentication:GET:/license"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/license",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 165,
+      "dsl_lines": [
+        165
+      ],
+      "route_id": "authentication:POST:/license"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/license/update",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 174,
+      "dsl_lines": [
+        174
+      ],
+      "route_id": "authentication:POST:/license/update"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/openId_auth",
+      "query_parameters": [
+        "code",
+        "serverName",
+        "state"
+      ],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/OpenIdAuthApi.scala",
+      "line": 16,
+      "dsl_lines": [
+        16
+      ],
+      "route_id": "authentication:GET:/openId_auth"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/openId_auth",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/OpenIdAuthApi.scala",
+      "line": 35,
+      "dsl_lines": [
+        35
+      ],
+      "route_id": "authentication:PATCH:/openId_auth"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/password-profile",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 201,
+      "dsl_lines": [
+        201
+      ],
+      "route_id": "authentication:GET:/password-profile"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/password-profile",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 206,
+      "dsl_lines": [
+        206
+      ],
+      "route_id": "authentication:PATCH:/password-profile"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/password-profile/public",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 185,
+      "dsl_lines": [
+        185
+      ],
+      "route_id": "authentication:GET:/password-profile/public"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/password-profile/user",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 192,
+      "dsl_lines": [
+        192
+      ],
+      "route_id": "authentication:POST:/password-profile/user"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/rebrand",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 33,
+      "dsl_lines": [
+        33
+      ],
+      "route_id": "authentication:GET:/rebrand"
+    },
+    {
+      "domain": "authentication",
+      "method": "DELETE",
+      "path": "/role2",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 70,
+      "dsl_lines": [
+        70
+      ],
+      "route_id": "authentication:DELETE:/role2"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/role2",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 49,
+      "dsl_lines": [
+        49
+      ],
+      "route_id": "authentication:GET:/role2"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/role2",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 63,
+      "dsl_lines": [
+        63
+      ],
+      "route_id": "authentication:PATCH:/role2"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/role2",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 56,
+      "dsl_lines": [
+        56
+      ],
+      "route_id": "authentication:POST:/role2"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/role2/permission-options",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 42,
+      "dsl_lines": [
+        42
+      ],
+      "route_id": "authentication:GET:/role2/permission-options"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/samlslo",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 65,
+      "dsl_lines": [
+        65
+      ],
+      "route_id": "authentication:GET:/samlslo"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/samlslo",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 62,
+      "dsl_lines": [
+        62
+      ],
+      "route_id": "authentication:POST:/samlslo"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/self",
+      "query_parameters": [
+        "isOnNV",
+        "isRancherSSOUrl"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [
+        "R_SESS"
+      ],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SuseAuthApi.scala",
+      "line": 42,
+      "dsl_lines": [
+        42
+      ],
+      "route_id": "authentication:GET:/self"
+    },
+    {
+      "domain": "authentication",
+      "method": "DELETE",
+      "path": "/server",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 236,
+      "dsl_lines": [
+        236
+      ],
+      "route_id": "authentication:DELETE:/server"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/server",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 217,
+      "dsl_lines": [
+        217
+      ],
+      "route_id": "authentication:GET:/server"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/server",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 229,
+      "dsl_lines": [
+        229
+      ],
+      "route_id": "authentication:PATCH:/server"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/server",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 222,
+      "dsl_lines": [
+        222
+      ],
+      "route_id": "authentication:POST:/server"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/token",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 144,
+      "dsl_lines": [
+        144
+      ],
+      "route_id": "authentication:POST:/token"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/token_auth_server",
+      "query_parameters": [
+        "serverName"
+      ],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 28,
+      "dsl_lines": [
+        28
+      ],
+      "route_id": "authentication:GET:/token_auth_server"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/token_auth_server",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 39,
+      "dsl_lines": [
+        39
+      ],
+      "route_id": "authentication:PATCH:/token_auth_server"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/token_auth_server",
+      "query_parameters": [],
+      "required_headers": [],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 46,
+      "dsl_lines": [
+        46
+      ],
+      "route_id": "authentication:POST:/token_auth_server"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/token_auth_server_slo",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/SamlAuthApi.scala",
+      "line": 69,
+      "dsl_lines": [
+        69
+      ],
+      "route_id": "authentication:GET:/token_auth_server_slo"
+    },
+    {
+      "domain": "authentication",
+      "method": "DELETE",
+      "path": "/user",
+      "query_parameters": [
+        "userId"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 130,
+      "dsl_lines": [
+        130
+      ],
+      "route_id": "authentication:DELETE:/user"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/user",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 109,
+      "dsl_lines": [
+        109
+      ],
+      "route_id": "authentication:GET:/user"
+    },
+    {
+      "domain": "authentication",
+      "method": "PATCH",
+      "path": "/user",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 123,
+      "dsl_lines": [
+        123
+      ],
+      "route_id": "authentication:PATCH:/user"
+    },
+    {
+      "domain": "authentication",
+      "method": "POST",
+      "path": "/user",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 116,
+      "dsl_lines": [
+        116
+      ],
+      "route_id": "authentication:POST:/user"
+    },
+    {
+      "domain": "authentication",
+      "method": "GET",
+      "path": "/version",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/authentication/ExtraAuthApi.scala",
+      "line": 139,
+      "dsl_lines": [
+        139
+      ],
+      "route_id": "authentication:GET:/version"
+    },
+    {
+      "domain": "cluster",
+      "method": "DELETE",
+      "path": "/fed",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 91,
+      "dsl_lines": [
+        91
+      ],
+      "route_id": "cluster:DELETE:/fed"
+    },
+    {
+      "domain": "cluster",
+      "method": "PATCH",
+      "path": "/fed/config",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 82,
+      "dsl_lines": [
+        82
+      ],
+      "route_id": "cluster:PATCH:/fed/config"
+    },
+    {
+      "domain": "cluster",
+      "method": "POST",
+      "path": "/fed/demote",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 50,
+      "dsl_lines": [
+        50
+      ],
+      "route_id": "cluster:POST:/fed/demote"
+    },
+    {
+      "domain": "cluster",
+      "method": "POST",
+      "path": "/fed/deploy",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 100,
+      "dsl_lines": [
+        100
+      ],
+      "route_id": "cluster:POST:/fed/deploy"
+    },
+    {
+      "domain": "cluster",
+      "method": "POST",
+      "path": "/fed/join",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 64,
+      "dsl_lines": [
+        64
+      ],
+      "route_id": "cluster:POST:/fed/join"
+    },
+    {
+      "domain": "cluster",
+      "method": "GET",
+      "path": "/fed/join_token",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 57,
+      "dsl_lines": [
+        57
+      ],
+      "route_id": "cluster:GET:/fed/join_token"
+    },
+    {
+      "domain": "cluster",
+      "method": "POST",
+      "path": "/fed/leave",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 73,
+      "dsl_lines": [
+        73
+      ],
+      "route_id": "cluster:POST:/fed/leave"
+    },
+    {
+      "domain": "cluster",
+      "method": "GET",
+      "path": "/fed/member",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 16,
+      "dsl_lines": [
+        16
+      ],
+      "route_id": "cluster:GET:/fed/member"
+    },
+    {
+      "domain": "cluster",
+      "method": "POST",
+      "path": "/fed/promote",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 41,
+      "dsl_lines": [
+        41
+      ],
+      "route_id": "cluster:POST:/fed/promote"
+    },
+    {
+      "domain": "cluster",
+      "method": "GET",
+      "path": "/fed/summary",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 32,
+      "dsl_lines": [
+        32
+      ],
+      "route_id": "cluster:GET:/fed/summary"
+    },
+    {
+      "domain": "cluster",
+      "method": "GET",
+      "path": "/fed/switch",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/cluster/ClusterApi.scala",
+      "line": 23,
+      "dsl_lines": [
+        23
+      ],
+      "route_id": "cluster:GET:/fed/switch"
+    },
+    {
+      "domain": "dashboard",
+      "method": "GET",
+      "path": "/dashboard/alerts",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 28,
+      "dsl_lines": [
+        28
+      ],
+      "route_id": "dashboard:GET:/dashboard/alerts"
+    },
+    {
+      "domain": "dashboard",
+      "method": "ANY",
+      "path": "/dashboard/details",
+      "query_parameters": [
+        "domain",
+        "isGlobalUser"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 34,
+      "dsl_lines": [],
+      "implicit_method": true,
+      "route_id": "dashboard:ANY:/dashboard/details"
+    },
+    {
+      "domain": "dashboard",
+      "method": "GET",
+      "path": "/dashboard/notifications",
+      "query_parameters": [
+        "domain"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 58,
+      "dsl_lines": [
+        58
+      ],
+      "route_id": "dashboard:GET:/dashboard/notifications"
+    },
+    {
+      "domain": "dashboard",
+      "method": "GET",
+      "path": "/dashboard/scores",
+      "query_parameters": [
+        "domain",
+        "isGlobalUser"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 49,
+      "dsl_lines": [
+        49
+      ],
+      "route_id": "dashboard:GET:/dashboard/scores"
+    },
+    {
+      "domain": "dashboard",
+      "method": "POST",
+      "path": "/dashboard/scores",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 42,
+      "dsl_lines": [
+        42
+      ],
+      "route_id": "dashboard:POST:/dashboard/scores"
+    },
+    {
+      "domain": "dashboard",
+      "method": "GET",
+      "path": "/multi-cluster-summary",
+      "query_parameters": [
+        "clusterId"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/dashboard/DashboardApi.scala",
+      "line": 18,
+      "dsl_lines": [
+        18
+      ],
+      "route_id": "dashboard:GET:/multi-cluster-summary"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/bench/docker",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 288,
+      "dsl_lines": [
+        288
+      ],
+      "route_id": "device:GET:/bench/docker"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/bench/docker",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 295,
+      "dsl_lines": [
+        295
+      ],
+      "route_id": "device:POST:/bench/docker"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/bench/kubernetes",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 304,
+      "dsl_lines": [
+        304
+      ],
+      "route_id": "device:GET:/bench/kubernetes"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/bench/kubernetes",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 311,
+      "dsl_lines": [
+        311
+      ],
+      "route_id": "device:POST:/bench/kubernetes"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/config",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 100,
+      "dsl_lines": [
+        100
+      ],
+      "route_id": "device:GET:/config"
+    },
+    {
+      "domain": "device",
+      "method": "PATCH",
+      "path": "/config",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 107,
+      "dsl_lines": [
+        107
+      ],
+      "route_id": "device:PATCH:/config"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/config-v2",
+      "query_parameters": [
+        "scope",
+        "source"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 116,
+      "dsl_lines": [
+        116
+      ],
+      "route_id": "device:GET:/config-v2"
+    },
+    {
+      "domain": "device",
+      "method": "PATCH",
+      "path": "/config-v2",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 124,
+      "dsl_lines": [
+        124
+      ],
+      "route_id": "device:PATCH:/config-v2"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/controller",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 38,
+      "dsl_lines": [
+        38
+      ],
+      "route_id": "device:GET:/controller"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/csp-support",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 321,
+      "dsl_lines": [
+        321
+      ],
+      "route_id": "device:POST:/csp-support"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/enforcer",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 20,
+      "dsl_lines": [
+        20
+      ],
+      "route_id": "device:GET:/enforcer"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/file/config",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 200,
+      "dsl_lines": [
+        200
+      ],
+      "route_id": "device:GET:/file/config"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/file/config",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-As-Standalone",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 207,
+      "dsl_lines": [
+        207
+      ],
+      "route_id": "device:POST:/file/config"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/file/config-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 243,
+      "dsl_lines": [
+        243
+      ],
+      "route_id": "device:POST:/file/config-fed"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/file/debug",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 264,
+      "dsl_lines": [
+        264
+      ],
+      "route_id": "device:GET:/file/debug"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/file/debug",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 269,
+      "dsl_lines": [
+        269
+      ],
+      "route_id": "device:POST:/file/debug"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/file/debug/check",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 278,
+      "dsl_lines": [
+        278
+      ],
+      "route_id": "device:GET:/file/debug/check"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/file/export-config-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 232,
+      "dsl_lines": [
+        232,
+        233
+      ],
+      "route_id": "device:POST:/file/export-config-fed"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/host",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 159,
+      "dsl_lines": [
+        159
+      ],
+      "route_id": "device:GET:/host"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/host/compliance",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 189,
+      "dsl_lines": [
+        189
+      ],
+      "route_id": "device:GET:/host/compliance"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/host/scan-report",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 168,
+      "dsl_lines": [
+        168
+      ],
+      "route_id": "device:POST:/host/scan-report"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/host/workload",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 180,
+      "dsl_lines": [
+        180
+      ],
+      "route_id": "device:GET:/host/workload"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/ibmsa_setup",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 61,
+      "dsl_lines": [
+        61
+      ],
+      "route_id": "device:GET:/ibmsa_setup"
+    },
+    {
+      "domain": "device",
+      "method": "DELETE",
+      "path": "/remote_repository",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 149,
+      "dsl_lines": [
+        149
+      ],
+      "route_id": "device:DELETE:/remote_repository"
+    },
+    {
+      "domain": "device",
+      "method": "PATCH",
+      "path": "/remote_repository",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 142,
+      "dsl_lines": [
+        142
+      ],
+      "route_id": "device:PATCH:/remote_repository"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/remote_repository",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 135,
+      "dsl_lines": [
+        135
+      ],
+      "route_id": "device:POST:/remote_repository"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/scanner",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 47,
+      "dsl_lines": [
+        47
+      ],
+      "route_id": "device:GET:/scanner"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/single-enforcer",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 29,
+      "dsl_lines": [
+        29
+      ],
+      "route_id": "device:GET:/single-enforcer"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/summary",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 54,
+      "dsl_lines": [
+        54
+      ],
+      "route_id": "device:GET:/summary"
+    },
+    {
+      "domain": "device",
+      "method": "GET",
+      "path": "/usage",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 68,
+      "dsl_lines": [
+        68
+      ],
+      "route_id": "device:GET:/usage"
+    },
+    {
+      "domain": "device",
+      "method": "DELETE",
+      "path": "/webhook",
+      "query_parameters": [
+        "name",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 91,
+      "dsl_lines": [
+        91
+      ],
+      "route_id": "device:DELETE:/webhook"
+    },
+    {
+      "domain": "device",
+      "method": "PATCH",
+      "path": "/webhook",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 82,
+      "dsl_lines": [
+        82
+      ],
+      "route_id": "device:PATCH:/webhook"
+    },
+    {
+      "domain": "device",
+      "method": "POST",
+      "path": "/webhook",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/device/DeviceApi.scala",
+      "line": 75,
+      "dsl_lines": [
+        75
+      ],
+      "route_id": "device:POST:/webhook"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/dlp/group",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 315,
+      "dsl_lines": [
+        315
+      ],
+      "route_id": "group:GET:/dlp/group"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/dlp/group",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 322,
+      "dsl_lines": [
+        322
+      ],
+      "route_id": "group:PATCH:/dlp/group"
+    },
+    {
+      "domain": "group",
+      "method": "DELETE",
+      "path": "/dlp/sensor",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 259,
+      "dsl_lines": [
+        259
+      ],
+      "route_id": "group:DELETE:/dlp/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/dlp/sensor",
+      "query_parameters": [
+        "name",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 245,
+      "dsl_lines": [
+        245
+      ],
+      "route_id": "group:GET:/dlp/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/dlp/sensor",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 252,
+      "dsl_lines": [
+        252
+      ],
+      "route_id": "group:PATCH:/dlp/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/dlp/sensor",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 238,
+      "dsl_lines": [
+        238
+      ],
+      "route_id": "group:POST:/dlp/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/dlp/sensor/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 268,
+      "dsl_lines": [
+        268
+      ],
+      "route_id": "group:POST:/dlp/sensor/export"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/dlp/sensor/export-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 291,
+      "dsl_lines": [
+        291
+      ],
+      "route_id": "group:POST:/dlp/sensor/export-fed"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/dlp/sensor/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 277,
+      "dsl_lines": [
+        277
+      ],
+      "route_id": "group:POST:/dlp/sensor/import"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/dlp/sensor/import-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 300,
+      "dsl_lines": [
+        300
+      ],
+      "route_id": "group:POST:/dlp/sensor/import-fed"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/filePreProfile",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 226,
+      "dsl_lines": [
+        226
+      ],
+      "route_id": "group:GET:/filePreProfile"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/fileProfile",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 199,
+      "dsl_lines": [
+        199
+      ],
+      "route_id": "group:GET:/fileProfile#1"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/fileProfile",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 206,
+      "dsl_lines": [
+        206
+      ],
+      "route_id": "group:GET:/fileProfile#2"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/fileProfile",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 213,
+      "dsl_lines": [
+        213
+      ],
+      "route_id": "group:PATCH:/fileProfile"
+    },
+    {
+      "domain": "group",
+      "method": "DELETE",
+      "path": "/group",
+      "query_parameters": [
+        "name",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 125,
+      "dsl_lines": [
+        125
+      ],
+      "route_id": "group:DELETE:/group"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/group",
+      "query_parameters": [
+        "limit",
+        "name",
+        "scope",
+        "start",
+        "with_cap"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 105,
+      "dsl_lines": [
+        105
+      ],
+      "route_id": "group:GET:/group"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/group",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 118,
+      "dsl_lines": [
+        118
+      ],
+      "route_id": "group:PATCH:/group"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/group",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 98,
+      "dsl_lines": [
+        98
+      ],
+      "route_id": "group:POST:/group"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/group-list",
+      "query_parameters": [
+        "f_kind",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 26,
+      "dsl_lines": [
+        26
+      ],
+      "route_id": "group:GET:/group-list"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/group/custom_check",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 36,
+      "dsl_lines": [
+        36
+      ],
+      "route_id": "group:GET:/group/custom_check"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/group/custom_check",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 43,
+      "dsl_lines": [
+        43
+      ],
+      "route_id": "group:PATCH:/group/custom_check"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/group/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 52,
+      "dsl_lines": [
+        52
+      ],
+      "route_id": "group:POST:/group/export"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/group/export-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 75,
+      "dsl_lines": [
+        75
+      ],
+      "route_id": "group:POST:/group/export-fed"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/group/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 61,
+      "dsl_lines": [
+        61
+      ],
+      "route_id": "group:POST:/group/import"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/group/import-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 84,
+      "dsl_lines": [
+        84
+      ],
+      "route_id": "group:POST:/group/import-fed"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/processProfile",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 172,
+      "dsl_lines": [
+        172
+      ],
+      "route_id": "group:GET:/processProfile#1"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/processProfile",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 179,
+      "dsl_lines": [
+        179
+      ],
+      "route_id": "group:GET:/processProfile#2"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/processProfile",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 186,
+      "dsl_lines": [
+        186
+      ],
+      "route_id": "group:PATCH:/processProfile"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/service",
+      "query_parameters": [
+        "name",
+        "with_cap"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 145,
+      "dsl_lines": [
+        145
+      ],
+      "route_id": "group:GET:/service"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/service",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 152,
+      "dsl_lines": [
+        152
+      ],
+      "route_id": "group:PATCH:/service"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/service",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 161,
+      "dsl_lines": [
+        161
+      ],
+      "route_id": "group:POST:/service"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/service/all",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 136,
+      "dsl_lines": [
+        136
+      ],
+      "route_id": "group:PATCH:/service/all"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/waf/group",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 411,
+      "dsl_lines": [
+        411
+      ],
+      "route_id": "group:GET:/waf/group"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/waf/group",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 418,
+      "dsl_lines": [
+        418
+      ],
+      "route_id": "group:PATCH:/waf/group"
+    },
+    {
+      "domain": "group",
+      "method": "DELETE",
+      "path": "/waf/sensor",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 355,
+      "dsl_lines": [
+        355
+      ],
+      "route_id": "group:DELETE:/waf/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "GET",
+      "path": "/waf/sensor",
+      "query_parameters": [
+        "name",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 341,
+      "dsl_lines": [
+        341
+      ],
+      "route_id": "group:GET:/waf/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "PATCH",
+      "path": "/waf/sensor",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 348,
+      "dsl_lines": [
+        348
+      ],
+      "route_id": "group:PATCH:/waf/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/waf/sensor",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 334,
+      "dsl_lines": [
+        334
+      ],
+      "route_id": "group:POST:/waf/sensor"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/waf/sensor/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 364,
+      "dsl_lines": [
+        364
+      ],
+      "route_id": "group:POST:/waf/sensor/export"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/waf/sensor/export-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 387,
+      "dsl_lines": [
+        387
+      ],
+      "route_id": "group:POST:/waf/sensor/export-fed"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/waf/sensor/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 373,
+      "dsl_lines": [
+        373
+      ],
+      "route_id": "group:POST:/waf/sensor/import"
+    },
+    {
+      "domain": "group",
+      "method": "POST",
+      "path": "/waf/sensor/import-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/group/GroupApi.scala",
+      "line": 396,
+      "dsl_lines": [
+        396
+      ],
+      "route_id": "group:POST:/waf/sensor/import-fed"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/audit",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 81,
+      "dsl_lines": [
+        81
+      ],
+      "route_id": "notification:GET:/audit"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/audit2",
+      "query_parameters": [
+        "limit",
+        "start"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 90,
+      "dsl_lines": [
+        90
+      ],
+      "route_id": "notification:GET:/audit2"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/event",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 36,
+      "dsl_lines": [
+        36
+      ],
+      "route_id": "notification:GET:/event"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/incident",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 45,
+      "dsl_lines": [
+        45
+      ],
+      "route_id": "notification:GET:/incident"
+    },
+    {
+      "domain": "notification",
+      "method": "PATCH",
+      "path": "/ip-geo",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 25,
+      "dsl_lines": [
+        25
+      ],
+      "route_id": "notification:PATCH:/ip-geo"
+    },
+    {
+      "domain": "notification",
+      "method": "DELETE",
+      "path": "/network/conversation",
+      "query_parameters": [
+        "from",
+        "to"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 137,
+      "dsl_lines": [
+        137
+      ],
+      "route_id": "notification:DELETE:/network/conversation"
+    },
+    {
+      "domain": "notification",
+      "method": "DELETE",
+      "path": "/network/endpoint",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 153,
+      "dsl_lines": [
+        153
+      ],
+      "route_id": "notification:DELETE:/network/endpoint"
+    },
+    {
+      "domain": "notification",
+      "method": "PATCH",
+      "path": "/network/endpoint",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 146,
+      "dsl_lines": [
+        146
+      ],
+      "route_id": "notification:PATCH:/network/endpoint"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/network/graph",
+      "query_parameters": [
+        "user"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 172,
+      "dsl_lines": [
+        172
+      ],
+      "route_id": "notification:GET:/network/graph"
+    },
+    {
+      "domain": "notification",
+      "method": "POST",
+      "path": "/network/graph",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 179,
+      "dsl_lines": [
+        179
+      ],
+      "route_id": "notification:POST:/network/graph"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/network/graph/blacklist",
+      "query_parameters": [
+        "user"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 197,
+      "dsl_lines": [
+        197
+      ],
+      "route_id": "notification:GET:/network/graph/blacklist"
+    },
+    {
+      "domain": "notification",
+      "method": "POST",
+      "path": "/network/graph/blacklist",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 204,
+      "dsl_lines": [
+        204
+      ],
+      "route_id": "notification:POST:/network/graph/blacklist"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/network/graph/layout",
+      "query_parameters": [
+        "user"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 188,
+      "dsl_lines": [
+        188
+      ],
+      "route_id": "notification:GET:/network/graph/layout"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/network/history",
+      "query_parameters": [
+        "from",
+        "to"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 162,
+      "dsl_lines": [
+        162
+      ],
+      "route_id": "notification:GET:/network/history"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/network/session",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 128,
+      "dsl_lines": [
+        128
+      ],
+      "route_id": "notification:GET:/network/session"
+    },
+    {
+      "domain": "notification",
+      "method": "POST",
+      "path": "/notification/accept",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 234,
+      "dsl_lines": [
+        234
+      ],
+      "route_id": "notification:POST:/notification/accept"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/security-events",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 216,
+      "dsl_lines": [
+        216
+      ],
+      "route_id": "notification:GET:/security-events"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/security-events2",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 225,
+      "dsl_lines": [
+        225
+      ],
+      "route_id": "notification:GET:/security-events2"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/threat",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 101,
+      "dsl_lines": [
+        101
+      ],
+      "route_id": "notification:GET:/threat"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/threat/top",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 119,
+      "dsl_lines": [
+        119
+      ],
+      "route_id": "notification:GET:/threat/top"
+    },
+    {
+      "domain": "notification",
+      "method": "POST",
+      "path": "/threat/track",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 110,
+      "dsl_lines": [
+        110
+      ],
+      "route_id": "notification:POST:/threat/track"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/violation",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 54,
+      "dsl_lines": [
+        54
+      ],
+      "route_id": "notification:GET:/violation"
+    },
+    {
+      "domain": "notification",
+      "method": "GET",
+      "path": "/violation/top",
+      "query_parameters": [
+        "category"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 61,
+      "dsl_lines": [
+        61
+      ],
+      "route_id": "notification:GET:/violation/top"
+    },
+    {
+      "domain": "notification",
+      "method": "POST",
+      "path": "/violation/track",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/notification/NotificationApi.scala",
+      "line": 70,
+      "dsl_lines": [
+        70
+      ],
+      "route_id": "notification:POST:/violation/track"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 507,
+      "dsl_lines": [
+        507
+      ],
+      "route_id": "policy:POST:/admission/export"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/export-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 533,
+      "dsl_lines": [
+        533
+      ],
+      "route_id": "policy:POST:/admission/export-fed"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 516,
+      "dsl_lines": [
+        516
+      ],
+      "route_id": "policy:POST:/admission/import"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/import-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 542,
+      "dsl_lines": [
+        542
+      ],
+      "route_id": "policy:POST:/admission/import-fed"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/matching-test",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 498,
+      "dsl_lines": [
+        498
+      ],
+      "route_id": "policy:POST:/admission/matching-test"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/admission/options",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 468,
+      "dsl_lines": [
+        468
+      ],
+      "route_id": "policy:GET:/admission/options"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/promote",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 560,
+      "dsl_lines": [
+        560
+      ],
+      "route_id": "policy:POST:/admission/promote"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/admission/rule",
+      "query_parameters": [
+        "id",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 459,
+      "dsl_lines": [
+        459
+      ],
+      "route_id": "policy:DELETE:/admission/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/admission/rule",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 452,
+      "dsl_lines": [
+        452
+      ],
+      "route_id": "policy:PATCH:/admission/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/admission/rule",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 445,
+      "dsl_lines": [
+        445
+      ],
+      "route_id": "policy:POST:/admission/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/admission/rules",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 436,
+      "dsl_lines": [
+        436
+      ],
+      "route_id": "policy:GET:/admission/rules"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/admission/state",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 477,
+      "dsl_lines": [
+        477
+      ],
+      "route_id": "policy:GET:/admission/state"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/admission/state",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 482,
+      "dsl_lines": [
+        482
+      ],
+      "route_id": "policy:PATCH:/admission/state"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/admission/test",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 491,
+      "dsl_lines": [
+        491
+      ],
+      "route_id": "policy:GET:/admission/test"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/conditionOption",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 30,
+      "dsl_lines": [
+        30
+      ],
+      "route_id": "policy:GET:/conditionOption"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/fed-deploy",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 22,
+      "dsl_lines": [
+        22
+      ],
+      "route_id": "policy:POST:/fed-deploy"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/policy",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 164,
+      "dsl_lines": [
+        164
+      ],
+      "route_id": "policy:DELETE:/policy"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/policy",
+      "query_parameters": [
+        "limit",
+        "scope",
+        "start"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 140,
+      "dsl_lines": [
+        140
+      ],
+      "route_id": "policy:GET:/policy"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/policy",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 153,
+      "dsl_lines": [
+        153
+      ],
+      "route_id": "policy:PATCH:/policy"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/policy/application",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 173,
+      "dsl_lines": [
+        173
+      ],
+      "route_id": "policy:GET:/policy/application"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/policy/graph",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 203,
+      "dsl_lines": [
+        203
+      ],
+      "route_id": "policy:GET:/policy/graph"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/policy/promote",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 210,
+      "dsl_lines": [
+        210
+      ],
+      "route_id": "policy:POST:/policy/promote"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/policy/rule",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 180,
+      "dsl_lines": [
+        180
+      ],
+      "route_id": "policy:GET:/policy/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/policy/rule",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 194,
+      "dsl_lines": [
+        194
+      ],
+      "route_id": "policy:PATCH:/policy/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/policy/rule",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 187,
+      "dsl_lines": [
+        187
+      ],
+      "route_id": "policy:POST:/policy/rule"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/responsePolicy",
+      "query_parameters": [
+        "id",
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 79,
+      "dsl_lines": [
+        79
+      ],
+      "route_id": "policy:DELETE:/responsePolicy"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/responsePolicy",
+      "query_parameters": [
+        "scope"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 58,
+      "dsl_lines": [
+        58
+      ],
+      "route_id": "policy:GET:/responsePolicy"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/responsePolicy",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 72,
+      "dsl_lines": [
+        72
+      ],
+      "route_id": "policy:PATCH:/responsePolicy"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/responsePolicy",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 65,
+      "dsl_lines": [
+        65
+      ],
+      "route_id": "policy:POST:/responsePolicy"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/responsePolicy/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 92,
+      "dsl_lines": [
+        92
+      ],
+      "route_id": "policy:POST:/responsePolicy/export"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/responsePolicy/export-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 115,
+      "dsl_lines": [
+        115
+      ],
+      "route_id": "policy:POST:/responsePolicy/export-fed"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/responsePolicy/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 101,
+      "dsl_lines": [
+        101
+      ],
+      "route_id": "policy:POST:/responsePolicy/import"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/responsePolicy/import-fed",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 124,
+      "dsl_lines": [
+        124
+      ],
+      "route_id": "policy:POST:/responsePolicy/import-fed"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/responseRule",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 48,
+      "dsl_lines": [
+        48
+      ],
+      "route_id": "policy:GET:/responseRule"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/config",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 280,
+      "dsl_lines": [
+        280
+      ],
+      "route_id": "policy:GET:/scan/config"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/config",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 285,
+      "dsl_lines": [
+        285
+      ],
+      "route_id": "policy:POST:/scan/config"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/host",
+      "query_parameters": [
+        "id",
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 244,
+      "dsl_lines": [
+        244
+      ],
+      "route_id": "policy:GET:/scan/host"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/host",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 251,
+      "dsl_lines": [
+        251
+      ],
+      "route_id": "policy:POST:/scan/host"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/platform",
+      "query_parameters": [
+        "platform",
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 260,
+      "dsl_lines": [
+        260
+      ],
+      "route_id": "policy:GET:/scan/platform"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/platform",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 271,
+      "dsl_lines": [
+        271
+      ],
+      "route_id": "policy:POST:/scan/platform"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/scan/registry",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 316,
+      "dsl_lines": [
+        316
+      ],
+      "route_id": "policy:DELETE:/scan/registry"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 295,
+      "dsl_lines": [
+        295
+      ],
+      "route_id": "policy:GET:/scan/registry"
+    },
+    {
+      "domain": "policy",
+      "method": "PATCH",
+      "path": "/scan/registry",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 309,
+      "dsl_lines": [
+        309
+      ],
+      "route_id": "policy:PATCH:/scan/registry"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/registry",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 302,
+      "dsl_lines": [
+        302
+      ],
+      "route_id": "policy:POST:/scan/registry"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry/fed-repo",
+      "query_parameters": [
+        "fed_repo"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 380,
+      "dsl_lines": [
+        380
+      ],
+      "route_id": "policy:GET:/scan/registry/fed-repo"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry/image",
+      "query_parameters": [
+        "imageId",
+        "name",
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 389,
+      "dsl_lines": [
+        389
+      ],
+      "route_id": "policy:GET:/scan/registry/image"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry/layer",
+      "query_parameters": [
+        "imageId",
+        "name",
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 411,
+      "dsl_lines": [
+        411
+      ],
+      "route_id": "policy:GET:/scan/registry/layer"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/scan/registry/repo",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 371,
+      "dsl_lines": [
+        371
+      ],
+      "route_id": "policy:DELETE:/scan/registry/repo"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry/repo",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 357,
+      "dsl_lines": [
+        357
+      ],
+      "route_id": "policy:GET:/scan/registry/repo"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/registry/repo",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 364,
+      "dsl_lines": [
+        364
+      ],
+      "route_id": "policy:POST:/scan/registry/repo"
+    },
+    {
+      "domain": "policy",
+      "method": "DELETE",
+      "path": "/scan/registry/test",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 346,
+      "dsl_lines": [
+        346
+      ],
+      "route_id": "policy:DELETE:/scan/registry/test"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/registry/test",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 325,
+      "dsl_lines": [
+        325
+      ],
+      "route_id": "policy:POST:/scan/registry/test"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/registry/type",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 404,
+      "dsl_lines": [
+        404
+      ],
+      "route_id": "policy:GET:/scan/registry/type"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/status",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 221,
+      "dsl_lines": [
+        221
+      ],
+      "route_id": "policy:GET:/scan/status"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/top",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 427,
+      "dsl_lines": [
+        427
+      ],
+      "route_id": "policy:GET:/scan/top"
+    },
+    {
+      "domain": "policy",
+      "method": "GET",
+      "path": "/scan/workload",
+      "query_parameters": [
+        "id",
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 228,
+      "dsl_lines": [
+        228
+      ],
+      "route_id": "policy:GET:/scan/workload"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/scan/workload",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 235,
+      "dsl_lines": [
+        235
+      ],
+      "route_id": "policy:POST:/scan/workload"
+    },
+    {
+      "domain": "policy",
+      "method": "POST",
+      "path": "/unquarantine",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/policy/PolicyApi.scala",
+      "line": 39,
+      "dsl_lines": [
+        39
+      ],
+      "route_id": "policy:POST:/unquarantine"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/compliance",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 213,
+      "dsl_lines": [
+        213
+      ],
+      "route_id": "risk:GET:/risk/compliance"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/compliance/available_filter",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 227,
+      "dsl_lines": [
+        227
+      ],
+      "route_id": "risk:GET:/risk/compliance/available_filter"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/compliance/profile",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 235,
+      "dsl_lines": [
+        235
+      ],
+      "route_id": "risk:GET:/risk/compliance/profile"
+    },
+    {
+      "domain": "risk",
+      "method": "PATCH",
+      "path": "/risk/compliance/profile",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 242,
+      "dsl_lines": [
+        242
+      ],
+      "route_id": "risk:PATCH:/risk/compliance/profile"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/compliance/profile/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 251,
+      "dsl_lines": [
+        251
+      ],
+      "route_id": "risk:POST:/risk/compliance/profile/export"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/compliance/profile/import",
+      "query_parameters": [],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 263,
+      "dsl_lines": [
+        263
+      ],
+      "route_id": "risk:POST:/risk/compliance/profile/import"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/compliance/template",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 220,
+      "dsl_lines": [
+        220
+      ],
+      "route_id": "risk:GET:/risk/compliance/template"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/complianceNIST",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 205,
+      "dsl_lines": [
+        205
+      ],
+      "route_id": "risk:POST:/risk/complianceNIST"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/cve",
+      "query_parameters": [
+        "show"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 92,
+      "dsl_lines": [
+        92
+      ],
+      "route_id": "risk:GET:/risk/cve"
+    },
+    {
+      "domain": "risk",
+      "method": "PATCH",
+      "path": "/risk/cve/assets-view",
+      "query_parameters": [
+        "queryToken"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 102,
+      "dsl_lines": [
+        102
+      ],
+      "route_id": "risk:PATCH:/risk/cve/assets-view"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/risk/cve/profile",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 119,
+      "dsl_lines": [
+        119
+      ],
+      "route_id": "risk:GET:/risk/cve/profile"
+    },
+    {
+      "domain": "risk",
+      "method": "PATCH",
+      "path": "/risk/cve/profile",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 124,
+      "dsl_lines": [
+        124
+      ],
+      "route_id": "risk:PATCH:/risk/cve/profile"
+    },
+    {
+      "domain": "risk",
+      "method": "DELETE",
+      "path": "/risk/cve/profile/entry",
+      "query_parameters": [
+        "entry_id",
+        "profile_name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 160,
+      "dsl_lines": [
+        160
+      ],
+      "route_id": "risk:DELETE:/risk/cve/profile/entry"
+    },
+    {
+      "domain": "risk",
+      "method": "PATCH",
+      "path": "/risk/cve/profile/entry",
+      "query_parameters": [
+        "name"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 146,
+      "dsl_lines": [
+        146
+      ],
+      "route_id": "risk:PATCH:/risk/cve/profile/entry"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/cve/profile/entry",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 136,
+      "dsl_lines": [
+        136
+      ],
+      "route_id": "risk:POST:/risk/cve/profile/entry"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/cve/profile/export",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 173,
+      "dsl_lines": [
+        173
+      ],
+      "route_id": "risk:POST:/risk/cve/profile/export"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/risk/cve/profile/import",
+      "query_parameters": [
+        "option"
+      ],
+      "required_headers": [
+        "Token",
+        "X-Transaction-Id"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 185,
+      "dsl_lines": [
+        185
+      ],
+      "route_id": "risk:POST:/risk/cve/profile/import"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/scanned-assets",
+      "query_parameters": [
+        "orderby",
+        "orderbyColumn",
+        "qf",
+        "row",
+        "start",
+        "token"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 26,
+      "dsl_lines": [
+        26
+      ],
+      "route_id": "risk:GET:/scanned-assets"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/scanned-assets",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 19,
+      "dsl_lines": [
+        19
+      ],
+      "route_id": "risk:POST:/scanned-assets"
+    },
+    {
+      "domain": "risk",
+      "method": "GET",
+      "path": "/vulasset",
+      "query_parameters": [
+        "lastmtime",
+        "orderby",
+        "orderbyColumn",
+        "qf",
+        "row",
+        "scoretype",
+        "start",
+        "token"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 61,
+      "dsl_lines": [
+        61
+      ],
+      "route_id": "risk:GET:/vulasset"
+    },
+    {
+      "domain": "risk",
+      "method": "POST",
+      "path": "/vulasset",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/risk/RiskApi.scala",
+      "line": 51,
+      "dsl_lines": [
+        51
+      ],
+      "route_id": "risk:POST:/vulasset"
+    },
+    {
+      "domain": "sigstore",
+      "method": "DELETE",
+      "path": "/sigstore",
+      "query_parameters": [
+        "rootOfTrustName"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 36,
+      "dsl_lines": [
+        36
+      ],
+      "route_id": "sigstore:DELETE:/sigstore"
+    },
+    {
+      "domain": "sigstore",
+      "method": "GET",
+      "path": "/sigstore",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 17,
+      "dsl_lines": [
+        17
+      ],
+      "route_id": "sigstore:GET:/sigstore"
+    },
+    {
+      "domain": "sigstore",
+      "method": "PATCH",
+      "path": "/sigstore",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 29,
+      "dsl_lines": [
+        29
+      ],
+      "route_id": "sigstore:PATCH:/sigstore"
+    },
+    {
+      "domain": "sigstore",
+      "method": "POST",
+      "path": "/sigstore",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 22,
+      "dsl_lines": [
+        22
+      ],
+      "route_id": "sigstore:POST:/sigstore"
+    },
+    {
+      "domain": "sigstore",
+      "method": "DELETE",
+      "path": "/verifier",
+      "query_parameters": [
+        "rootOfTrustName",
+        "verifierName"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 67,
+      "dsl_lines": [
+        67
+      ],
+      "route_id": "sigstore:DELETE:/verifier"
+    },
+    {
+      "domain": "sigstore",
+      "method": "GET",
+      "path": "/verifier",
+      "query_parameters": [
+        "rootOfTrustName"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 46,
+      "dsl_lines": [
+        46
+      ],
+      "route_id": "sigstore:GET:/verifier"
+    },
+    {
+      "domain": "sigstore",
+      "method": "PATCH",
+      "path": "/verifier",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 60,
+      "dsl_lines": [
+        60
+      ],
+      "route_id": "sigstore:PATCH:/verifier"
+    },
+    {
+      "domain": "sigstore",
+      "method": "POST",
+      "path": "/verifier",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/sigstore/SigstoreApi.scala",
+      "line": 53,
+      "dsl_lines": [
+        53
+      ],
+      "route_id": "sigstore:POST:/verifier"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/container",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 89,
+      "dsl_lines": [
+        89
+      ],
+      "route_id": "workload:GET:/container"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/container/process",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 98,
+      "dsl_lines": [
+        98
+      ],
+      "route_id": "workload:GET:/container/process"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/container/processHistory",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 107,
+      "dsl_lines": [
+        107
+      ],
+      "route_id": "workload:GET:/container/processHistory"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/domain",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 159,
+      "dsl_lines": [
+        159
+      ],
+      "route_id": "workload:GET:/domain"
+    },
+    {
+      "domain": "workload",
+      "method": "PATCH",
+      "path": "/domain",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 164,
+      "dsl_lines": [
+        164
+      ],
+      "route_id": "workload:PATCH:/domain"
+    },
+    {
+      "domain": "workload",
+      "method": "POST",
+      "path": "/domain",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 171,
+      "dsl_lines": [
+        171
+      ],
+      "route_id": "workload:POST:/domain"
+    },
+    {
+      "domain": "workload",
+      "method": "DELETE",
+      "path": "/sniffer",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 139,
+      "dsl_lines": [
+        139
+      ],
+      "route_id": "workload:DELETE:/sniffer"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/sniffer",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 118,
+      "dsl_lines": [
+        118
+      ],
+      "route_id": "workload:GET:/sniffer"
+    },
+    {
+      "domain": "workload",
+      "method": "PATCH",
+      "path": "/sniffer",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 132,
+      "dsl_lines": [
+        132
+      ],
+      "route_id": "workload:PATCH:/sniffer"
+    },
+    {
+      "domain": "workload",
+      "method": "POST",
+      "path": "/sniffer",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 125,
+      "dsl_lines": [
+        125
+      ],
+      "route_id": "workload:POST:/sniffer"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/sniffer/pcap",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 148,
+      "dsl_lines": [
+        148
+      ],
+      "route_id": "workload:GET:/sniffer/pcap"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/workload",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 18,
+      "dsl_lines": [
+        18
+      ],
+      "route_id": "workload:GET:/workload"
+    },
+    {
+      "domain": "workload",
+      "method": "POST",
+      "path": "/workload",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 25,
+      "dsl_lines": [
+        25
+      ],
+      "route_id": "workload:POST:/workload"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/workload/compliance",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 78,
+      "dsl_lines": [
+        78
+      ],
+      "route_id": "workload:GET:/workload/compliance"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/workload/monitor",
+      "query_parameters": [
+        "id",
+        "monitor"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 65,
+      "dsl_lines": [
+        65
+      ],
+      "route_id": "workload:GET:/workload/monitor"
+    },
+    {
+      "domain": "workload",
+      "method": "POST",
+      "path": "/workload/scan-report",
+      "query_parameters": [],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 37,
+      "dsl_lines": [
+        37
+      ],
+      "route_id": "workload:POST:/workload/scan-report"
+    },
+    {
+      "domain": "workload",
+      "method": "ANY",
+      "path": "/workload/scanned",
+      "query_parameters": [
+        "limit",
+        "start"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 48,
+      "dsl_lines": [],
+      "implicit_method": true,
+      "route_id": "workload:ANY:/workload/scanned"
+    },
+    {
+      "domain": "workload",
+      "method": "GET",
+      "path": "/workload/workload-by-id",
+      "query_parameters": [
+        "id"
+      ],
+      "required_headers": [
+        "Token"
+      ],
+      "cookies": [],
+      "source": "admin/src/main/scala/com/neu/api/workload/WorkloadApi.scala",
+      "line": 56,
+      "dsl_lines": [
+        56
+      ],
+      "route_id": "workload:GET:/workload/workload-by-id"
+    }
+  ]
+}

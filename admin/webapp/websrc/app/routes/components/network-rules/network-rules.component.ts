@@ -119,6 +119,7 @@ export class NetworkRulesComponent implements OnInit, OnChanges, OnDestroy {
       const $win = $(GlobalVariable.window);
       if (params && params.api) {
         this.gridApi = params.api;
+        this.refresh();
       }
       setTimeout(() => {
         if (params && params.api) {
@@ -176,8 +177,6 @@ export class NetworkRulesComponent implements OnInit, OnChanges, OnDestroy {
         }
       );
     }
-    this.refresh();
-
     //refresh the page when it switched to a remote cluster
     this.switchClusterSubscription =
       this.multiClusterService.onClusterSwitchedEvent$.subscribe(() => {
@@ -204,6 +203,9 @@ export class NetworkRulesComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   refresh = () => {
+    if (!this.gridApi) {
+      return;
+    }
     this.refreshing$.next(true);
     this.selectedNetworkRules = [];
     if (
