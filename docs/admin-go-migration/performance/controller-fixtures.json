@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "max_request_bytes": 67108864,
+  "rules": [
+    {
+      "id": "large-auth-body",
+      "match": {"method": "POST", "path": "/v1/auth"},
+      "response": {"status": 401, "json": {"error": "missing fixture credentials"}}
+    },
+    {
+      "id": "eula-steady",
+      "match": {"method": "GET", "path": "/v1/eula", "headers": {"X-R-SSO": "false"}},
+      "response": {"status": 200, "json": {"eula": {"accepted": true}}}
+    },
+    {
+      "id": "large-download",
+      "match": {"method": "GET", "path": "/v1/file/config", "query": {"raw": "true"}},
+      "response": {
+        "status": 200,
+        "headers": {"Content-Type": "application/octet-stream"},
+        "repeat": {"text": "0123456789abcdef", "bytes": 52428800}
+      }
+    },
+    {
+      "id": "large-upload",
+      "match": {"method": "POST", "path": "/v1/file/config"},
+      "response": {"status": 200, "json": {"status": "ok"}}
+    },
+    {
+      "id": "cache-pressure-groups",
+      "match": {
+        "method": "GET",
+        "path": "/v1/group",
+        "query": {"view": "pod", "with_cap": "false"}
+      },
+      "response": {
+        "status": 200,
+        "json": {
+          "groups": [
+            {
+              "name": "group-one", "comment": "fixture", "domain": "prod",
+              "learned": false, "reserved": false, "criteria": [], "members": [],
+              "policy_rules": [], "response_rules": [], "policy_mode": null,
+              "profile_mode": "basic", "baseline_profile": null, "platform_role": "",
+              "cap_change_mode": true, "cap_scorable": null, "kind": "container",
+              "cfg_type": "user_created", "not_scored": false, "monitor_metric": true,
+              "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30
+            },
+            {
+              "name": "group-two", "comment": "fixture", "domain": "prod",
+              "learned": false, "reserved": false, "criteria": [], "members": [],
+              "policy_rules": [], "response_rules": [], "policy_mode": null,
+              "profile_mode": "basic", "baseline_profile": null, "platform_role": "",
+              "cap_change_mode": true, "cap_scorable": null, "kind": "container",
+              "cfg_type": "user_created", "not_scored": false, "monitor_metric": true,
+              "group_sess_cur": 10, "group_sess_rate": 20, "group_band_width": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "intermittent-controller-failure",
+      "match": {"method": "GET", "path": "/v1/system/license"},
+      "responses": [
+        {"status": 200, "json": {"license": {"name": "fixture"}}},
+        {"status": 503, "json": {"error": "fixture unavailable"}},
+        {"close_connection": true},
+        {"status": 200, "delay_ms": 250, "json": {"license": {"name": "fixture"}}}
+      ]
+    }
+  ]
+}

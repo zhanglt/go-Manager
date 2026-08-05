@@ -245,8 +245,7 @@
   <ng-container *ngIf="form.controls.imageName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Image
-      {{ getOperator(form.get('matchTypeImage')?.value) }}
+      >Image {{ getOperator(form.get('matchTypeImage')?.value) }}
       {{ form.controls.imageName.value }}
       <button (click)="clear(FilterView.IMAGE)" class="remove-button">
         <i class="eos-icons">close</i>
@@ -256,8 +255,7 @@
   <ng-container *ngIf="form.controls.nodeName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Node
-      {{ getOperator(form.get('matchTypeNode')?.value) }}
+      >Node {{ getOperator(form.get('matchTypeNode')?.value) }}
       {{ form.controls.nodeName.value }}
       <button (click)="clear(FilterView.NODE)" class="remove-button">
         <i class="eos-icons">close</i>
@@ -267,8 +265,7 @@
   <ng-container *ngIf="form.controls.containerName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Container
-      {{ getOperator(form.get('matchTypeContainer')?.value) }}
+      >Container {{ getOperator(form.get('matchTypeContainer')?.value) }}
       {{ form.controls.containerName.value }}
       <button (click)="clear(FilterView.CONTAINER)" class="remove-button">
         <i class="eos-icons">close</i>

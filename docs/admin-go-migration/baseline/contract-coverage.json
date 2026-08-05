@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "route_count": 263,
-  "case_count": 304,
+  "case_count": 308,
   "covered_route_count": 263,
   "coverage_percent": 100.0,
   "missing_route_count": 0,

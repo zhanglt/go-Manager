@@ -424,9 +424,6 @@ func decodeJSON(response *http.Response, target any) error {
 
 func copyResponse(c *gin.Context, response *http.Response) {
 	for name, values := range response.Header {
-		if strings.EqualFold(name, "Content-Length") {
-			continue
-		}
 		for _, value := range values {
 			c.Writer.Header().Add(name, value)
 		}

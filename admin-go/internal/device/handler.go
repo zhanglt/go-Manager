@@ -39,6 +39,7 @@ type Handler struct {
 	debugJobs         map[string]*supportJob
 	jobsWG            sync.WaitGroup
 	closed            bool
+	metrics           SupportMetrics
 }
 
 type debugFile struct{ Path string }
@@ -49,6 +50,14 @@ type SupportOptions struct {
 	Timeout       time.Duration
 	MaxFileBytes  int64
 	MaxConcurrent int
+	Metrics       SupportMetrics
+}
+
+type SupportMetrics interface {
+	SupportStarted()
+	SupportFinished(outcome string, elapsed time.Duration)
+	SupportRejected(reason string)
+	SupportDownloaded(bytes int64)
 }
 
 var debugEnforcerID = regexp.MustCompile(`^[A-Za-z0-9._:-]+$`)
@@ -123,6 +132,7 @@ func NewSupportHandler(client *controller.Client, resolver *controller.TargetRes
 	h.supportTimeout = options.Timeout
 	h.maxDebugFileBytes = options.MaxFileBytes
 	h.supportSlots = make(chan struct{}, options.MaxConcurrent)
+	h.metrics = options.Metrics
 	return h, nil
 }
 
@@ -623,9 +633,6 @@ func requiredQuery(c *gin.Context, name string) (string, bool) {
 
 func copyResponse(c *gin.Context, response *http.Response) {
 	for name, values := range response.Header {
-		if strings.EqualFold(name, "Content-Length") {
-			continue
-		}
 		for _, value := range values {
 			c.Writer.Header().Add(name, value)
 		}

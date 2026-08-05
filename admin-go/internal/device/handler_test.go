@@ -189,7 +189,10 @@ func TestDeviceReadRoutes(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.manager, nil)
 			request.Header.Set("Token", "token")
 			engine.ServeHTTP(response, request)
-			if response.Code != http.StatusOK || response.Header().Get("X-Fixture") != "forwarded" || response.Body.String() != `{"status":"ok"}` {
+			if response.Code != http.StatusOK ||
+				response.Header().Get("X-Fixture") != "forwarded" ||
+				response.Header().Get("Content-Length") != "15" ||
+				response.Body.String() != `{"status":"ok"}` {
 				t.Fatalf("response = %d %v %s", response.Code, response.Header(), response.Body.String())
 			}
 		})

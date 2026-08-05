@@ -111,6 +111,11 @@ func NewHandler(client *controller.Client, resolver *controller.TargetResolver, 
 	return &Handler{transfer: transfer.New(client, resolver, sessions), sessions: sessions, nist: newNISTDatabase()}
 }
 
+func (h *Handler) LoadLocalData() error {
+	h.nist.once.Do(h.nist.load)
+	return h.nist.err
+}
+
 func (h *Handler) Export(resource string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input profileExportInput
@@ -171,7 +176,11 @@ func (h *Handler) QueryCVEAssets(c *gin.Context) {
 	}
 	body, _ := json.Marshal(cleanNulls(value))
 	query := url.Values{}
-	if token, present := c.GetQuery("queryToken"); present {
+	token, present := c.GetQuery("queryId")
+	if !present {
+		token, present = c.GetQuery("queryToken")
+	}
+	if present {
 		query.Set("token", token)
 	}
 	h.transfer.Request(c, http.MethodPost, query, nil, body, "assetvul")

@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-const defaultMaxBodyBytes int64 = 50 * 1024 * 1024
-
 type Config struct {
 	Server     ServerConfig
 	Controller ControllerConfig
@@ -33,8 +31,12 @@ type ServerConfig struct {
 	PrivateKeyFile    string
 	MaxHeaderBytes    int
 	MaxBodyBytes      int64
+	MaxConnections    int
 	PathPrefix        string
 	ReadHeaderTimeout time.Duration
+	ReadTimeout       time.Duration
+	WriteTimeout      time.Duration
+	IdleTimeout       time.Duration
 	ShutdownTimeout   time.Duration
 }
 
@@ -101,6 +103,30 @@ func Load() (Config, error) {
 	maxHeader, err := parseBytes(env("HTTP_MAX_HEADER_LENGTH", "32k"))
 	if err != nil {
 		problems = append(problems, fmt.Errorf("HTTP_MAX_HEADER_LENGTH: %w", err))
+	}
+	maxBody, err := parseBytes(env("MANAGER_MAX_BODY_BYTES", "50m"))
+	if err != nil {
+		problems = append(problems, fmt.Errorf("MANAGER_MAX_BODY_BYTES: %w", err))
+	}
+	maxConnections, err := strconv.Atoi(env("MANAGER_MAX_CONNECTIONS", "1024"))
+	if err != nil || maxConnections < 1 {
+		problems = append(problems, errors.New("MANAGER_MAX_CONNECTIONS must be a positive integer"))
+	}
+	readHeaderTimeout, err := positiveDuration("MANAGER_READ_HEADER_TIMEOUT", "10s")
+	if err != nil {
+		problems = append(problems, err)
+	}
+	readTimeout, err := positiveDuration("MANAGER_READ_TIMEOUT", "2m")
+	if err != nil {
+		problems = append(problems, err)
+	}
+	writeTimeout, err := positiveDuration("MANAGER_WRITE_TIMEOUT", "15m")
+	if err != nil {
+		problems = append(problems, err)
+	}
+	idleTimeout, err := positiveDuration("MANAGER_IDLE_TIMEOUT", "2m")
+	if err != nil {
+		problems = append(problems, err)
 	}
 	shutdownTimeout, err := time.ParseDuration(env("MANAGER_SHUTDOWN_TIMEOUT", "30s"))
 	if err != nil || shutdownTimeout <= 0 {
@@ -190,9 +216,13 @@ func Load() (Config, error) {
 			CertificateFile:   env("MANAGER_CERT_FILE", "/etc/neuvector/certs/ssl-cert.pem"),
 			PrivateKeyFile:    env("MANAGER_KEY_FILE", "/etc/neuvector/certs/ssl-cert.key"),
 			MaxHeaderBytes:    maxHeader,
-			MaxBodyBytes:      defaultMaxBodyBytes,
+			MaxBodyBytes:      int64(maxBody),
+			MaxConnections:    maxConnections,
 			PathPrefix:        prefix,
-			ReadHeaderTimeout: 10 * time.Second,
+			ReadHeaderTimeout: readHeaderTimeout,
+			ReadTimeout:       readTimeout,
+			WriteTimeout:      writeTimeout,
+			IdleTimeout:       idleTimeout,
 			ShutdownTimeout:   shutdownTimeout,
 		},
 		Controller: ControllerConfig{BaseURL: baseURL, TLSVerify: tlsVerify, Timeout: controllerTimeout},
@@ -218,6 +248,14 @@ func Load() (Config, error) {
 		},
 		SSO: SSOConfig{PublicURL: publicURL, TTL: ssoTTL, MaxEntries: ssoMaxEntries},
 	}, nil
+}
+
+func positiveDuration(name, fallback string) (time.Duration, error) {
+	value, err := time.ParseDuration(env(name, fallback))
+	if err != nil || value <= 0 {
+		return 0, fmt.Errorf("%s must be a positive duration", name)
+	}
+	return value, nil
 }
 
 func parsePublicURL(value string, tlsEnabled bool) (*url.URL, error) {

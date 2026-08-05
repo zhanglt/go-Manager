@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "backend_probe": {
+    "url": "${ENV:RW004_GO_METRICS_URL}",
+    "contains": "go_goroutines",
+    "insecure": true,
+    "timeout": 10
+  },
+  "workflows": [
+    {"id": "ui-login", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "login"], "evidence_files": ["/evidence/rw004/screenshots/login.png"]},
+    {"id": "ui-dashboard", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "dashboard"], "evidence_files": ["/evidence/rw004/screenshots/dashboard.png"]},
+    {"id": "ui-workloads", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "workloads"], "evidence_files": ["/evidence/rw004/screenshots/workloads.png"]},
+    {"id": "ui-network-policy", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "network-policy"], "evidence_files": ["/evidence/rw004/screenshots/network-policy.png"]},
+    {"id": "ui-risk", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "risk"], "evidence_files": ["/evidence/rw004/screenshots/risk.png"]},
+    {"id": "ui-settings", "kind": "ui", "command": ["/evidence/rw004/ui-e2e", "settings"], "evidence_files": ["/evidence/rw004/screenshots/settings.png"]},
+    {"id": "cli-login", "kind": "cli", "command": ["/evidence/rw004/cli-e2e", "login"]},
+    {"id": "cli-system", "kind": "cli", "command": ["/evidence/rw004/cli-e2e", "system"]},
+    {"id": "cli-workloads", "kind": "cli", "command": ["/evidence/rw004/cli-e2e", "workloads"]},
+    {"id": "cli-federation", "kind": "cli", "command": ["/evidence/rw004/cli-e2e", "federation"]}
+  ]
+}

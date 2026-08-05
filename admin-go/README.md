@@ -64,7 +64,13 @@ MANAGER_SUPPORT_COMMAND="$(realpath ../scripts/support)" \
   chain 与 PKCS#1/PKCS#8 RSA key，否则按 Scala 兼容语义生成仅驻留内存的 RSA-2048/SHA-256
   临时自签名证书。生产部署必须挂载受信任证书。
 - `MANAGER_SHUTDOWN_TIMEOUT=30s`：收到 SIGTERM/SIGINT 后的退出期限。
-- `MANAGER_INTERNAL_ADDR`：非空时启用独立的 `/livez` 和 `/readyz` HTTP listener。
+- `MANAGER_INTERNAL_ADDR`：非空时启用独立的 `/livez`、`/readyz` 和 `/metrics` HTTP listener；
+  该 listener 不提供 TLS 或认证，必须由 NetworkPolicy 隔离，禁止暴露到用户入口。
+- `HTTP_MAX_HEADER_LENGTH=32k`、`MANAGER_MAX_BODY_BYTES=50m`：请求 Header 与 Body 上限。
+- `MANAGER_MAX_CONNECTIONS=1024`：公开和内部 listener 各自允许的并发连接上限。
+- `MANAGER_READ_HEADER_TIMEOUT=10s`、`MANAGER_READ_TIMEOUT=2m`、
+  `MANAGER_WRITE_TIMEOUT=15m`、`MANAGER_IDLE_TIMEOUT=2m`：HTTP 读头、完整读取、响应写入和
+  keep-alive 空闲超时。较长的写入期限为流式下载保留空间，但仍保证连接最终释放。
 - `PATH_PREFIX`：静态资源和 API 的路径前缀。
 - `IS_DEV=true`：使用未压缩 JavaScript；其他值使用生产 `.js.gz`。
 
@@ -99,7 +105,19 @@ SSO 登录结果使用随机 `nv_sso_handoff` Cookie 一次性交付；该 Cooki
 
 Support 收集不需要 Linux capability。Token 与 Rancher session 仅通过子进程环境传递，不出现在
 命令行或日志；结果使用 `0600` 原子写入，并在下载完成、中断、失败、超时、替换或 Manager
-关闭时删除。IP 数据库首次请求时惰性加载，避免增加进程启动期常驻内存。
+关闭时删除。生产启动会完整加载并校验 IP 与 CIS/NIST 数据库；任一数据文件缺失或损坏时不会
+绑定服务端口，也不会报告 ready。
+
+### 可观测性
+
+`/metrics` 使用 Prometheus 文本格式，覆盖规范化路由的请求量、状态与延迟、登录失败、
+Controller 请求/失败/可用性、缓存容量/字节/驱逐、session 容量、goroutine、RSS，以及 support
+命令的运行数、结果、耗时和下载字节。标签仅包含有界的 method、route、status、cache、reason
+和 outcome；不会包含 Token、凭据、用户名、原始 URL/query、cluster ID 或文件名。
+
+可部署的告警规则和 Grafana dashboard 位于 `deploy/observability/`。初始告警覆盖 5xx、登录失败、
+P95/P99、Controller 可用性、缓存/session 饱和、RSS、goroutine 和超时 support 命令。发布前应按
+容器内存限制、Scala 性能基线及 RC 压测结果复核阈值。
 
 ## 构建与打包
 
