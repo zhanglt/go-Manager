@@ -166,9 +166,9 @@ cache-only 验证、push 和内容验证目标。builder/runtime 镜像固定多
 本地 OCI evidence 还验证 attestation manifest 同时包含 `https://spdx.dev/Document` SBOM 和
 `https://slsa.dev/provenance/v1` provenance predicate。
 
-Angular `npm ci` 当前仍报告 36 个既有依赖告警（3 low、8 moderate、23 high、2 critical）。
-本项未进行可能破坏 UI 兼容性的大版本升级；依赖漏洞门禁和修复由 RW-007 跟踪，发布前必须
-完成风险确认或升级。
+Angular 完整开发工具链 audit 当前仍报告 36 个既有告警（3 low、8 moderate、23 high、
+2 critical），但 `--omit=dev` 生产依赖审计为 0。本项未进行可能破坏 UI 兼容性的大版本升级；
+开发工具链告警由 RW-007 和 Renovate 持续跟踪。
 
 本项完成不表示镜像已签名发布或取得 FIPS 认证；Security/FIPS Owner 的工具链批准、不可变 digest、
 签名、SBOM/provenance 归档及 Release Candidate 签字仍分别由 RW-001 和 RW-010 跟踪。
@@ -184,12 +184,12 @@ Angular `npm ci` 当前仍报告 36 个既有依赖告警（3 low、8 moderate�
 验收：测试、race、覆盖率、安全或生成制品回归会阻止合并。
 
 完成证据（2026-08-05）：`.github/workflows/admin-go-ci.yml` 对 PR、主分支和 release 分支配置
-Go test/race/vet/gofmt、32 项 Python 工具测试、patch whitespace、Scala 路由清单重新
+Go test/race/vet/gofmt、33 项 Python 工具测试、patch whitespace、Scala 路由清单重新
 生成比对及 263/263 strict coverage。安全 job 使用固定版本的 `go-licenses`、`govulncheck`、
 `pip-audit`、生产 UI 依赖 audit 和 gitleaks，并执行前端 lint/format check；Go 工具链固定为已修复标准库漏洞的
 1.26.5，`quic-go` 升至 0.59.1。镜像 job 实际构建 OCI layout，并由
-`verify_oci_attestations.py` 从被引用的 in-toto layer 验证 SPDX SBOM 与 SLSA v1 provenance，
-不能仅靠 Docker 参数字符串通过。
+`verify_oci_attestations.py` 递归 Buildx 的嵌套 OCI index，并从被引用的 in-toto layer 验证
+SPDX SBOM 与 SLSA v1 provenance，不能仅靠 Docker 参数字符串通过。
 
 每周日及手工触发 job 会构建 Scala/Go，使用彼此隔离的 HTTPS Controller fixture 执行全部
 308 个契约场景，并分别执行三轮缩时性能 smoke 和候选 Go 稳定性 smoke；报告与合成日志保留
@@ -199,9 +199,16 @@ QA 批准。`prettier-eslint` 已移至开发依赖，运行时 `uuid` 已升级
 为 0，PR 门禁从 low 起阻断任何新增生产依赖漏洞。开发工具链仍有 npm audit 告警，但不会进入
 发布镜像；由 Renovate 和独立工具链升级持续跟踪。
 
-远端 `Default` ruleset 当前只禁止删除和 non-fast-forward，尚未把上述 job 注册为 required
-status checks；workflow 合入并首次运行后，仓库管理员仍须将 PR 四个 job 设为 required，届时
-失败状态才会在 GitHub 服务端阻止合并。在该外部设置完成前，不宣告 RW-007 验收关闭。
+首次 GitHub PR CI 已在可写镜像的 run `30971502456` 实际通过四个 PR job：`Go test, race,
+vet and format`、`Python tools and generated baseline`、`Licenses, vulnerabilities and secrets`
+及 `Image SBOM and provenance`。首次失败还发现并修复了生成资产 gitleaks 误报范围和 Buildx
+嵌套 OCI index 验证缺口；第二次运行验证了 secret 扫描及真实 SBOM/provenance predicate。
+
+上游 `neuvector/manager` 对当前账号仅授予 pull、未授予 push/admin：推送 `main` 返回 HTTP
+403，更新 ruleset `2992788` 返回 HTTP 404（无管理权限时隐藏写接口）。因此上游 `Default`
+ruleset 仍只禁止 deletion 和 non-fast-forward，尚未注册上述 required status checks。仓库管理员
+须先合入 workflow，再原样保留现有规则并追加这四个 required checks；该外部设置完成前，不宣告
+RW-007 验收关闭。
 
 ### RW-008 可观测性与运行限制
 
