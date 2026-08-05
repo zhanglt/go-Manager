@@ -1,0 +1,311 @@
+name: Admin Go migration gates
+
+on:
+  pull_request:
+  push:
+    branches: [main, master, 'release/**']
+  schedule:
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-go-gates-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  GO_VERSION: '1.26.5'
+
+jobs:
+  go-quality:
+    name: Go test, race, vet and format
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: admin-go/go.sum
+      - name: Check patch whitespace
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = pull_request ] || [ "$EVENT_NAME" = push ]; then
+            git diff --check "$BASE_SHA..$HEAD_SHA"
+          else
+            git diff --check
+          fi
+      - name: Check Go format
+        run: test -z "$(gofmt -l admin-go)"
+      - name: Run Go tests
+        working-directory: admin-go
+        run: go test ./...
+      - name: Run Go race detector
+        working-directory: admin-go
+        run: go test -race ./...
+      - name: Run Go vet
+        working-directory: admin-go
+        run: go vet ./...
+
+  migration-baseline:
+    name: Python tools and generated baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Run migration tool tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s tools/migration -p 'test_*.py' -v
+      - name: Verify generated route inventory
+        run: |
+          python3 tools/migration/inventory_admin_routes.py \
+            --json "$RUNNER_TEMP/routes.json" --markdown "$RUNNER_TEMP/routes.md"
+          cmp docs/admin-go-migration/baseline/routes.json "$RUNNER_TEMP/routes.json"
+          cmp docs/admin-go-migration/baseline/routes.md "$RUNNER_TEMP/routes.md"
+      - name: Enforce strict 263/263 route coverage
+        run: |
+          python3 tools/migration/contract_coverage.py \
+            --routes docs/admin-go-migration/baseline/routes.json \
+            --manifest docs/admin-go-migration/baseline/contract-manifest.m2-poc.json \
+            --output "$RUNNER_TEMP/contract-coverage.json" --strict
+          cmp docs/admin-go-migration/baseline/contract-coverage.json \
+            "$RUNNER_TEMP/contract-coverage.json"
+          jq -e '.route_count == 263 and .covered_route_count == 263' \
+            "$RUNNER_TEMP/contract-coverage.json"
+
+  dependency-security:
+    name: Licenses, vulnerabilities and secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: admin-go/go.sum
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: admin/webapp/package-lock.manager.json
+      - name: Check Go dependency licenses
+        working-directory: admin-go
+        run: >-
+          go run github.com/google/go-licenses@v1.6.0 check ./...
+          --ignore=github.com/neuvector/manager/admin-go
+          --allowed_licenses=Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC,MIT,MPL-2.0
+      - name: Check reachable Go vulnerabilities
+        working-directory: admin-go
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...
+      - name: Check Python dependency vulnerabilities
+        run: |
+          python3 -m pip install --disable-pip-version-check pip-audit==2.9.0
+          python3 -m pip_audit -r package/requirements.txt
+      - name: Check frontend lint and format
+        working-directory: admin/webapp
+        run: |
+          cp package-lock.manager.json package-lock.json
+          npm ci --legacy-peer-deps
+          npm run lint:check
+          npm run format:check
+      - name: Block runtime UI dependency vulnerabilities
+        working-directory: admin/webapp
+        run: npm audit --package-lock-only --omit=dev --audit-level=low --legacy-peer-deps
+      - name: Scan the repository for secrets
+        working-directory: admin-go
+        run: go run github.com/zricethezav/gitleaks/v8@v8.28.0 dir .. --no-banner --redact --no-color
+
+  image-attestations:
+    name: Image SBOM and provenance
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build OCI image with attestations
+        run: |
+          docker buildx build --platform=linux/amd64 --target=final \
+            --sbom=true --provenance=mode=max \
+            --build-arg VERSION=ci --build-arg COMMIT="${GITHUB_SHA}" \
+            --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --output="type=oci,dest=$RUNNER_TEMP/manager.oci.tar" \
+            -f package/Dockerfile .
+      - name: Verify SBOM and provenance predicates
+        run: python3 tools/migration/verify_oci_attestations.py "$RUNNER_TEMP/manager.oci.tar"
+
+  scheduled-contract:
+    name: Full Scala/Go synthetic contract
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up Java
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: sbt
+      - name: Set up sbt
+        uses: sbt/setup-sbt@bfea3c5f48abd221b04a6df4798aa5eb8b6a2baf # v1
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: admin-go/go.sum
+      - name: Build both managers
+        run: |
+          sbt assembly
+          (cd admin-go && go build -trimpath -o "$RUNNER_TEMP/manager-go" ./cmd/manager)
+      - name: Run all 308 contract cases
+        env:
+          MANAGER_TEST_TOKEN: fixture-token-1234567890
+        run: |
+          mkdir -p "$RUNNER_TEMP/contract-logs" "$RUNNER_TEMP/support"
+          chmod 0700 "$RUNNER_TEMP/support"
+          cleanup() {
+            jobs -pr | xargs -r kill
+          }
+          trap cleanup EXIT
+          python3 tools/migration/controller_mock.py --https --port 19443 \
+            --fixtures docs/admin-go-migration/baseline/controller-fixtures.example.json \
+            >"$RUNNER_TEMP/contract-logs/controller-scala.log" 2>&1 &
+          python3 tools/migration/controller_mock.py --https --port 29443 \
+            --fixtures docs/admin-go-migration/baseline/controller-fixtures.example.json \
+            >"$RUNNER_TEMP/contract-logs/controller-go.log" 2>&1 &
+          env MANAGER_SSL=off MANAGER_SERVER_PORT=18443 CTRL_SERVER_IP=127.0.0.1 \
+            CTRL_SERVER_PORT=19443 java -Xms256m -Xmx2048m \
+            --add-opens=java.base/java.lang=ALL-UNNAMED \
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+            --add-opens=java.base/java.util=ALL-UNNAMED \
+            -jar admin/target/scala-3.3.5/admin-assembly-1.0.jar \
+            >"$RUNNER_TEMP/contract-logs/scala.log" 2>&1 &
+          env MANAGER_SSL=off MANAGER_SERVER_PORT=28443 MANAGER_INTERNAL_ADDR=127.0.0.1:29090 \
+            CTRL_SERVER_IP=127.0.0.1 CTRL_SERVER_PORT=29443 \
+            IP_GEO_IPV4_DB="$GITHUB_WORKSPACE/admin/src/main/resources/IP2LOCATION-LITE-DB1.CSV" \
+            IP_GEO_IPV6_DB="$GITHUB_WORKSPACE/admin/src/main/resources/IP2LOCATION-LITE-DB1.IPV6.CSV" \
+            CIS_NIST_DB="$GITHUB_WORKSPACE/admin/src/main/resources/CIS_NIST-MASTER.CSV" \
+            MANAGER_SUPPORT_COMMAND=/bin/true MANAGER_SUPPORT_TEMP_DIR="$RUNNER_TEMP/support" \
+            "$RUNNER_TEMP/manager-go" >"$RUNNER_TEMP/contract-logs/go.log" 2>&1 &
+          python3 - <<'PY'
+          import socket
+          import time
+          ports = (18443, 28443)
+          deadline = time.monotonic() + 180
+          while ports and time.monotonic() < deadline:
+              ports = tuple(port for port in ports if socket.socket().connect_ex(('127.0.0.1', port)))
+              time.sleep(0.2)
+          if ports:
+              raise SystemExit(f'managers did not start on ports: {ports}')
+          PY
+          python3 tools/migration/contract_runner.py \
+            --manifest docs/admin-go-migration/baseline/contract-manifest.m2-poc.json \
+            --left-url http://127.0.0.1:18443 --right-url http://127.0.0.1:28443 \
+            --output "$RUNNER_TEMP/contract-report.json" \
+            --approval-candidates-output "$RUNNER_TEMP/difference-candidates.json" \
+            --strict-normalization
+      - name: Upload contract evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: scheduled-contract-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/contract-report.json
+            ${{ runner.temp }}/difference-candidates.json
+            ${{ runner.temp }}/contract-logs/
+          retention-days: 14
+
+  scheduled-performance:
+    name: Performance and stability smoke
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      IP_GEO_IPV4_DB: ${{ github.workspace }}/admin/src/main/resources/IP2LOCATION-LITE-DB1.CSV
+      IP_GEO_IPV6_DB: ${{ github.workspace }}/admin/src/main/resources/IP2LOCATION-LITE-DB1.IPV6.CSV
+      CIS_NIST_DB: ${{ github.workspace }}/admin/src/main/resources/CIS_NIST-MASTER.CSV
+      MANAGER_SUPPORT_COMMAND: /bin/true
+      MANAGER_SUPPORT_TEMP_DIR: /tmp/neuvector-support
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - name: Set up Java
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: sbt
+      - name: Set up sbt
+        uses: sbt/setup-sbt@bfea3c5f48abd221b04a6df4798aa5eb8b6a2baf # v1
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: admin-go/go.sum
+      - name: Build both managers
+        run: |
+          mkdir -p "$MANAGER_SUPPORT_TEMP_DIR" "$RUNNER_TEMP/performance-logs"
+          chmod 0700 "$MANAGER_SUPPORT_TEMP_DIR"
+          sbt assembly
+          (cd admin-go && go build -trimpath -o cmd/manager/manager ./cmd/manager)
+      - name: Run performance smoke
+        run: |
+          python3 tools/migration/performance_gate.py run \
+            --config docs/admin-go-migration/performance/formal-gate.json \
+            --output "$RUNNER_TEMP/performance-smoke.json" \
+            --keep-logs "$RUNNER_TEMP/performance-logs" \
+            --scenario idle --scenario steady --scenario burst \
+            --runs 3 --duration-scale 0.02 || test -s "$RUNNER_TEMP/performance-smoke.json"
+          python3 tools/migration/performance_gate.py smoke-check \
+            --report "$RUNNER_TEMP/performance-smoke.json" \
+            --scenario idle --scenario steady --scenario burst \
+            --output "$RUNNER_TEMP/performance-smoke-gate.json"
+      - name: Run stability smoke
+        run: |
+          python3 tools/migration/performance_gate.py run \
+            --config docs/admin-go-migration/performance/formal-gate.json \
+            --output "$RUNNER_TEMP/stability-smoke.json" \
+            --keep-logs "$RUNNER_TEMP/stability-logs" \
+            --scenario stability-24h --runs 3 --duration-scale 0.001 \
+            || test -s "$RUNNER_TEMP/stability-smoke.json"
+          python3 tools/migration/performance_gate.py smoke-check \
+            --report "$RUNNER_TEMP/stability-smoke.json" \
+            --scenario stability-24h --output "$RUNNER_TEMP/stability-smoke-gate.json"
+      - name: Upload performance evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: scheduled-performance-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/*smoke*.json
+            ${{ runner.temp }}/performance-logs/
+            ${{ runner.temp }}/stability-logs/
+          retention-days: 14

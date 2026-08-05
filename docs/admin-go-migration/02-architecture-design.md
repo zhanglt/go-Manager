@@ -391,6 +391,15 @@ Query 整体写入日志，以免泄露 Token 或镜像凭据。
 - `/metrics`：请求数、延迟、Controller 错误、缓存、goroutine 和内存指标。
 
 内部 Listener 默认禁用；启用时由部署网络策略保护。pprof 仅允许测试构建显式启用。
+指标还覆盖登录失败、session/cache 容量、cache 容量驱逐，以及 support 命令运行数、结果、耗时
+和下载字节。所有 label 只使用 method、规范化 route、status、cache、reason 和 outcome 等固定
+低基数字段，禁止 Token、认证 Header、用户标识、原始 query、cluster ID 和文件名。
+
+HTTP 默认限制为 32 KiB Header、50 MiB Body、每 listener 1,024 个连接、10 秒读头、2 分钟读取、
+15 分钟写入和 2 分钟 keep-alive 空闲。公开 listener、TLS、配置和本地 support 资源先同步完成
+初始化及绑定，再置 readiness；进入关闭流程时立即撤销 readiness。Prometheus 告警与 Grafana
+dashboard 作为部署资产随 Go Manager 维护，覆盖 5xx、登录失败、P95/P99、RSS、goroutine、
+Controller 可用性、容量饱和和 support 长任务。
 
 ## 14. 构建、镜像与供应链
 

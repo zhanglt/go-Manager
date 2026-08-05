@@ -104,5 +104,5 @@ python3 tools/migration/contract_coverage.py \
 CI 最终应增加 `--strict`，要求覆盖率 100%、无未知 case、无重复 case ID 且无歧义。
 通常可通过 method/path 自动关联唯一 Route ID；`/processProfile` 和 `/fileProfile` 这类
 相同 method/path 的参数分流必须在 case 中显式设置 `covers`，Route ID 可从
-`routes.md` 或 `routes.json` 查询。当前 M2 Manifest 有 304 个 smoke case，覆盖全部
+`routes.md` 或 `routes.json` 查询。当前 M2 Manifest 有 308 个 smoke case，覆盖全部
 263 个语义路由；部分路由为不同请求分支保留多个用例，因此 case 数大于覆盖路由数。

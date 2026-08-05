@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "approved_environment": {
+    "approved": false,
+    "approval_id": "REQUIRED",
+    "approved_by": "REQUIRED",
+    "approval_ticket": "REQUIRED",
+    "approved_at": "REQUIRED"
+  },
+  "sanitized_fixture": {
+    "path": "/evidence/rw004/controller-fixtures.sanitized.json",
+    "sha256": "REQUIRED",
+    "approved": false,
+    "approved_by": "REQUIRED",
+    "approval_ticket": "REQUIRED",
+    "approved_at": "REQUIRED"
+  },
+  "contract": {
+    "manifest": "../baseline/contract-manifest.m2-poc.json",
+    "report": "/evidence/rw004/real-controller-contract.json",
+    "coverage_report": "/evidence/rw004/contract-coverage.json",
+    "minimum_cases": 308
+  },
+  "required_features": [
+    "success", "error", "gzip", "headers", "cookies", "federation",
+    "large_response", "stateful_transaction"
+  ],
+  "workflows": {
+    "report": "/evidence/rw004/workflows-report.json",
+    "required": [
+      "ui-login", "ui-dashboard", "ui-workloads", "ui-network-policy", "ui-risk",
+      "ui-settings", "cli-login", "cli-system", "cli-workloads", "cli-federation"
+    ]
+  },
+  "qa_approval": {
+    "approved": false,
+    "approved_by": "REQUIRED",
+    "approval_ticket": "REQUIRED",
+    "approved_at": "REQUIRED"
+  },
+  "ui_owner_approval": {
+    "approved": false,
+    "approved_by": "REQUIRED",
+    "approval_ticket": "REQUIRED",
+    "approved_at": "REQUIRED"
+  }
+}

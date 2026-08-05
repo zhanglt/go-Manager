@@ -111,6 +111,11 @@ func NewHandler(client *controller.Client, resolver *controller.TargetResolver, 
 	return &Handler{transfer: transfer.New(client, resolver, sessions), sessions: sessions, nist: newNISTDatabase()}
 }
 
+func (h *Handler) LoadLocalData() error {
+	h.nist.once.Do(h.nist.load)
+	return h.nist.err
+}
+
 func (h *Handler) Export(resource string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input profileExportInput

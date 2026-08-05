@@ -2,17 +2,23 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"sync/atomic"
 
 	"github.com/neuvector/manager/admin-go/internal/config"
 	"github.com/neuvector/manager/admin-go/internal/controller"
+	"golang.org/x/net/netutil"
 )
 
 func Run(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
+	if cfg.Server.MaxConnections < 1 {
+		return errors.New("server max connections must be positive")
+	}
 	controllerClient := controller.New(cfg.Controller.BaseURL, cfg.Controller.TLSVerify, cfg.Controller.Timeout)
 	handler, err := newManagedHandler(cfg, logger, controllerClient)
 	if err != nil {
@@ -21,6 +27,8 @@ func Run(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 	publicServer := &http.Server{
 		Addr: cfg.Server.Address, Handler: handler,
 		MaxHeaderBytes: cfg.Server.MaxHeaderBytes, ReadHeaderTimeout: cfg.Server.ReadHeaderTimeout,
+		ReadTimeout: cfg.Server.ReadTimeout, WriteTimeout: cfg.Server.WriteTimeout,
+		IdleTimeout: cfg.Server.IdleTimeout,
 	}
 	certificateSource := "disabled"
 	if cfg.Server.TLS {
@@ -40,23 +48,35 @@ func Run(ctx context.Context, cfg config.Config, logger *slog.Logger) error {
 	servers := []*http.Server{publicServer}
 	if cfg.Server.InternalAddress != "" {
 		servers = append(servers, &http.Server{
-			Addr: cfg.Server.InternalAddress, Handler: NewHealthHandler(ready.Load),
+			Addr: cfg.Server.InternalAddress, Handler: NewHealthHandler(ready.Load, handler.metrics),
 			MaxHeaderBytes: cfg.Server.MaxHeaderBytes, ReadHeaderTimeout: cfg.Server.ReadHeaderTimeout,
+			ReadTimeout: cfg.Server.ReadTimeout, WriteTimeout: cfg.Server.WriteTimeout,
+			IdleTimeout: cfg.Server.IdleTimeout,
 		})
+	}
+
+	listeners := make([]net.Listener, 0, len(servers))
+	for index, current := range servers {
+		listener, err := net.Listen("tcp", current.Addr)
+		if err != nil {
+			for _, opened := range listeners {
+				_ = opened.Close()
+			}
+			_ = handler.Close()
+			return fmt.Errorf("listen on %s: %w", current.Addr, err)
+		}
+		listener = netutil.LimitListener(listener, cfg.Server.MaxConnections)
+		if index == 0 && cfg.Server.TLS {
+			listener = tls.NewListener(listener, current.TLSConfig)
+		}
+		listeners = append(listeners, listener)
 	}
 
 	errorsChannel := make(chan error, len(servers))
 	for index, current := range servers {
-		isPublic := index == 0
-		go func(instance *http.Server) {
-			var err error
-			if isPublic && cfg.Server.TLS {
-				err = instance.ListenAndServeTLS("", "")
-			} else {
-				err = instance.ListenAndServe()
-			}
-			errorsChannel <- err
-		}(current)
+		go func(instance *http.Server, listener net.Listener) {
+			errorsChannel <- instance.Serve(listener)
+		}(current, listeners[index])
 	}
 	ready.Store(true)
 	logger.Info("manager started", "address", cfg.Server.Address, "tls", cfg.Server.TLS, "tls_certificate_source", certificateSource, "path_prefix", cfg.Server.PathPrefix)

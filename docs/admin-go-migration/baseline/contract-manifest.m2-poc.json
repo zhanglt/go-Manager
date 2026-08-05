@@ -2,7 +2,18 @@
   "schema_version": 1,
   "normalization": {
     "ignored_headers": ["date", "server"],
-    "ignored_json_pointers": []
+    "ignored_json_pointers": [],
+    "reason": "HTTP date and implementation server identifiers are non-deterministic transport metadata"
+  },
+  "features": {
+    "success": {"cases": ["m2-authenticated-version-get"]},
+    "error": {"cases": ["m2-error-missing-token-self", "m2-error-invalid-group-pagination", "m2-error-missing-file-config-id"], "status_min": 400},
+    "gzip": {"cases": ["m2-workload-scanned-first-page-get"]},
+    "headers": {"cases": ["m2-sniffer-pcap-get"], "response_headers": ["content-disposition"]},
+    "cookies": {"cases": ["m2-login-cookie-post"], "request_headers": ["cookie"]},
+    "federation": {"cases": ["m2-cluster-switch-get", "m2-fed-summary-get"]},
+    "large_response": {"cases": ["m2-file-config-all-get"], "min_decoded_body_bytes": 1048576},
+    "stateful_transaction": {"cases": ["m2-file-config-transaction-post"]}
   },
   "cases": [
     {
@@ -17,16 +28,32 @@
           "new_password": null
         }
       },
-      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}
+    },
+    {
+      "id": "m2-login-cookie-post",
+      "covers": ["authentication:POST:/auth"],
+      "request": {
+        "method": "POST",
+        "path": "/auth",
+        "headers": {"Cookie": "R_SESS=fixture-rancher-session"},
+        "body_json": {
+          "username": "fixture-user",
+          "password": "fixture-password",
+          "isRancherSSOUrl": true,
+          "new_password": null
+        }
+      },
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}
     },
     {"id": "m2-samlslo-get", "request": {"method": "GET", "path": "/samlslo"}},
     {"id": "m2-samlslo-post", "request": {"method": "POST", "path": "/samlslo"}},
     {"id": "m2-token-auth-server-get", "request": {"method": "GET", "path": "/token_auth_server"}},
     {"id": "m2-openid-auth-get", "request": {"method": "GET", "path": "/openId_auth"}},
     {"id": "m2-token-auth-server-post", "request": {"method": "POST", "path": "/token_auth_server", "headers": {"Host": "manager.example"}, "body_text": "fixture-saml-assertion"}},
-    {"id": "m2-token-auth-server-patch", "request": {"method": "PATCH", "path": "/token_auth_server"}, "normalization": {"ignored_json_pointers": ["/login_timestamp"]}},
+    {"id": "m2-token-auth-server-patch", "request": {"method": "PATCH", "path": "/token_auth_server"}, "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}},
     {"id": "m2-openid-auth-callback-get", "request": {"method": "GET", "path": "/openId_auth?code=fixture-code&state=fixture-state", "headers": {"Host": "manager.example"}}},
-    {"id": "m2-openid-auth-patch", "request": {"method": "PATCH", "path": "/openId_auth"}, "normalization": {"ignored_json_pointers": ["/login_timestamp"]}},
+    {"id": "m2-openid-auth-patch", "request": {"method": "PATCH", "path": "/openId_auth"}, "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}},
     {"id": "m2-token-auth-server-slo-get", "request": {"method": "GET", "path": "/token_auth_server_slo", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
     {
       "id": "m2-public-gravatar-get",
@@ -51,7 +78,7 @@
         "path": "/self?isOnNV=true&isRancherSSOUrl=false",
         "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
       },
-      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}
     },
     {
       "id": "m2-heartbeat-patch",
@@ -151,7 +178,7 @@
         "method": "POST", "path": "/token",
         "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
       },
-      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}
     },
     {
       "id": "m2-single-user-get",
@@ -159,7 +186,7 @@
         "method": "GET", "path": "/user?name=fixture-user",
         "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}
       },
-      "normalization": {"ignored_json_pointers": ["/login_timestamp"]}
+      "normalization": {"ignored_json_pointers": ["/login_timestamp"], "reason": "login timestamps are generated independently by each Manager process"}
     },
     {
       "id": "m2-user-list-get",
@@ -1115,6 +1142,21 @@
     {
       "id": "m2-sniffer-pcap-get",
       "request": {"method": "GET", "path": "/sniffer/pcap?id=sniffer-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "m2-error-missing-token-self",
+      "covers": ["authentication:GET:/self"],
+      "request": {"method": "GET", "path": "/self?isOnNV=true&isRancherSSOUrl=false"}
+    },
+    {
+      "id": "m2-error-invalid-group-pagination",
+      "covers": ["group:GET:/group"],
+      "request": {"method": "GET", "path": "/group?start=invalid&limit=1", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
+    },
+    {
+      "id": "m2-error-missing-file-config-id",
+      "covers": ["device:GET:/file/config"],
+      "request": {"method": "GET", "path": "/file/config", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}
     },
     {
       "id": "m2-logout-delete",

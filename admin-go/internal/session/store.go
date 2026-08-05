@@ -140,3 +140,5 @@ func (s *Store) Len() int {
 	defer s.mu.RUnlock()
 	return len(s.entries)
 }
+
+func (s *Store) Capacity() int { return s.max }

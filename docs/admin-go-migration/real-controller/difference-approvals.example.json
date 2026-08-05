@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "approved_by": "REQUIRED_QA_OWNER",
+  "approval_ticket": "REQUIRED_TICKET",
+  "approved_at": "REQUIRED_DATE",
+  "differences": []
+}
