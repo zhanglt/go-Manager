@@ -11,7 +11,8 @@
       "response": {
         "status": 200,
         "headers": {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Set-Cookie": "fixture_session=fixture; Path=/; Secure; HttpOnly; SameSite=Lax"
         },
         "json": {
           "password_days_until_expire": -1,
@@ -496,7 +497,7 @@
         "method": "GET", "path": "/v1/fed/cluster/member-one/v1/file/config",
         "query": {"raw": "true"}
       },
-      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "text": "fixture-all-config"}
+      "response": {"status": 200, "headers": {"Content-Type": "application/octet-stream"}, "repeat": {"text": "fixture-config-line\n", "bytes": 2097152}}
     },
     {
       "id": "remote-file-config-policy-success",

@@ -289,9 +289,6 @@ func requiredQuery(c *gin.Context, name string) (string, bool) {
 
 func copyResponse(c *gin.Context, response *http.Response) {
 	for name, values := range response.Header {
-		if strings.EqualFold(name, "Content-Length") {
-			continue
-		}
 		for _, value := range values {
 			if strings.EqualFold(name, "Content-Disposition") {
 				value = quoteDispositionFilename(value)

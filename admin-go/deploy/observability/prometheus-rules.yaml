@@ -1,0 +1,110 @@
+groups:
+  - name: neuvector-manager
+    interval: 30s
+    rules:
+      - alert: NeuVectorManagerHigh5xxRate
+        expr: |
+          sum(rate(manager_http_requests_total{status=~"5.."}[5m]))
+            /
+          clamp_min(sum(rate(manager_http_requests_total[5m])), 0.001) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager 5xx rate exceeds 5%
+          description: The Manager has returned more than 5% server errors for 10 minutes.
+
+      - alert: NeuVectorManagerLoginFailures
+        expr: |
+          sum(rate(manager_login_failures_total[5m]))
+            /
+          clamp_min(sum(rate(manager_http_requests_total{route=~".*/(auth|token_auth_server|openId_auth)"}[5m])), 0.001) > 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager login failures exceed 10%
+          description: Authentication failures are elevated and may indicate an SSO or Controller regression.
+
+      - alert: NeuVectorManagerP95LatencyHigh
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(manager_http_request_duration_seconds_bucket[5m]))) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager P95 latency exceeds 2 seconds
+          description: User-visible request latency has remained above the warning threshold for 10 minutes.
+
+      - alert: NeuVectorManagerP99LatencyCritical
+        expr: |
+          histogram_quantile(0.99, sum by (le) (rate(manager_http_request_duration_seconds_bucket[5m]))) > 5
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: NeuVector Manager P99 latency exceeds 5 seconds
+          description: Tail latency indicates saturation or a downstream Controller failure.
+
+      - alert: NeuVectorManagerControllerUnavailable
+        expr: manager_controller_available == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: NeuVector Controller is unavailable to Manager
+          description: The most recent Controller request has failed for at least five minutes.
+
+      - alert: NeuVectorManagerControllerErrors
+        expr: sum(rate(manager_controller_failures_total[5m])) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager sees sustained Controller errors
+          description: Controller transport or HTTP failures exceed one request per second.
+
+      - alert: NeuVectorManagerCacheSaturated
+        expr: manager_cache_entries / manager_cache_capacity_entries > 0.90
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager cache is over 90% full
+          description: Cache {{ $labels.cache }} is approaching its configured entry capacity.
+
+      - alert: NeuVectorManagerSessionCapacityHigh
+        expr: manager_sessions / manager_session_capacity > 0.90
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager session capacity is over 90%
+          description: Session eviction may occur if the configured capacity is reached.
+
+      - alert: NeuVectorManagerHighRSS
+        expr: process_resident_memory_bytes > 536870912
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager RSS exceeds 512 MiB
+          description: Resident memory is above the initial production warning threshold; tune it against the container limit.
+
+      - alert: NeuVectorManagerGoroutinesHigh
+        expr: go_goroutines > 1000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager goroutine count exceeds 1000
+          description: A sustained increase can indicate blocked requests or a goroutine leak.
+
+      - alert: NeuVectorManagerSupportCommandStuck
+        expr: manager_support_operations_running > 0
+        for: 12m
+        labels:
+          severity: warning
+        annotations:
+          summary: NeuVector Manager support command is running too long
+          description: A support command exceeded the default 10 minute command limit plus grace period.

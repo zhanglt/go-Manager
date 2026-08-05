@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import http.client
 import os
 import ssl
 import sys
@@ -12,7 +13,7 @@ from pathlib import Path
 
 import contract_runner
 from contract_lib import Capture, compare, resolve_env, send_request
-from controller_mock import build_handler, generate_certificate
+from controller_mock import build_handler, generate_certificate, response_body
 
 
 def capture(body, headers=None):
@@ -21,6 +22,119 @@ def capture(body, headers=None):
 
 
 class ContractLibraryTest(unittest.TestCase):
+    def test_strict_normalization_rejects_broad_or_unexplained_ignores(self):
+        with self.assertRaisesRegex(ValueError, "functional headers"):
+            contract_runner.validate_normalization(
+                {"normalization": {"ignored_headers": ["content-type"], "reason": "bad"}}
+            )
+        with self.assertRaisesRegex(ValueError, "broad JSON"):
+            contract_runner.validate_normalization(
+                {"normalization": {"ignored_json_pointers": ["/"], "reason": "bad"}}
+            )
+        with self.assertRaisesRegex(ValueError, "missing a reason"):
+            contract_runner.validate_normalization(
+                {"normalization": {"ignored_headers": ["date"]}}
+            )
+
+    def test_difference_approvals_must_be_exact_and_owned(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "approvals.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "approved_by": "qa-owner",
+                        "approval_ticket": "QA-1",
+                        "approved_at": "2026-08-05",
+                        "differences": [
+                            {
+                                "case_id": "case-one",
+                                "kind": "header",
+                                "path": "/headers/x-runtime",
+                                "reason": "implementation identifier",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            approvals, metadata = contract_runner.load_approvals(path)
+            self.assertIn(("case-one", "header", "/headers/x-runtime"), approvals)
+            self.assertEqual(metadata["approved_by"], "qa-owner")
+            document = json.loads(path.read_text(encoding="utf-8"))
+            document["differences"][0]["path"] = "/headers/*"
+            path.write_text(json.dumps(document), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "unique and exact"):
+                contract_runner.load_approvals(path)
+            document["differences"][0].update({"kind": "body", "path": "/body"})
+            path.write_text(json.dumps(document), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "requires exact left/right SHA-256"):
+                contract_runner.load_approvals(path)
+
+    def test_fixture_repeat_body_and_response_sequence(self):
+        self.assertEqual(response_body({"repeat": {"text": "ab", "bytes": 5}}), b"ababa")
+        fixtures = {
+            "rules": [
+                {
+                    "id": "sequence",
+                    "match": {"method": "GET", "path": "/status"},
+                    "responses": [
+                        {"status": 200, "text": "up"},
+                        {"status": 503, "text": "down"},
+                    ],
+                }
+            ]
+        }
+        server = ThreadingHTTPServer(("127.0.0.1", 0), build_handler(fixtures))
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            first = send_request(
+                f"http://127.0.0.1:{server.server_port}",
+                {"method": "GET", "path": "/status"},
+                timeout=2,
+                insecure=False,
+            )
+            second = send_request(
+                f"http://127.0.0.1:{server.server_port}",
+                {"method": "GET", "path": "/status"},
+                timeout=2,
+                insecure=False,
+            )
+            self.assertEqual((first.status, second.status), (200, 503))
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
+    def test_fixture_reads_chunked_request_before_responding(self):
+        fixtures = {
+            "max_request_bytes": 16,
+            "rules": [
+                {
+                    "match": {
+                        "method": "POST",
+                        "path": "/upload",
+                        "body_sha256": "bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
+                    },
+                    "response": {"status": 200, "text": "ok"},
+                }
+            ],
+        }
+        server = ThreadingHTTPServer(("127.0.0.1", 0), build_handler(fixtures))
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=2)
+            connection.request("POST", "/upload", body=iter([b"abc", b"def"]), encode_chunked=True)
+            response = connection.getresponse()
+            self.assertEqual((response.status, response.read()), (200, b"ok"))
+            connection.close()
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
     def test_json_pointer_ignore_and_difference_path(self):
         left = capture({"token": {"value": "left"}, "items": [1, 2]})
         right = capture({"token": {"value": "right"}, "items": [1, 3]})

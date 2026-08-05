@@ -15,6 +15,11 @@ import (
 type Client struct {
 	baseURL    *url.URL
 	httpClient *http.Client
+	observer   Observer
+}
+
+type Observer interface {
+	ObserveController(method string, status int, elapsed time.Duration, err error)
 }
 
 func New(baseURL *url.URL, verifyTLS bool, timeout time.Duration) *Client {
@@ -36,6 +41,8 @@ func New(baseURL *url.URL, verifyTLS bool, timeout time.Duration) *Client {
 func NewWithHTTPClient(baseURL *url.URL, client *http.Client) *Client {
 	return &Client{baseURL: cloneURL(baseURL), httpClient: client}
 }
+
+func (c *Client) SetObserver(observer Observer) { c.observer = observer }
 
 func (c *Client) Do(ctx context.Context, method, path string, body io.Reader, headers http.Header) (*http.Response, error) {
 	target, err := c.resolve(path)
@@ -65,7 +72,15 @@ func (c *Client) DoTargetSized(ctx context.Context, method string, target *url.U
 			request.Header.Add(name, value)
 		}
 	}
+	started := time.Now()
 	response, err := c.httpClient.Do(request)
+	status := 0
+	if response != nil {
+		status = response.StatusCode
+	}
+	if c.observer != nil {
+		c.observer.ObserveController(method, status, time.Since(started), err)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("controller request: %w", err)
 	}

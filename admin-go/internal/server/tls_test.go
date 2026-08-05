@@ -13,10 +13,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/neuvector/manager/admin-go/internal/config"
+	"github.com/neuvector/manager/admin-go/internal/controller"
 )
 
 func TestManagerTLSConfigGeneratesEphemeralCertificate(t *testing.T) {
@@ -102,6 +104,13 @@ func TestManagerTLSConfigFallsBackWhenPairIsIncomplete(t *testing.T) {
 }
 
 func TestRunServesHTTPSWithEphemeralCertificate(t *testing.T) {
+	resourceDir, err := filepath.Abs(filepath.Join("..", "..", "..", "admin", "src", "main", "resources"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("IP_GEO_IPV4_DB", filepath.Join(resourceDir, "IP2LOCATION-LITE-DB1.CSV"))
+	t.Setenv("IP_GEO_IPV6_DB", filepath.Join(resourceDir, "IP2LOCATION-LITE-DB1.IPV6.CSV"))
+	t.Setenv("CIS_NIST_DB", filepath.Join(resourceDir, "CIS_NIST-MASTER.CSV"))
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -138,12 +147,18 @@ func TestRunServesHTTPSWithEphemeralCertificate(t *testing.T) {
 	}()
 
 	client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}} //nolint:gosec -- the test verifies a generated self-signed certificate
-	deadline := time.Now().Add(5 * time.Second)
+	deadline := time.Now().Add(30 * time.Second)
 	var response *http.Response
 	for time.Now().Before(deadline) {
 		response, err = client.Get("https://" + address + "/gravatar")
 		if err == nil {
 			break
+		}
+		select {
+		case runErr := <-done:
+			cancel()
+			t.Fatalf("server exited before HTTPS was ready: %v", runErr)
+		default:
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
@@ -165,5 +180,30 @@ func TestRunServesHTTPSWithEphemeralCertificate(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("server did not stop")
+	}
+}
+
+func TestManagedHandlerRejectsUnavailableLocalData(t *testing.T) {
+	missing := filepath.Join(t.TempDir(), "missing.csv")
+	t.Setenv("IP_GEO_IPV4_DB", missing)
+	t.Setenv("IP_GEO_IPV6_DB", missing)
+	t.Setenv("CIS_NIST_DB", missing)
+	executable, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	controllerURL, _ := url.Parse("http://127.0.0.1:1/v1")
+	cfg := testConfig(controllerURL)
+	supportTempDir := t.TempDir()
+	if err := os.Chmod(supportTempDir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	cfg.Support = config.SupportConfig{
+		Command: executable, TempDir: supportTempDir, Timeout: time.Minute,
+		MaxFileBytes: 1 << 20, MaxConcurrent: 1,
+	}
+	_, err = newManagedHandler(cfg, slog.New(slog.NewTextHandler(io.Discard, nil)), controller.NewWithHTTPClient(controllerURL, http.DefaultClient))
+	if err == nil || !strings.Contains(err.Error(), "load local data") {
+		t.Fatalf("newManagedHandler() error = %v", err)
 	}
 }

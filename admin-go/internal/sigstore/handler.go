@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/neuvector/manager/admin-go/internal/controller"
@@ -189,9 +188,6 @@ func requiredQuery(c *gin.Context, name string) (string, bool) {
 
 func copyResponse(c *gin.Context, response *http.Response) {
 	for name, values := range response.Header {
-		if strings.EqualFold(name, "Content-Length") {
-			continue
-		}
 		for _, value := range values {
 			c.Writer.Header().Add(name, value)
 		}

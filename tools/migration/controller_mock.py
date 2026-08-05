@@ -12,6 +12,7 @@ import socket
 import ssl
 import subprocess
 import tempfile
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -31,7 +32,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def response_body(response: dict[str, Any]) -> bytes:
-    variants = [name for name in ("json", "text", "base64") if name in response]
+    variants = [name for name in ("json", "text", "base64", "repeat") if name in response]
     if len(variants) > 1:
         raise ValueError(f"mock response has multiple body variants: {variants}")
     if "json" in response:
@@ -40,6 +41,13 @@ def response_body(response: dict[str, Any]) -> bytes:
         return str(response["text"]).encode()
     if "base64" in response:
         return base64.b64decode(response["base64"], validate=True)
+    if "repeat" in response:
+        repeat = response["repeat"]
+        value = str(repeat.get("text", "x")).encode()
+        count = int(repeat["bytes"])
+        if not value or count < 0:
+            raise ValueError("mock repeat body requires non-empty text and non-negative bytes")
+        return (value * (count // len(value) + 1))[:count]
     return b""
 
 
@@ -64,18 +72,48 @@ def rule_matches(rule: dict[str, Any], method: str, target: str, headers: Any, b
     return True
 
 
+def read_request_body(handler: BaseHTTPRequestHandler, maximum: int) -> bytes | None:
+    transfer_encoding = handler.headers.get("Transfer-Encoding", "").lower()
+    if transfer_encoding == "chunked":
+        body = bytearray()
+        while True:
+            line = handler.rfile.readline(8192)
+            if not line:
+                raise ConnectionError("unexpected EOF in chunk header")
+            size = int(line.split(b";", 1)[0].strip(), 16)
+            if size == 0:
+                while handler.rfile.readline(8192).strip():
+                    pass
+                return bytes(body)
+            if len(body) + size > maximum:
+                return None
+            chunk = handler.rfile.read(size)
+            if len(chunk) != size or handler.rfile.read(2) != b"\r\n":
+                raise ConnectionError("invalid chunked request body")
+            body.extend(chunk)
+    length = int(handler.headers.get("Content-Length", "0"))
+    if length > maximum:
+        return None
+    return handler.rfile.read(length) if length else b""
+
+
 def build_handler(fixtures: dict[str, Any]) -> type[BaseHTTPRequestHandler]:
     rules = fixtures.get("rules", [])
+    response_counts: dict[str, int] = {}
+    response_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
 
         def handle_request(self) -> None:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length > fixtures.get("max_request_bytes", 52_428_800):
+            try:
+                body = read_request_body(self, int(fixtures.get("max_request_bytes", 52_428_800)))
+            except (ConnectionError, ValueError):
+                self.send_error(400)
+                return
+            if body is None:
                 self.send_error(413)
                 return
-            body = self.rfile.read(length) if length else b""
             rule = next(
                 (
                     candidate
@@ -93,7 +131,15 @@ def build_handler(fixtures: dict[str, Any]) -> type[BaseHTTPRequestHandler]:
                 self.wfile.write(payload)
                 return
 
-            response = rule.get("response", {})
+            responses = rule.get("responses")
+            if responses:
+                rule_id = str(rule.get("id", rules.index(rule)))
+                with response_lock:
+                    response_index = response_counts.get(rule_id, 0)
+                    response_counts[rule_id] = response_index + 1
+                response = responses[response_index % len(responses)]
+            else:
+                response = rule.get("response", {})
             if response.get("delay_ms", 0):
                 time.sleep(float(response["delay_ms"]) / 1000)
             if response.get("close_connection"):

@@ -12,6 +12,7 @@ import (
 
 	"github.com/neuvector/manager/admin-go/internal/config"
 	"github.com/neuvector/manager/admin-go/internal/controller"
+	"github.com/neuvector/manager/admin-go/internal/observability"
 )
 
 func TestCompatibilityRoutes(t *testing.T) {
@@ -59,13 +60,19 @@ func TestCompatibilityRoutes(t *testing.T) {
 }
 
 func TestHealthHandler(t *testing.T) {
-	handler := NewHealthHandler(func() bool { return false })
+	metrics := observability.NewRegistry()
+	handler := NewHealthHandler(func() bool { return false }, metrics)
 	for path, want := range map[string]int{"/livez": http.StatusOK, "/readyz": http.StatusServiceUnavailable} {
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, path, nil))
 		if response.Code != want {
 			t.Errorf("GET %s = %d, want %d", path, response.Code, want)
 		}
+	}
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/metrics", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "go_goroutines") {
+		t.Fatalf("metrics response = %d %q", response.Code, response.Body.String())
 	}
 }
 
@@ -115,7 +122,7 @@ func TestUpdateConfigPreservesScalaHeaderException(t *testing.T) {
 
 func testConfig(baseURL *url.URL) config.Config {
 	return config.Config{
-		Server:     config.ServerConfig{MaxBodyBytes: 50 << 20},
+		Server:     config.ServerConfig{MaxBodyBytes: 50 << 20, MaxConnections: 100},
 		Controller: config.ControllerConfig{BaseURL: baseURL, Timeout: time.Second},
 		Session:    config.SessionConfig{MaxEntries: 100},
 		Cache:      config.CacheConfig{MaxEntries: 10, MaxBytes: 1 << 20, TTL: time.Minute},

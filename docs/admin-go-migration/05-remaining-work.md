@@ -1,13 +1,14 @@
 # Admin Go 迁移未完成工作
 
-最后更新：2026-08-04
+最后更新：2026-08-05
 
 ## 1. 当前基线
 
-Go/Gin 后端已经实现清单中的全部 263 个语义 HTTP 操作。当前契约 Manifest 包含 304 个
-场景，覆盖 263/263 个路由，独立 Scala/Go 差分结果为 304/304 PASS。Go 单元测试、race、
-vet、严格路由覆盖检查和临时 HTTPS 证书启动验证均已通过。因此，当前没有待迁移的 API
-路由。
+Go/Gin 后端已经实现清单中的全部 263 个语义 HTTP 操作。当前契约 Manifest 包含 308 个
+场景并覆盖 263/263 个路由；此前批准的合成基线为 304/304 PASS。加入严格安全与错误路径
+后，当前隔离 fixture 差分为 300/308 exact match，八项精确差异等待 QA 审查。Go 单元测试、严格路由
+覆盖检查和临时 HTTPS 证书启动验证均已通过。因此，当前没有待迁移的 API 路由，但不能把
+路由完成等同于 RW-004 已验收。
 
 本文跟踪将兼容性 POC 转化为可发布 Scala/Pekko Admin 替代服务所需的剩余工作。路由覆盖
 完成不等于已满足生产发布条件。
@@ -45,17 +46,27 @@ prefix。详细威胁模型、状态机、部署要求与残余测试见
 
 ### RW-003 正式性能与稳定性门禁
 
-- [ ] 扩展基准工具，使 Scala 和 Go 使用相同端口、Controller fixture、预热时间、运行时长、
+- [x] 扩展基准工具，使 Scala 和 Go 使用相同端口、Controller fixture、预热时间、运行时长、
   资源限制和采样间隔。
 - [ ] 使用至少三次独立运行测量 idle、steady、burst、50 MiB Body、上传下载、缓存压力和
   Controller 故障场景。
-- [ ] 以机器可读格式报告 RSS/HWM、CPU、吞吐、P50/P95/P99、goroutine/thread、FD、启动
+- [x] 以机器可读格式报告 RSS/HWM、CPU、吞吐、P50/P95/P99、goroutine/thread、FD、启动
   时间和峰值内存。
 - [ ] 执行包含 Controller 间歇故障的 24 小时混合流量稳定性测试。
 - [ ] 调查持续内存、goroutine、连接、文件或命令子进程增长。
 
 验收：RSS 相比 Scala 至少降低 50%，吞吐不下降，P95 劣化不超过 10%，稳定性测试无泄漏、
 崩溃、死锁或无界增长。
+
+门禁实现记录（2026-08-04）：`tools/migration/performance_gate.py` 已提供同端口顺序编排、
+三次独立运行、进程树 `/proc` 采样、Go goroutine 采样、固定速率与 burst 负载、机器可读
+JSON 报告及非零退出阻断。`docs/admin-go-migration/performance/` 固化九类场景、HTTPS
+Controller fixture、50 MiB 流式上传下载、2,000 个隔离 Token 的缓存压力和成功/503/断连/
+延迟循环故障。门禁拒绝缺场景、少于三次、缩短时长或不足 86,400 秒的报告，开发 smoke
+不能伪装成正式 PASS。短时三次 idle 演练测得 Scala/Go 中位峰值 RSS 约 974 MiB/10.8 MiB；
+steady、缓存和故障演练验证了状态计数、预期断连与进程存活，但这些缩时数据不作为发布
+证据。尚需在受控 RC 节点执行完整套件、归档 24 小时证据并调查趋势后，才能勾选其余三项
+和关闭 RW-003。执行及证据要求见 [`performance/README.md`](performance/README.md)。
 
 ### RW-004 经批准的真实 Controller 验证
 
@@ -65,6 +76,23 @@ prefix。详细威胁模型、状态机、部署要求与残余测试见
 - [ ] 使用 Go 后端执行关键 UI 和 CLI 工作流。
 
 验收：不存在未解释的 Scala/Go 差异，QA 批准关键路径 E2E 报告。
+
+门禁实现记录（2026-08-05）：`contract_runner.py` 已支持 strict normalization、精确预期差异
+审批、过期/通配/未使用审批拒绝和候选差异生成；非 JSON Body 只有固定左右 SHA-256 后才可
+批准。Manifest 扩展到 308 个成功/错误场景并继续保持 263/263，显式门禁 gzip、Header、
+Cookie、联邦、2 MiB 响应和有状态 transaction。Controller mock 的 2 MiB 流式差分发现 Go
+未保留上游 `Content-Length`，已统一修复全部透明代理并增加回归测试。
+
+`sanitize_controller_fixture.py` 提供 HMAC-SHA256 稳定伪名和二次敏感数据扫描；
+`workflow_runner.py` 在验证 Go metrics marker 后编排 QA UI/CLI 套件，仅归档输出和截图摘要；
+`real_controller_gate.py` 对环境、fixture digest、契约、coverage、八类特性、十个关键工作流及
+QA/UI Owner 批准执行 fail-closed 聚合。完整流程和不可直接通过的批准模板见
+[`real-controller/README.md`](real-controller/README.md)。
+
+当前使用彼此隔离的 Controller fixture 严格演练为 300/308 exact match；剩余八项来自 SSO 一次性 capability/
+Cookie 安全闭环、debug 下载授权收紧及新增错误响应差异，均保持为未批准并正确阻断。仓库和
+环境中没有经批准的真实 Controller、凭据或 QA/UI Owner 签字，因此不得勾选上述四项或宣告
+RW-004 验收完成；需在批准环境运行、逐项审查候选差异并归档 E2E 证据后关闭。
 
 ## 3. P1 工程工作
 
@@ -147,22 +175,51 @@ Angular `npm ci` 当前仍报告 36 个既有依赖告警（3 low、8 moderate�
 
 ### RW-007 持续集成门禁
 
-- [ ] 将 `go test ./...`、`go test -race ./...`、`go vet ./...` 和 Python 迁移工具测试加入 PR CI。
-- [ ] 使用 `--strict` 执行路由覆盖检查，并要求保持 263/263。
-- [ ] 验证格式、生成基线一致性、`git diff --check`、依赖许可证、漏洞、secret、SBOM 和
+- [x] 将 `go test ./...`、`go test -race ./...`、`go vet ./...` 和 Python 迁移工具测试加入 PR CI。
+- [x] 使用 `--strict` 执行路由覆盖检查，并要求保持 263/263。
+- [x] 验证格式、生成基线一致性、`git diff --check`、依赖许可证、漏洞、secret、SBOM 和
   provenance。
-- [ ] 对不适合每个 PR 执行的完整契约、性能 smoke 和稳定性测试增加 scheduled job。
+- [x] 对不适合每个 PR 执行的完整契约、性能 smoke 和稳定性测试增加 scheduled job。
 
 验收：测试、race、覆盖率、安全或生成制品回归会阻止合并。
 
+完成证据（2026-08-05）：`.github/workflows/admin-go-ci.yml` 对 PR、主分支和 release 分支配置
+Go test/race/vet/gofmt、32 项 Python 工具测试、patch whitespace、Scala 路由清单重新
+生成比对及 263/263 strict coverage。安全 job 使用固定版本的 `go-licenses`、`govulncheck`、
+`pip-audit`、生产 UI 依赖 audit 和 gitleaks，并执行前端 lint/format check；Go 工具链固定为已修复标准库漏洞的
+1.26.5，`quic-go` 升至 0.59.1。镜像 job 实际构建 OCI layout，并由
+`verify_oci_attestations.py` 从被引用的 in-toto layer 验证 SPDX SBOM 与 SLSA v1 provenance，
+不能仅靠 Docker 参数字符串通过。
+
+每周日及手工触发 job 会构建 Scala/Go，使用彼此隔离的 HTTPS Controller fixture 执行全部
+308 个契约场景，并分别执行三轮缩时性能 smoke 和候选 Go 稳定性 smoke；报告与合成日志保留
+14 天。缩时报告由独立 `smoke-check` 判定，不会伪装成 RW-003 正式性能 PASS。当前完整契约
+仍会因 RW-004 的八项未批准差异正确失败并产出候选报告；这是 fail-closed 状态，不代表已取得
+QA 批准。`prettier-eslint` 已移至开发依赖，运行时 `uuid` 已升级至 11.1.1；UI 生产依赖审计
+为 0，PR 门禁从 low 起阻断任何新增生产依赖漏洞。开发工具链仍有 npm audit 告警，但不会进入
+发布镜像；由 Renovate 和独立工具链升级持续跟踪。
+
+远端 `Default` ruleset 当前只禁止删除和 non-fast-forward，尚未把上述 job 注册为 required
+status checks；workflow 合入并首次运行后，仓库管理员仍须将 PR 四个 job 设为 required，届时
+失败状态才会在 GitHub 服务端阻止合并。在该外部设置完成前，不宣告 RW-007 验收关闭。
+
 ### RW-008 可观测性与运行限制
 
-- [ ] 提供经过批准的 request rate、status、latency、Controller failure、cache capacity/
+- [x] 提供经过批准的 request rate、status、latency、Controller failure、cache capacity/
   eviction、goroutine 和长时间文件/命令操作指标，禁止使用凭据作为 label。
-- [ ] 仅在公开 Listener、TLS、配置和本地数据可用后返回 ready。
-- [ ] 定义 session、cache、request body、header、connection、timeout、debug file 和命令时长
+- [x] 仅在公开 Listener、TLS、配置和本地数据可用后返回 ready。
+- [x] 定义 session、cache、request body、header、connection、timeout、debug file 和命令时长
   的生产限制。
-- [ ] 为 5xx、登录失败、P95/P99、RSS、goroutine 和 Controller 可用性增加告警与 dashboard。
+- [x] 为 5xx、登录失败、P95/P99、RSS、goroutine 和 Controller 可用性增加告警与 dashboard。
+
+完成证据（2026-08-04）：可选内部 listener 提供 `/livez`、`/readyz` 和 Prometheus `/metrics`；
+Manager 在配置、TLS、本地 support 资源及全部 listener 同步初始化成功后才置 ready，关闭开始即
+撤销 ready。指标使用规范化 route 和固定低基数标签，覆盖 HTTP、登录失败、Controller、七类
+cache、session、goroutine、RSS 和 support 命令/文件操作，禁止凭据、用户数据、query、cluster
+或文件名进入 label。默认限制为 10,000 sessions、每类 1,000/64 MiB cache、50 MiB body、
+32 KiB header、每 listener 1,024 connections、10 秒读头、2 分钟读取/空闲、15 分钟写入、
+60 秒 Controller、64 MiB debug file、10 分钟命令和并发 2。`admin-go/deploy/observability/`
+提供 11 条初始 Prometheus 告警和 9 面板 Grafana dashboard；RSS 和延迟阈值在 RC 压测后复核。
 
 验收：运维可在用户可见故障阈值前发现饱和、泄漏、认证回归和 Controller 故障。
 

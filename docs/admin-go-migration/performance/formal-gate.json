@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "runs": 3,
+  "server": {"host": "127.0.0.1", "port": 18443, "startup_timeout_seconds": 120},
+  "resource_limits": {
+    "cpus": 2, "memory_mib": 2048, "file_descriptors": 4096,
+    "enforced": false, "enforced_by": "set on dedicated runner before formal execution"
+  },
+  "controller": {
+    "command": [
+      "python3", "tools/migration/controller_mock.py", "--https", "--port", "19443",
+      "--fixtures", "docs/admin-go-migration/performance/controller-fixtures.json"
+    ],
+    "cwd": ".",
+    "host": "127.0.0.1",
+    "port": 19443,
+    "startup_timeout_seconds": 30
+  },
+  "implementations": [
+    {
+      "name": "scala",
+      "artifact": "admin/target/scala-3.3.5/admin-assembly-1.0.jar",
+      "command": [
+        "java", "-Xms256m", "-Xmx2048m",
+        "-Djdk.tls.rejectClientInitiatedRenegotiation=true",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        "-jar", "admin/target/scala-3.3.5/admin-assembly-1.0.jar"
+      ],
+      "cwd": ".",
+      "base_url": "http://{host}:{port}",
+      "env": {
+        "MANAGER_SSL": "off", "MANAGER_SERVER_PORT": "{port}",
+        "CTRL_SERVER_IP": "127.0.0.1", "CTRL_SERVER_PORT": "19443"
+      }
+    },
+    {
+      "name": "go",
+      "artifact": "admin-go/cmd/manager/manager",
+      "command": ["admin-go/cmd/manager/manager"],
+      "cwd": ".",
+      "base_url": "http://{host}:{port}",
+      "metrics_url": "http://127.0.0.1:19090/metrics",
+      "env": {
+        "MANAGER_SSL": "off", "MANAGER_SERVER_PORT": "{port}",
+        "MANAGER_INTERNAL_ADDR": "127.0.0.1:19090",
+        "CTRL_SERVER_IP": "127.0.0.1", "CTRL_SERVER_PORT": "19443"
+      }
+    }
+  ],
+  "criteria": {
+    "baseline": "scala", "candidate": "go", "max_rss_ratio": 0.5,
+    "min_throughput_ratio": 1.0, "max_p95_ratio": 1.1,
+    "stability_scenario": "stability-24h", "max_stability_rss_growth_ratio": 0.05,
+    "max_goroutine_growth": 10, "max_fd_growth": 5,
+    "max_thread_growth": 5, "max_process_growth": 0,
+    "minimum_runs": 3, "minimum_stability_seconds": 86400,
+    "required_scenarios": [
+      "idle", "steady", "burst", "body-50mib", "upload-50mib", "download-50mib",
+      "cache-pressure", "controller-fault", "stability-24h"
+    ]
+  },
+  "scenarios": [
+    {
+      "name": "idle", "warmup_seconds": 30, "duration_seconds": 300,
+      "sample_interval_seconds": 5, "requests": []
+    },
+    {
+      "name": "steady", "warmup_seconds": 30, "duration_seconds": 300,
+      "sample_interval_seconds": 5, "concurrency": 16, "rps": 200,
+      "requests": [{"method": "GET", "path": "/eula?isSSO=false", "expected_status": [200]}]
+    },
+    {
+      "name": "burst", "warmup_seconds": 10, "duration_seconds": 120,
+      "sample_interval_seconds": 2, "concurrency": 64,
+      "requests": [{"method": "GET", "path": "/eula?isSSO=false", "expected_status": [200]}]
+    },
+    {
+      "name": "body-50mib", "warmup_seconds": 0, "duration_seconds": 90,
+      "sample_interval_seconds": 1, "concurrency": 1, "rps": 0.05,
+      "requests": [{
+        "method": "POST", "path": "/auth", "body_json_bytes": 52428800,
+        "headers": {"Content-Type": "application/json"}, "expected_status": [400, 401, 413]
+      }]
+    },
+    {
+      "name": "upload-50mib", "warmup_seconds": 0, "duration_seconds": 90,
+      "sample_interval_seconds": 1, "concurrency": 1, "rps": 0.05,
+      "requests": [{
+        "method": "POST", "path": "/file/config", "body_multipart_bytes": 52428800,
+        "headers": {
+          "Token": "fixture-token", "X-As-Standalone": "false",
+          "Content-Type": "multipart/form-data; boundary=perf"
+        },
+        "expected_status": [200]
+      }]
+    },
+    {
+      "name": "download-50mib", "warmup_seconds": 0, "duration_seconds": 90,
+      "sample_interval_seconds": 1, "concurrency": 1, "rps": 0.05,
+      "requests": [{
+        "method": "GET", "path": "/file/config?id=all",
+        "headers": {"Token": "fixture-token"}, "expected_status": [200]
+      }]
+    },
+    {
+      "name": "cache-pressure", "warmup_seconds": 10, "duration_seconds": 300,
+      "sample_interval_seconds": 5, "concurrency": 16, "rps": 100,
+      "requests": [{
+        "method": "GET", "path": "/group?start=0&limit=1",
+        "headers": {"Token": {"sequence": "cache-token-{sequence}", "modulo": 2000}},
+        "expected_status": [200]
+      }]
+    },
+    {
+      "name": "controller-fault", "warmup_seconds": 10, "duration_seconds": 300,
+      "sample_interval_seconds": 5, "concurrency": 8, "rps": 20,
+      "allow_transport_errors": true, "gate_throughput": false,
+      "requests": [{
+        "method": "GET", "path": "/license", "headers": {"Token": "fixture-token"},
+        "expected_status": [200, 500, 502, 503, 504]
+      }]
+    },
+    {
+      "name": "stability-24h", "implementations": ["go"], "runs": 1,
+      "warmup_seconds": 60, "duration_seconds": 86400, "sample_interval_seconds": 60,
+      "concurrency": 16, "rps": 100,
+      "allow_transport_errors": true, "gate_throughput": false,
+      "requests": [
+        {"method": "GET", "path": "/eula?isSSO=false", "weight": 8, "expected_status": [200]},
+        {"method": "GET", "path": "/group?start=0&limit=1", "weight": 1,
+          "headers": {"Token": {"sequence": "stable-token-{sequence}", "modulo": 2000}},
+          "expected_status": [200]},
+        {"method": "GET", "path": "/license", "weight": 1,
+          "headers": {"Token": "fixture-token"}, "expected_status": [200, 500, 502, 503, 504]}
+      ]
+    }
+  ]
+}
