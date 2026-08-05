@@ -176,7 +176,11 @@ func (h *Handler) QueryCVEAssets(c *gin.Context) {
 	}
 	body, _ := json.Marshal(cleanNulls(value))
 	query := url.Values{}
-	if token, present := c.GetQuery("queryToken"); present {
+	token, present := c.GetQuery("queryId")
+	if !present {
+		token, present = c.GetQuery("queryToken")
+	}
+	if present {
 		query.Set("token", token)
 	}
 	h.transfer.Request(c, http.MethodPost, query, nil, body, "assetvul")
