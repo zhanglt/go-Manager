@@ -15,6 +15,10 @@ PROVENANCE_PREDICATE = "https://slsa.dev/provenance/v1"
 REQUIRED_PREDICATES = {SBOM_PREDICATE, PROVENANCE_PREDICATE}
 ATTESTATION_MANIFEST = "application/vnd.oci.image.manifest.v1+json"
 IN_TOTO_LAYER = "application/vnd.in-toto+json"
+IMAGE_INDEXES = {
+    "application/vnd.oci.image.index.v1+json",
+    "application/vnd.docker.distribution.manifest.list.v2+json",
+}
 
 
 class OCIReader:
@@ -54,20 +58,39 @@ def predicate_types(source: Path) -> set[str]:
     try:
         index = reader.json("index.json")
         predicates: set[str] = set()
-        for descriptor in index.get("manifests", []):
-            if descriptor.get("mediaType") != ATTESTATION_MANIFEST:
-                continue
+        visited: set[str] = set()
+
+        def visit(descriptor: dict[str, Any]) -> None:
+            digest = str(descriptor.get("digest", ""))
+            if not digest or digest in visited:
+                return
+            visited.add(digest)
+
+            document = reader.json(blob_path(digest))
+            if descriptor.get("mediaType") in IMAGE_INDEXES:
+                for child in document.get("manifests", []):
+                    if isinstance(child, dict):
+                        visit(child)
+                return
+
             annotations = descriptor.get("annotations", {})
-            if annotations.get("vnd.docker.reference.type") != "attestation-manifest":
-                continue
-            manifest = reader.json(blob_path(str(descriptor["digest"])))
-            for layer in manifest.get("layers", []):
+            if (
+                descriptor.get("mediaType") != ATTESTATION_MANIFEST
+                or annotations.get("vnd.docker.reference.type")
+                != "attestation-manifest"
+            ):
+                return
+            for layer in document.get("layers", []):
                 if layer.get("mediaType") != IN_TOTO_LAYER:
                     continue
                 statement = reader.json(blob_path(str(layer["digest"])))
                 predicate = statement.get("predicateType")
                 if isinstance(predicate, str):
                     predicates.add(predicate)
+
+        for descriptor in index.get("manifests", []):
+            if isinstance(descriptor, dict):
+                visit(descriptor)
         return predicates
     finally:
         reader.close()
