@@ -54,6 +54,35 @@ class VerifyOCIAttestationsTest(unittest.TestCase):
 
             self.assertEqual(predicate_types(root), {SBOM_PREDICATE, PROVENANCE_PREDICATE})
 
+    def test_finds_attestations_in_nested_buildx_index(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            builder = OCIBuilder(root)
+            nested_index, nested_index_size = builder.blob(
+                {
+                    "schemaVersion": 2,
+                    "manifests": [
+                        builder.add_attestation(SBOM_PREDICATE),
+                        builder.add_attestation(PROVENANCE_PREDICATE),
+                    ],
+                }
+            )
+            (root / "index.json").write_text(
+                json.dumps(
+                    {
+                        "manifests": [
+                            {
+                                "mediaType": "application/vnd.oci.image.index.v1+json",
+                                "digest": nested_index,
+                                "size": nested_index_size,
+                            }
+                        ]
+                    }
+                )
+            )
+
+            self.assertEqual(predicate_types(root), {SBOM_PREDICATE, PROVENANCE_PREDICATE})
+
     def test_rejects_malformed_digest(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
