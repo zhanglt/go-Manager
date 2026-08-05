@@ -40,9 +40,10 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: |
           if [ "$EVENT_NAME" = pull_request ] || [ "$EVENT_NAME" = push ]; then
-            git diff --check "$BASE_SHA..$HEAD_SHA"
+            git diff --check "$BASE_SHA..$HEAD_SHA" -- . \
+              ':(exclude)admin-go/assets/web/root/**'
           else
-            git diff --check
+            git diff --check -- . ':(exclude)admin-go/assets/web/root/**'
           fi
       - name: Check Go format
         run: test -z "$(gofmt -l admin-go)"

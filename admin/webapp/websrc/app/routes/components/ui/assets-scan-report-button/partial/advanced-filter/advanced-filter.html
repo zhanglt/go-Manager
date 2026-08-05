@@ -17,12 +17,12 @@
 <div mat-dialog-content>
   <form [formGroup]="form">
     <section class="row mx-0 mb-4 align-items-center">
-      <label class="col-2 mb-0" style="font-weight: normal" for="score_type"
-        >{{ 'scan.report.gridHeader.SCORE' | translate }}</label
-      >
-      <label class="sr-only" for="score_type"
-        >{{ 'scan.report.gridHeader.SCORE' | translate }}</label
-      >
+      <label class="col-2 mb-0" style="font-weight: normal" for="score_type">{{
+        'scan.report.gridHeader.SCORE' | translate
+      }}</label>
+      <label class="sr-only" for="score_type">{{
+        'scan.report.gridHeader.SCORE' | translate
+      }}</label>
       <mat-form-field class="col-2 match mb-0">
         <select formControlName="scoreType" id="score_type" matNativeControl>
           <option [value]="'v2'">V2</option>
@@ -137,9 +137,9 @@
       <ng-container [ngSwitch]="view">
         <div class="row col align-items-center">
           <ng-container *ngSwitchCase="FilterView.IMAGE">
-            <label class="sr-only" for="imageName"
-              >{{ 'admissionControl.names.IMAGE' | translate }}</label
-            >
+            <label class="sr-only" for="imageName">{{
+              'admissionControl.names.IMAGE' | translate
+            }}</label>
             <label class="sr-only" for="imageMatch">Match</label>
             <mat-form-field class="col-2 pe-0 match">
               <select
@@ -158,9 +158,9 @@
             </mat-form-field>
           </ng-container>
           <ng-container *ngSwitchCase="FilterView.NODE">
-            <label class="sr-only" for="nodeName"
-              >{{ 'admissionControl.names.NODE' | translate }}</label
-            >
+            <label class="sr-only" for="nodeName">{{
+              'admissionControl.names.NODE' | translate
+            }}</label>
             <label class="sr-only" for="nodeMatch">Match</label>
             <mat-form-field class="col-2 pe-0 match">
               <select
@@ -179,9 +179,9 @@
             </mat-form-field>
           </ng-container>
           <ng-container *ngSwitchCase="FilterView.CONTAINER">
-            <label class="sr-only" for="containerName"
-              >{{ 'admissionControl.names.CONTAINER' | translate }}</label
-            >
+            <label class="sr-only" for="containerName">{{
+              'admissionControl.names.CONTAINER' | translate
+            }}</label>
             <label class="sr-only" for="containerMatch">Match</label>
             <mat-form-field class="col-2 pe-0 match">
               <select
@@ -211,21 +211,21 @@
         aria-label="Severity"
         class="col row"
         formControlName="severityType">
-        <mat-radio-button class="col-2" value="all"
-          >{{ 'setting.ALL' | translate }}</mat-radio-button
-        >
-        <mat-radio-button class="col-2" value="critical"
-          >{{ 'enum.CRITICAL' | translate }}</mat-radio-button
-        >
-        <mat-radio-button class="col-2" value="high"
-          >{{ 'enum.HIGH' | translate }}</mat-radio-button
-        >
-        <mat-radio-button class="col-2" value="medium"
-          >{{ 'enum.MEDIUM' | translate }}</mat-radio-button
-        >
-        <mat-radio-button class="col-2" value="low"
-          >{{ 'enum.LOW' | translate }}</mat-radio-button
-        >
+        <mat-radio-button class="col-2" value="all">{{
+          'setting.ALL' | translate
+        }}</mat-radio-button>
+        <mat-radio-button class="col-2" value="critical">{{
+          'enum.CRITICAL' | translate
+        }}</mat-radio-button>
+        <mat-radio-button class="col-2" value="high">{{
+          'enum.HIGH' | translate
+        }}</mat-radio-button>
+        <mat-radio-button class="col-2" value="medium">{{
+          'enum.MEDIUM' | translate
+        }}</mat-radio-button>
+        <mat-radio-button class="col-2" value="low">{{
+          'enum.LOW' | translate
+        }}</mat-radio-button>
       </mat-radio-group>
     </section>
     <section class="row mx-0 align-items-center mt-3">
@@ -245,8 +245,8 @@
   <ng-container *ngIf="form.controls.imageName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Image {{ getOperator(form.get('matchTypeImage')?.value) }} {{
-      form.controls.imageName.value }}
+      >Image {{ getOperator(form.get('matchTypeImage')?.value) }}
+      {{ form.controls.imageName.value }}
       <button (click)="clear(FilterView.IMAGE)" class="remove-button">
         <i class="eos-icons">close</i>
       </button></span
@@ -255,8 +255,8 @@
   <ng-container *ngIf="form.controls.nodeName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Node {{ getOperator(form.get('matchTypeNode')?.value) }} {{
-      form.controls.nodeName.value }}
+      >Node {{ getOperator(form.get('matchTypeNode')?.value) }}
+      {{ form.controls.nodeName.value }}
       <button (click)="clear(FilterView.NODE)" class="remove-button">
         <i class="eos-icons">close</i>
       </button></span
@@ -265,8 +265,8 @@
   <ng-container *ngIf="form.controls.containerName.value">
     <span
       class="badge badge-secondary mb-1 me-1 ms-0 d-inline-flex justify-content-center align-items-center"
-      >Container {{ getOperator(form.get('matchTypeContainer')?.value) }} {{
-      form.controls.containerName.value }}
+      >Container {{ getOperator(form.get('matchTypeContainer')?.value) }}
+      {{ form.controls.containerName.value }}
       <button (click)="clear(FilterView.CONTAINER)" class="remove-button">
         <i class="eos-icons">close</i>
       </button></span

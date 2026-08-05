@@ -250,7 +250,7 @@ Total HTTP method DSL occurrences: **262**
 | `risk:GET:/risk/compliance/template` | risk | GET | `/risk/compliance/template` |  | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:220` |
 | `risk:POST:/risk/complianceNIST` | risk | POST | `/risk/complianceNIST` |  | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:205` |
 | `risk:GET:/risk/cve` | risk | GET | `/risk/cve` | show | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:92` |
-| `risk:PATCH:/risk/cve/assets-view` | risk | PATCH | `/risk/cve/assets-view` | queryToken | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:102` |
+| `risk:PATCH:/risk/cve/assets-view` | risk | PATCH | `/risk/cve/assets-view` | queryId | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:102` |
 | `risk:GET:/risk/cve/profile` | risk | GET | `/risk/cve/profile` |  | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:119` |
 | `risk:PATCH:/risk/cve/profile` | risk | PATCH | `/risk/cve/profile` |  | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:124` |
 | `risk:DELETE:/risk/cve/profile/entry` | risk | DELETE | `/risk/cve/profile/entry` | entry_id, profile_name | Token |  | `admin/src/main/scala/com/neu/api/risk/RiskApi.scala:160` |

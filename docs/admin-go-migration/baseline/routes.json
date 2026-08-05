@@ -3805,7 +3805,7 @@
       "method": "PATCH",
       "path": "/risk/cve/assets-view",
       "query_parameters": [
-        "queryToken"
+        "queryId"
       ],
       "required_headers": [
         "Token"
