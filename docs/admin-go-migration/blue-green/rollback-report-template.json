@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "candidate_digest": "sha256:REQUIRED_GO_DIGEST",
+  "scala_digest": "sha256:REQUIRED_SCALA_DIGEST",
+  "trigger_rule_id": "REQUIRED_APPROVED_RULE_ID",
+  "triggered_at": "REQUIRED_ISO8601",
+  "traffic_restored_at": "REQUIRED_ISO8601",
+  "scala_ready_at": "REQUIRED_ISO8601",
+  "completed_at": "REQUIRED_ISO8601",
+  "recovery_seconds": "REQUIRED_NUMBER",
+  "automatic": false,
+  "injected": true,
+  "readiness_passed": false,
+  "no_data_rollback": false,
+  "final_target_digest": "sha256:REQUIRED_SCALA_DIGEST",
+  "session_behavior": "REQUIRED_preserved_OR_relogin-required",
+  "notification_ticket": "REQUIRED_NOTIFICATION_TICKET"
+}

@@ -23,11 +23,10 @@ export class RegistryDetailsComponent {
   @Input() linkedImage: string;
   @Input() linkedTag: string;
   filter = new FormControl('');
-  queryToken: string;
+  queryId: string;
   registryDetails$ = this.registriesCommunicationService.registryDetails$.pipe(
     tap(res => {
-      if (!!res.isAllView)
-        this.queryToken = res.allScannedImagesSummary!.queryToken;
+      if (!!res.isAllView) this.queryId = res.allScannedImagesSummary!.queryId;
     }),
     catchError(err => {
       this.error = err;
@@ -70,7 +69,7 @@ export class RegistryDetailsComponent {
 
   exportAllScannedImagesCSV(): void {
     this.registriesService
-      .getAllScannedImages(this.queryToken, 0, -1, [], {
+      .getAllScannedImages(this.queryId, 0, -1, [], {
         '-': { filter: this.filter.value },
       })
       .subscribe(res => {

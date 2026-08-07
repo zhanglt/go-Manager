@@ -1,6 +1,8 @@
 package server
 
 import (
+	"errors"
+	"fmt"
 	"io/fs"
 	"log/slog"
 	"net/http"
@@ -20,6 +22,7 @@ import (
 	managerGroup "github.com/neuvector/manager/admin-go/internal/group"
 	managerMiddleware "github.com/neuvector/manager/admin-go/internal/middleware"
 	"github.com/neuvector/manager/admin-go/internal/notification"
+	"github.com/neuvector/manager/admin-go/internal/observability"
 	"github.com/neuvector/manager/admin-go/internal/policy"
 	"github.com/neuvector/manager/admin-go/internal/risk"
 	"github.com/neuvector/manager/admin-go/internal/session"
@@ -41,35 +44,43 @@ func NewHandler(cfg config.Config, logger *slog.Logger, controllerClient *contro
 }
 
 func newHandler(cfg config.Config, logger *slog.Logger, controllerClient *controller.Client, webFiles fs.FS) http.Handler {
+	metrics := observability.NewRegistry()
+	controllerClient.SetObserver(metrics)
 	sessions := session.NewStore(cfg.Session.MaxEntries)
 	resolver := controller.NewTargetResolver(cfg.Controller.BaseURL, sessions)
-	return buildHandler(cfg, logger, controllerClient, webFiles, sessions, resolver, device.NewHandler(controllerClient, resolver, sessions))
+	handler, _ := buildHandler(cfg, logger, controllerClient, webFiles, sessions, resolver, device.NewHandler(controllerClient, resolver, sessions), metrics, false)
+	return handler
 }
 
 type managedHandler struct {
 	http.Handler
-	device *device.Handler
+	device  *device.Handler
+	metrics *observability.Registry
 }
 
 func (h *managedHandler) Close() error { return h.device.Close() }
 
 func newManagedHandler(cfg config.Config, logger *slog.Logger, controllerClient *controller.Client) (*managedHandler, error) {
+	metrics := observability.NewRegistry()
+	controllerClient.SetObserver(metrics)
 	sessions := session.NewStore(cfg.Session.MaxEntries)
 	resolver := controller.NewTargetResolver(cfg.Controller.BaseURL, sessions)
 	deviceHandler, err := device.NewSupportHandler(controllerClient, resolver, sessions, device.SupportOptions{
 		Command: cfg.Support.Command, TempDir: cfg.Support.TempDir, Timeout: cfg.Support.Timeout,
-		MaxFileBytes: cfg.Support.MaxFileBytes, MaxConcurrent: cfg.Support.MaxConcurrent,
+		MaxFileBytes: cfg.Support.MaxFileBytes, MaxConcurrent: cfg.Support.MaxConcurrent, Metrics: metrics,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &managedHandler{
-		Handler: buildHandler(cfg, logger, controllerClient, webassets.Root(), sessions, resolver, deviceHandler),
-		device:  deviceHandler,
-	}, nil
+	handler, err := buildHandler(cfg, logger, controllerClient, webassets.Root(), sessions, resolver, deviceHandler, metrics, true)
+	if err != nil {
+		_ = deviceHandler.Close()
+		return nil, err
+	}
+	return &managedHandler{Handler: handler, device: deviceHandler, metrics: metrics}, nil
 }
 
-func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *controller.Client, webFiles fs.FS, sessions *session.Store, resolver *controller.TargetResolver, deviceHandler *device.Handler) http.Handler {
+func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *controller.Client, webFiles fs.FS, sessions *session.Store, resolver *controller.TargetResolver, deviceHandler *device.Handler, metrics *observability.Registry, loadLocalData bool) (http.Handler, error) {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.SetTrustedProxies(nil) //nolint:errcheck
@@ -77,6 +88,7 @@ func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *cont
 		managerMiddleware.RequestID(),
 		managerMiddleware.Recovery(logger),
 		managerMiddleware.AccessLog(logger),
+		managerMiddleware.Metrics(metrics),
 		managerMiddleware.LimitBody(cfg.Server.MaxBodyBytes),
 		managerMiddleware.SecurityHeaders(cfg.Server.TLS),
 	)
@@ -88,6 +100,22 @@ func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *cont
 	auditCache := notification.NewCache(cfg.Cache.MaxEntries, cfg.Cache.MaxBytes, cfg.Cache.TTL)
 	graphLayoutCache := notification.NewGraphLayoutCache(cfg.Cache.MaxEntries, cfg.Cache.MaxBytes, cfg.Cache.TTL)
 	graphBlacklistCache := notification.NewGraphBlacklistCache(cfg.Cache.MaxEntries, cfg.Cache.MaxBytes, cfg.Cache.TTL)
+	dashboardCache := dashboard.NewCache(cfg.Cache.MaxEntries, cfg.Cache.MaxBytes, cfg.Cache.TTL)
+	registerCacheMetrics(metrics, "workload_scanned", scannedCache)
+	registerCacheMetrics(metrics, "group", groupCache)
+	registerCacheMetrics(metrics, "policy", policyCache)
+	registerCacheMetrics(metrics, "audit", auditCache)
+	registerCacheMetrics(metrics, "graph_layout", graphLayoutCache)
+	registerCacheMetrics(metrics, "graph_blacklist", graphBlacklistCache)
+	registerCacheMetrics(metrics, "dashboard", dashboardCache)
+	metrics.RegisterSession(func() (int, int) { return sessions.Len(), sessions.Capacity() })
+	notificationHandler := notification.NewHandlerWithCaches(controllerClient, resolver, sessions, auditCache, graphLayoutCache, graphBlacklistCache)
+	riskHandler := risk.NewHandler(controllerClient, resolver, sessions)
+	if loadLocalData {
+		if err := errors.Join(notificationHandler.LoadLocalData(), riskHandler.LoadLocalData()); err != nil {
+			return nil, fmt.Errorf("load local data: %w", err)
+		}
+	}
 	invalidators := managerCache.Invalidators{scannedCache, groupCache, policyCache, auditCache, graphLayoutCache, graphBlacklistCache}
 	registerCompatibilityRoutes(
 		group,
@@ -99,17 +127,27 @@ func buildHandler(cfg config.Config, logger *slog.Logger, controllerClient *cont
 		access.NewHandler(controllerClient, resolver, sessions, invalidators),
 		account.NewHandler(controllerClient, resolver, sessions),
 		cluster.NewHandler(controllerClient, resolver, sessions),
-		dashboard.NewHandlerWithCache(controllerClient, resolver, sessions, cfg.Cache.MaxBytes, dashboard.NewCache(cfg.Cache.MaxEntries, cfg.Cache.MaxBytes, cfg.Cache.TTL)),
+		dashboard.NewHandlerWithCache(controllerClient, resolver, sessions, cfg.Cache.MaxBytes, dashboardCache),
 		deviceHandler,
 		managerGroup.NewHandler(controllerClient, resolver, sessions, groupCache),
-		notification.NewHandlerWithCaches(controllerClient, resolver, sessions, auditCache, graphLayoutCache, graphBlacklistCache),
+		notificationHandler,
 		policy.NewHandler(controllerClient, resolver, sessions, policyCache),
-		risk.NewHandler(controllerClient, resolver, sessions),
+		riskHandler,
 		sigstore.NewHandler(controllerClient, resolver, sessions),
 		workload.NewHandler(controllerClient, resolver, sessions, scannedCache),
 	)
 	engine.NoRoute(newStaticHandler(webFiles, cfg.Server.PathPrefix, cfg.Server.Development, buildinfo.Version).handle)
-	return engine
+	return engine, nil
+}
+
+func registerCacheMetrics[V any](registry *observability.Registry, name string, store *managerCache.Store[V]) {
+	registry.RegisterCache(name, func() observability.CacheSnapshot {
+		stats := store.Stats()
+		return observability.CacheSnapshot{
+			Entries: stats.Entries, Bytes: stats.Bytes, CapacityEntries: stats.CapacityEntries,
+			CapacityBytes: stats.CapacityBytes, CapacityEvictions: stats.CapacityEvictions,
+		}
+	})
 }
 
 func registerCompatibilityRoutes(
@@ -416,7 +454,7 @@ func requireToken() gin.HandlerFunc {
 	}
 }
 
-func NewHealthHandler(ready func() bool) http.Handler {
+func NewHealthHandler(ready func() bool, metrics ...http.Handler) http.Handler {
 	engine := gin.New()
 	engine.GET("/livez", func(c *gin.Context) { c.Status(http.StatusOK) })
 	engine.GET("/readyz", func(c *gin.Context) {
@@ -426,5 +464,8 @@ func NewHealthHandler(ready func() bool) http.Handler {
 		}
 		c.Status(http.StatusOK)
 	})
+	if len(metrics) > 0 && metrics[0] != nil {
+		engine.GET("/metrics", gin.WrapH(metrics[0]))
+	}
 	return engine
 }

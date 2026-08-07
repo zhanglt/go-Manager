@@ -618,7 +618,7 @@
     {"id": "scan-registry-test", "request": {"method": "POST", "path": "/scan/registry/test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-registry"}, "body_json": {"config": {"name": "repo-test", "registry_type": "docker"}}}},
     {"id": "scan-registry-test-delete", "request": {"method": "DELETE", "path": "/scan/registry/test?name=repo-test", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}", "X-Transaction-Id": "tx-registry"}}},
     {"id": "risk-cve-get", "request": {"method": "GET", "path": "/risk/cve?show=all", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
-    {"id": "risk-cve-assets-view", "request": {"method": "PATCH", "path": "/risk/cve/assets-view?queryToken=query-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"last_modified_timestamp": 123, "include_no_vul_assets": null}}},
+    {"id": "risk-cve-assets-view", "request": {"method": "PATCH", "path": "/risk/cve/assets-view?queryId=query-one", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}, "body_json": {"last_modified_timestamp": 123, "include_no_vul_assets": null}}},
     {"id": "risk-compliance-get", "request": {"method": "GET", "path": "/risk/compliance", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
     {"id": "risk-compliance-template-get", "request": {"method": "GET", "path": "/risk/compliance/template", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},
     {"id": "risk-compliance-filter-get", "request": {"method": "GET", "path": "/risk/compliance/available_filter", "headers": {"Token": "${ENV:MANAGER_TEST_TOKEN}"}}},

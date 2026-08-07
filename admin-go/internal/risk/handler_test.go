@@ -134,7 +134,7 @@ func TestProfileCRUD(t *testing.T) {
 func TestRiskQueries(t *testing.T) {
 	tests := []struct{ name, method, route, input, wantMethod, wantPath, wantQuery, wantBody string }{
 		{"cve", http.MethodGet, "/risk/cve?show=all", "", http.MethodGet, "/v1/fed/cluster/member-one/v1/scan/asset", "show=all", ""},
-		{"assets", http.MethodPatch, "/risk/cve/assets-view?queryToken=query%2Fone", `{"last_modified_timestamp":123,"include_no_vul_assets":null}`, http.MethodPost, "/v1/fed/cluster/member-one/v1/assetvul", "token=query%2Fone", `{"last_modified_timestamp":123}`},
+		{"assets", http.MethodPatch, "/risk/cve/assets-view?queryId=query%2Fone", `{"last_modified_timestamp":123,"include_no_vul_assets":null}`, http.MethodPost, "/v1/fed/cluster/member-one/v1/assetvul", "token=query%2Fone", `{"last_modified_timestamp":123}`},
 		{"compliance", http.MethodGet, "/risk/compliance", "", http.MethodGet, "/v1/fed/cluster/member-one/v1/compliance/asset", "", ""},
 		{"template", http.MethodGet, "/risk/compliance/template", "", http.MethodGet, "/v1/fed/cluster/member-one/v1/list/compliance", "", ""},
 		{"filters", http.MethodGet, "/risk/compliance/available_filter", "", http.MethodGet, "/v1/fed/cluster/member-one/v1/compliance/available_filter", "", ""},

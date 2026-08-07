@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/neuvector/manager/admin-go/internal/observability"
 )
 
 const RequestIDKey = "request_id"
@@ -56,12 +57,21 @@ func AccessLog(logger *slog.Logger) gin.HandlerFunc {
 		logger.Info("request completed",
 			"request_id", requestID(c),
 			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
+			"route", normalizedRoute(c),
 			"status", c.Writer.Status(),
-			"bytes", c.Writer.Size(),
-			"duration_ms", time.Since(started).Milliseconds(),
-			"client_ip", c.ClientIP(),
+			"latency_ms", time.Since(started).Milliseconds(),
+			"response_bytes", c.Writer.Size(),
+			"controller_status", 0,
+			"cluster_present", c.GetHeader("X-Cluster-ID") != "",
 		)
+	}
+}
+
+func Metrics(registry *observability.Registry) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		started := time.Now()
+		c.Next()
+		registry.ObserveRequest(c.Request.Method, normalizedRoute(c), c.Writer.Status(), time.Since(started))
 	}
 }
 
@@ -102,4 +112,11 @@ func requestID(c *gin.Context) string {
 	value, _ := c.Get(RequestIDKey)
 	requestID, _ := value.(string)
 	return requestID
+}
+
+func normalizedRoute(c *gin.Context) string {
+	if route := c.FullPath(); route != "" {
+		return route
+	}
+	return "unmatched"
 }

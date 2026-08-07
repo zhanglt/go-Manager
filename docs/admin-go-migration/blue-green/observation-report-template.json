@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "started_at": "REQUIRED_ISO8601",
+  "ended_at": "REQUIRED_ISO8601",
+  "samples": [
+    {
+      "captured_at": "REQUIRED_ISO8601",
+      "target_digest": "sha256:REQUIRED_GO_DIGEST",
+      "http_5xx_rate": "REQUIRED_NUMBER",
+      "login_success_rate": "REQUIRED_NUMBER",
+      "p95_ms": "REQUIRED_NUMBER",
+      "rss_mib": "REQUIRED_NUMBER",
+      "cpu_percent": "REQUIRED_NUMBER",
+      "goroutines": "REQUIRED_NUMBER",
+      "cache_utilization": "REQUIRED_NUMBER",
+      "controller_error_rate": "REQUIRED_NUMBER",
+      "active_file_jobs": "REQUIRED_NUMBER",
+      "active_command_jobs": "REQUIRED_NUMBER"
+    }
+  ],
+  "critical_path_failures": ["REQUIRED_REMOVE_WHEN_EMPTY"],
+  "security_incidents": ["REQUIRED_REMOVE_WHEN_EMPTY"],
+  "certificate_errors": "REQUIRED_COUNT",
+  "fips_mode_errors": "REQUIRED_COUNT",
+  "controller_amplification": true
+}

@@ -128,9 +128,6 @@ func (p *Proxy) requestTarget(c *gin.Context, method string, target *url.URL, qu
 	}
 	defer response.Body.Close()
 	for name, values := range response.Header {
-		if strings.EqualFold(name, "Content-Length") {
-			continue
-		}
 		for _, value := range values {
 			c.Writer.Header().Add(name, value)
 		}

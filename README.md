@@ -46,6 +46,9 @@ Linux capabilities dropped, a read-only root filesystem, and a bounded `/tmp` tm
 also verifies the support executable and the IP geolocation and CIS/NIST data files at their final
 runtime paths.
 
+The workflow for merging NeuVector upstream changes into the customized Go Manager branches is
+documented in [docs/upstream-sync-workflow.md](docs/upstream-sync-workflow.md).
+
 The `make push-image` and `make push-fips-image` targets publish multi-architecture images with SPDX
 SBOM and SLSA provenance attestations. Common overrides include:
 

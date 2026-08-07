@@ -27,6 +27,7 @@ type supportJob struct {
 	finished bool
 	err      error
 	timer    *time.Timer
+	started  time.Time
 }
 
 func (h *Handler) CreateDebugLog(c *gin.Context) {
@@ -53,6 +54,9 @@ func (h *Handler) CreateDebugLog(c *gin.Context) {
 	select {
 	case h.supportSlots <- struct{}{}:
 	default:
+		if h.metrics != nil {
+			h.metrics.SupportRejected("capacity")
+		}
 		writeDebugText(c, http.StatusTooManyRequests, "Too many support collections are running.")
 		return
 	}
@@ -93,15 +97,21 @@ func (h *Handler) CreateDebugLog(c *gin.Context) {
 		}
 		return err
 	}
-	job := &supportJob{path: path, cancel: cancel, done: make(chan struct{})}
+	job := &supportJob{path: path, cancel: cancel, done: make(chan struct{}), started: time.Now()}
 	old, replaced, accepted := h.replaceJob(key, job)
 	if !accepted {
 		cancel()
 		_ = os.Remove(path)
+		if h.metrics != nil {
+			h.metrics.SupportRejected("shutdown")
+		}
 		writeDebugText(c, http.StatusServiceUnavailable, "Server is shutting down.")
 		return
 	}
 	releaseSlot = false
+	if h.metrics != nil {
+		h.metrics.SupportStarted()
+	}
 	if replaced {
 		h.cancelJob(old)
 	}
@@ -160,6 +170,9 @@ func (h *Handler) GetDebugLog(c *gin.Context) {
 		return
 	}
 	defer opened.Close()
+	if h.metrics != nil {
+		h.metrics.SupportDownloaded(info.Size())
+	}
 	c.Header("Content-Disposition", `inline; filename="debug.gz"`)
 	c.DataFromReader(http.StatusOK, info.Size(), "application/x-gzip", opened, nil)
 }
@@ -322,6 +335,13 @@ func (h *Handler) finishJob(key string, job *supportJob, err error) {
 	job.timer = time.AfterFunc(h.debugFileTTL, func() { h.expireJob(key, job) })
 	close(job.done)
 	h.jobsMu.Unlock()
+	if h.metrics != nil {
+		outcome := "success"
+		if err != nil {
+			outcome = "failed"
+		}
+		h.metrics.SupportFinished(outcome, time.Since(job.started))
+	}
 	<-h.supportSlots
 	h.jobsWG.Done()
 }

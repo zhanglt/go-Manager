@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 ARG NODE_BUILDER_IMAGE=node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
-ARG GO_BUILDER_IMAGE=golang:1.25.0-alpine@sha256:f18a072054848d87a8077455f0ac8a25886f2397f88bfdd222d6fafbb5bba440
+ARG GO_BUILDER_IMAGE=golang:1.26.5-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2
 ARG BCI_BASE_IMAGE=registry.suse.com/bci/bci-base:15.7@sha256:f210b01e65ad0d6485cdac7236475101613be1206740e3dc97b53007aaffa1e1
 ARG BCI_MICRO_IMAGE=registry.suse.com/bci/bci-micro:15.7@sha256:44f5c047210188eb290414c52f883b763efa1e234c2a15c325f03e83f0984fa6
 
@@ -45,11 +45,12 @@ COPY package/requirements.txt /chroot/requirements.txt
 RUN --mount=type=cache,target=/var/cache/zypp \
     --mount=type=cache,target=/chroot/root/.cache/pip \
     for attempt in 1 2 3 4 5; do \
-      zypper refresh && break; \
+      zypper --gpg-auto-import-keys refresh && break; \
       test "$attempt" -lt 5 || exit 1; \
       sleep $((attempt * 2)); \
     done && \
-    zypper --installroot /chroot --non-interactive install --no-recommends \
+    zypper --gpg-auto-import-keys --installroot /chroot --non-interactive \
+      install --no-recommends \
       bash ca-certificates python313 python313-pip iproute2 lsof procps grep awk && \
     cp /etc/resolv.conf /chroot/etc/resolv.conf && \
     chroot /chroot /usr/bin/python3.13 -m pip install \

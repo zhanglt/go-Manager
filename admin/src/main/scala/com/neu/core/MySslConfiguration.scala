@@ -192,7 +192,7 @@ trait MySslConfiguration extends LazyLogging {
               .map(_.toChar)
               .mkString
               .replaceAll("\\n|\\r\\n", "")
-              .replace("-----BEGIN PRIVATE KEY-----", "")
+              .replace("-----BEGIN PRIVATE KEY-----", "") // gitleaks:allow -- PEM marker only
               .replace("-----END PRIVATE KEY-----", "")
           privateKey = keyFactory
             .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder.decode(encodedPrivateKey)))

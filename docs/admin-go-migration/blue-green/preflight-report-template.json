@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "candidate_digest": "sha256:REQUIRED",
+  "executed_at": "REQUIRED_ISO8601",
+  "checks": {
+    "readiness": {"passed": false, "status_code": "REQUIRED_STATUS"},
+    "certificate": {"passed": false, "verified": false, "expires_at": "REQUIRED_ISO8601"},
+    "version": {"passed": false, "actual": "REQUIRED_VERSION", "expected": "REQUIRED_VERSION"},
+    "static_ui": {"passed": false, "requests": "REQUIRED_COUNT", "errors": "REQUIRED_COUNT"},
+    "controller": {"passed": false, "requests": "REQUIRED_COUNT", "errors": "REQUIRED_COUNT"},
+    "shadow": {
+      "passed": false,
+      "read_only": false,
+      "requests": "REQUIRED_COUNT",
+      "mutation_requests": "REQUIRED_COUNT",
+      "unapproved_differences": "REQUIRED_COUNT"
+    }
+  }
+}

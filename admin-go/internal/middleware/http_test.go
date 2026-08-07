@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/neuvector/manager/admin-go/internal/observability"
 )
 
 func TestAccessLogDoesNotRecordQueryOrHeaders(t *testing.T) {
@@ -26,6 +27,11 @@ func TestAccessLogDoesNotRecordQueryOrHeaders(t *testing.T) {
 			t.Errorf("access log contains sensitive value %q: %s", secret, logs.String())
 		}
 	}
+	for _, field := range []string{"request_id", "method", "route", "status", "latency_ms", "response_bytes", "controller_status", "cluster_present"} {
+		if !strings.Contains(logs.String(), `"`+field+`"`) {
+			t.Errorf("access log is missing %q: %s", field, logs.String())
+		}
+	}
 }
 
 func TestRecoveryDoesNotExposePanic(t *testing.T) {
@@ -41,6 +47,20 @@ func TestRecoveryDoesNotExposePanic(t *testing.T) {
 	}
 	if strings.Contains(logs.String(), "secret panic value") {
 		t.Fatalf("panic log contains recovered value: %s", logs.String())
+	}
+}
+
+func TestMetricsUseNormalizedRouteAndMethod(t *testing.T) {
+	registry := observability.NewRegistry()
+	engine := gin.New()
+	engine.Use(Metrics(registry))
+	engine.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("ATTACKER-METHOD", "/secret-object-id", nil))
+
+	response := httptest.NewRecorder()
+	registry.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/metrics", nil))
+	body := response.Body.String()
+	if strings.Contains(body, "secret-object-id") || !strings.Contains(body, `method="OTHER",route="unmatched"`) {
+		t.Fatalf("metrics contain an unbounded label: %s", body)
 	}
 }
 

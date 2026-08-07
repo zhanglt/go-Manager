@@ -29,13 +29,11 @@ export class AuthInterceptor implements HttpInterceptor {
       authToken = this.localStorage.has(GlobalConstant.LOCAL_STORAGE_TOKEN)
         ? this.localStorage.get(GlobalConstant.LOCAL_STORAGE_TOKEN).token.token
         : '';
-      if (
-        !(
-          req.url.indexOf(PathConstant.LOGIN_URL) >= 0 &&
-          typeof req.method === 'string' &&
-          req.method === 'POST'
-        )
-      ) {
+      if (!(
+        req.url.indexOf(PathConstant.LOGIN_URL) >= 0 &&
+        typeof req.method === 'string' &&
+        req.method === 'POST'
+      )) {
         if (authToken === '') {
           this.router.navigate([GlobalConstant.PATH_LOGIN]);
         } else {

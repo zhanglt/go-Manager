@@ -20,14 +20,23 @@ type entry[V any] struct {
 }
 
 type Store[V any] struct {
-	mu         sync.Mutex
-	entries    map[Key]*list.Element
-	lru        *list.List
-	maxEntries int
-	maxBytes   int64
-	ttl        time.Duration
-	usedBytes  int64
-	now        func() time.Time
+	mu                sync.Mutex
+	entries           map[Key]*list.Element
+	lru               *list.List
+	maxEntries        int
+	maxBytes          int64
+	ttl               time.Duration
+	usedBytes         int64
+	capacityEvictions uint64
+	now               func() time.Time
+}
+
+type Stats struct {
+	Entries           int
+	Bytes             int64
+	CapacityEntries   int
+	CapacityBytes     int64
+	CapacityEvictions uint64
 }
 
 type TokenInvalidator interface {
@@ -68,6 +77,7 @@ func (s *Store[V]) Set(key Key, value []V, size int64) bool {
 	s.usedBytes += size
 	for len(s.entries) > s.maxEntries || s.usedBytes > s.maxBytes {
 		s.removeElement(s.lru.Back())
+		s.capacityEvictions++
 	}
 	return s.entries[key] != nil
 }
@@ -122,6 +132,16 @@ func (s *Store[V]) DeleteToken(token string) {
 
 func (s *Store[V]) MaxBytes() int64 {
 	return s.maxBytes
+}
+
+func (s *Store[V]) Stats() Stats {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.removeExpired()
+	return Stats{
+		Entries: len(s.entries), Bytes: s.usedBytes, CapacityEntries: s.maxEntries,
+		CapacityBytes: s.maxBytes, CapacityEvictions: s.capacityEvictions,
+	}
 }
 
 func (s *Store[V]) delete(key Key) {

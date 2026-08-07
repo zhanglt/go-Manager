@@ -1,0 +1,10 @@
+title = "NeuVector manager gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated embedded web assets are scanned in their source form"
+paths = [
+  '''admin-go/assets/web/root/''',
+]

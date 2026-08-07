@@ -35,6 +35,11 @@ func NewHandlerWithCaches(client *controller.Client, resolver *controller.Target
 	return &Handler{transfer: transfer.New(client, resolver, sessions), ipGeo: newIPGeoDatabase(), sessions: sessions, audits: audits, layouts: layouts, blacklists: blacklists}
 }
 
+func (h *Handler) LoadLocalData() error {
+	h.ipGeo.once.Do(h.ipGeo.load)
+	return h.ipGeo.err
+}
+
 func NewCache(maxEntries int, maxBytes int64, ttl time.Duration) *managerCache.Store[json.RawMessage] {
 	return managerCache.New[json.RawMessage](maxEntries, maxBytes, ttl)
 }

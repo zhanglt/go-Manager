@@ -24,6 +24,10 @@ func TestStoreBoundsAndLRU(t *testing.T) {
 	if store.Set(Key{Token: "large"}, []string{"too large"}, 8) {
 		t.Fatal("oversized entry was accepted")
 	}
+	stats := store.Stats()
+	if stats.Entries != 2 || stats.Bytes != 6 || stats.CapacityEvictions != 1 || stats.CapacityEntries != 2 || stats.CapacityBytes != 7 {
+		t.Fatalf("unexpected stats: %+v", stats)
+	}
 }
 
 func TestStoreExpiryAndTokenInvalidation(t *testing.T) {
