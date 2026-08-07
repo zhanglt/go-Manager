@@ -2,7 +2,15 @@
 
 import unittest
 
-from performance_gate import evaluate, evaluate_smoke, percentile, request_body, resolve_headers, slope
+from performance_gate import (
+    evaluate,
+    evaluate_smoke,
+    percentile,
+    request_body,
+    resolve_headers,
+    slope,
+    summarize_resources,
+)
 
 
 def scenario(name, rss, throughput=100, p95=10, growth=0, goroutines=0, fds=0):
@@ -55,6 +63,35 @@ class PerformanceGateTest(unittest.TestCase):
             {"Token": {"sequence": "cache-{sequence}", "modulo": 10}}, sequence=12
         )
         self.assertEqual(headers["Token"], "cache-2")
+
+    def test_resource_summary_includes_child_process_growth(self):
+        samples = [
+            {
+                "timestamp": 0,
+                "cpu_seconds": 0,
+                "rss_kib": 100,
+                "hwm_kib": 100,
+                "threads": 2,
+                "fds": 3,
+                "processes": 1,
+                "goroutines": None,
+            },
+            {
+                "timestamp": 60,
+                "cpu_seconds": 1,
+                "rss_kib": 110,
+                "hwm_kib": 110,
+                "threads": 2,
+                "fds": 3,
+                "processes": 2,
+                "goroutines": None,
+            },
+        ]
+
+        summary = summarize_resources(samples)
+
+        self.assertEqual(summary["processes_growth"], 1)
+        self.assertEqual(summary["processes_slope_per_hour"], 60)
 
     def test_gate_accepts_thresholds_and_candidate_only_stability(self):
         report = {
