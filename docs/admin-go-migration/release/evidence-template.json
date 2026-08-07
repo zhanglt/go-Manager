@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "candidate": {
+    "version": "REQUIRED",
+    "commit": "REQUIRED",
+    "built_at": "REQUIRED",
+    "image": {
+      "reference": "REQUIRED@sha256:...",
+      "digest": "REQUIRED",
+      "platforms": {
+        "linux/amd64": "REQUIRED",
+        "linux/arm64": "REQUIRED"
+      }
+    },
+    "fips_image": {
+      "reference": "REQUIRED@sha256:...",
+      "digest": "REQUIRED",
+      "platforms": {
+        "linux/amd64": "REQUIRED",
+        "linux/arm64": "REQUIRED"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "id": "RW010-CONTRACT",
+      "category": "contract",
+      "path": "/evidence/rw010/contract/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": ["routes", "errors", "gzip", "headers", "cookies"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-E2E",
+      "category": "e2e",
+      "path": "/evidence/rw010/e2e/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": [
+        "login", "dashboard", "workloads", "network-policy", "risk", "settings",
+        "cli", "federation"
+      ],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-PERFORMANCE",
+      "category": "performance",
+      "path": "/evidence/rw010/performance/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": ["idle", "steady", "burst", "large-body", "upload", "download"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-STABILITY",
+      "category": "stability",
+      "path": "/evidence/rw010/stability/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": ["24h", "controller-fault", "resource-leaks"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-SECURITY",
+      "category": "security",
+      "path": "/evidence/rw010/security/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": [
+        "tls", "csp", "dependencies", "sbom", "provenance", "secrets",
+        "file-permissions"
+      ],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-FIPS",
+      "category": "fips",
+      "path": "/evidence/rw010/fips/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED_FIPS_IMAGE_DIGEST"],
+      "coverage": ["runtime-mode", "toolchain", "base-image", "linux/amd64", "linux/arm64"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-UPGRADE",
+      "category": "upgrade",
+      "path": "/evidence/rw010/upgrade/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": ["configuration", "certificates", "cli", "ui", "session"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    },
+    {
+      "id": "RW010-ROLLBACK",
+      "category": "rollback",
+      "path": "/evidence/rw010/rollback/gate-result.json",
+      "sha256": "REQUIRED",
+      "status": "REQUIRED",
+      "image_digests": ["REQUIRED"],
+      "coverage": ["scala-restore", "readiness", "recovery-time", "session"],
+      "executed_at": "REQUIRED",
+      "environment": "REQUIRED",
+      "approval_ticket": "REQUIRED"
+    }
+  ],
+  "defects": [],
+  "accepted_limitations": [
+    {
+      "id": "REQUIRED_OR_REMOVE_EXAMPLE",
+      "impact": "REQUIRED",
+      "workaround": "REQUIRED",
+      "owner": "REQUIRED",
+      "target_version": "REQUIRED",
+      "approval_ticket": "REQUIRED",
+      "accepted": false,
+      "accepted_at": "REQUIRED"
+    }
+  ],
+  "approvals": {
+    "qa": {},
+    "security_fips": {},
+    "performance": {},
+    "release": {},
+    "product": {}
+  }
+}
