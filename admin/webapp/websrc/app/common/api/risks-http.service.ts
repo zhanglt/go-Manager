@@ -146,7 +146,7 @@ export class RisksHttpService {
   }
 
   postAssetsViewData(
-    queryToken: string,
+    queryId: string,
     lastModifiedTime: number,
     includeNoVulAssets: boolean = false
   ) {
@@ -156,7 +156,7 @@ export class RisksHttpService {
         last_modified_timestamp: lastModifiedTime,
         include_no_vul_assets: includeNoVulAssets,
       },
-      { params: { queryToken: queryToken } }
+      { params: { queryId: queryId } }
     );
   }
 
