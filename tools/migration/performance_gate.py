@@ -404,7 +404,7 @@ def summarize_resources(samples: list[dict[str, Any]]) -> dict[str, Any]:
         result["cpu_percent_mean"] = round(100 * cpu_delta / elapsed, 3) if elapsed else 0
     else:
         result["cpu_percent_mean"] = 0
-    for metric in ("rss_kib", "threads", "fds", "goroutines"):
+    for metric in ("rss_kib", "threads", "fds", "processes", "goroutines"):
         points = [(sample["timestamp"], sample[metric]) for sample in samples if sample.get(metric) is not None]
         if points:
             result[f"{metric}_slope_per_hour"] = round(slope(points), 3)
