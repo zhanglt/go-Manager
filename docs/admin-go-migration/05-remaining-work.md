@@ -256,6 +256,12 @@ cache、session、goroutine、RSS 和 support 命令/文件操作，禁止凭据
 - [ ] 获取 QA、Security/FIPS、Performance、Release 和 Product Owner 签字。
 - [ ] 为每个已接受限制记录影响、规避方式、责任人和目标版本。
 
+本地资格演练记录（2026-08-05）：已实现 fail-closed G5 总门禁，并完成普通/FIPS 多架构 OCI、
+SBOM/provenance、runtime、合成契约、缩时性能/稳定性和部分依赖安全检查。当前结论仍为
+**NO-GO**；正式 RC、真实 E2E、九场景性能、24 小时稳定性、upgrade/rollback、Security/FIPS
+批准和五类 Owner 签字均未齐全。完整结果和阻断项见
+[`release/local-qualification-2026-08-05.md`](release/local-qualification-2026-08-05.md)。
+
 验收：不存在 P0/P1 缺陷，全部 G5 发布责任人批准同一个不可变镜像 digest。
 
 ### RW-011 蓝绿切换与回滚
@@ -266,6 +272,12 @@ cache、session、goroutine、RSS 和 support 命令/文件操作，禁止凭据
 - [ ] 在批准窗口切换新流量，禁止重复发送有副作用请求。
 - [ ] 观察登录成功率、错误率、延迟、RSS/CPU、goroutine、cache、文件和命令指标。
 - [ ] 演练自动回滚阈值并记录恢复时间。
+
+本地门禁演练记录（2026-08-07）：已实现蓝绿/回滚 fail-closed 总门禁、证据模板和 Operations
+runbook，并以合成证据通过 68/68 项检查及 30 秒自动回滚演练。当前正式状态仍为 **NO-GO**：
+RW-010 未通过，且真实镜像、备份、入口切流、监控阈值、观察窗口、目标环境回滚及
+Operations/Release 签字尚未形成证据。完整结果见
+[`blue-green/local-drill-2026-08-07.md`](blue-green/local-drill-2026-08-07.md)。
 
 验收：批准的观察窗口内未触发回滚条件，或回滚能在规定恢复时间内恢复 Scala 服务。
 

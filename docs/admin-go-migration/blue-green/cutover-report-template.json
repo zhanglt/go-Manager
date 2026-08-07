@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "started_at": "REQUIRED_ISO8601",
+  "switched_at": "REQUIRED_ISO8601",
+  "completed_at": "REQUIRED_ISO8601",
+  "initial_target_digest": "sha256:REQUIRED_SCALA_DIGEST",
+  "final_target_digest": "sha256:REQUIRED_GO_DIGEST",
+  "new_connections_only": false,
+  "side_effect_replay": true,
+  "duplicated_mutating_requests": "REQUIRED_COUNT"
+}

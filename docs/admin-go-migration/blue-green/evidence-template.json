@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "change": {
+    "id": "REQUIRED_CHANGE_ID",
+    "environment": "REQUIRED_ENVIRONMENT",
+    "ticket": "REQUIRED_CHANGE_TICKET",
+    "approved_by": "REQUIRED_CHANGE_APPROVER",
+    "approved_at": "REQUIRED_ISO8601",
+    "window_start": "REQUIRED_ISO8601",
+    "window_end": "REQUIRED_ISO8601"
+  },
+  "candidate": {
+    "go_image": {
+      "reference": "REQUIRED_REGISTRY/manager@sha256:REQUIRED",
+      "digest": "sha256:REQUIRED"
+    },
+    "scala_image": {
+      "reference": "REQUIRED_REGISTRY/manager-scala@sha256:REQUIRED",
+      "digest": "sha256:REQUIRED"
+    },
+    "qualification_report": {
+      "path": "/evidence/rw010/gate-result.json",
+      "sha256": "sha256:REQUIRED"
+    }
+  },
+  "backups": {
+    "configuration": {
+      "path": "/evidence/rw011/backups/manager-config.backup",
+      "sha256": "sha256:REQUIRED",
+      "created_at": "REQUIRED_ISO8601",
+      "protected": false,
+      "restore_tested": false
+    },
+    "certificates": {
+      "path": "/evidence/rw011/backups/certificate-references.backup",
+      "sha256": "sha256:REQUIRED",
+      "created_at": "REQUIRED_ISO8601",
+      "protected": false,
+      "restore_tested": false
+    },
+    "deployment": {
+      "path": "/evidence/rw011/backups/scala-deployment.backup",
+      "sha256": "sha256:REQUIRED",
+      "created_at": "REQUIRED_ISO8601",
+      "protected": false,
+      "restore_tested": false
+    }
+  },
+  "rollback_runbook": {
+    "path": "/evidence/rw011/rollback-runbook.md",
+    "sha256": "sha256:REQUIRED",
+    "owner": "REQUIRED_OPERATIONS_OWNER",
+    "approval_ticket": "REQUIRED_RUNBOOK_TICKET"
+  },
+  "monitoring": {
+    "approved_by": "REQUIRED_SRE_OWNER",
+    "approval_ticket": "REQUIRED_SLO_TICKET",
+    "approved_at": "REQUIRED_ISO8601",
+    "minimum_observation_seconds": "REQUIRED_APPROVED_SECONDS",
+    "max_sample_interval_seconds": "REQUIRED_APPROVED_SECONDS",
+    "max_recovery_seconds": "REQUIRED_APPROVED_SECONDS",
+    "thresholds": [
+      {"id": "http-5xx", "metric": "http_5xx_rate", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "login-success", "metric": "login_success_rate", "direction": "min", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "p95", "metric": "p95_ms", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "rss", "metric": "rss_mib", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "cpu", "metric": "cpu_percent", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "goroutines", "metric": "goroutines", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "cache", "metric": "cache_utilization", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "controller-errors", "metric": "controller_error_rate", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "file-jobs", "metric": "active_file_jobs", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true},
+      {"id": "command-jobs", "metric": "active_command_jobs", "direction": "max", "value": "REQUIRED_APPROVED_THRESHOLD", "sustain_seconds": "REQUIRED_APPROVED_SECONDS", "automatic_rollback": true}
+    ]
+  },
+  "reports": {
+    "preflight": {"path": "/evidence/rw011/preflight.json", "sha256": "sha256:REQUIRED"},
+    "cutover": {"path": "/evidence/rw011/cutover.json", "sha256": "sha256:REQUIRED"},
+    "observation": {"path": "/evidence/rw011/observation.json", "sha256": "sha256:REQUIRED"},
+    "rollback_drill": {"path": "/evidence/rw011/rollback-drill.json", "sha256": "sha256:REQUIRED"}
+  },
+  "approvals": {
+    "operations": {},
+    "release": {}
+  }
+}
