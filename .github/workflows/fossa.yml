@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   fossa-scanning:
+    # The Vault role is available only to repositories in the NeuVector org.
+    if: github.repository_owner == 'neuvector'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
