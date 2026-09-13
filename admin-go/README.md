@@ -133,17 +133,57 @@ make test-images
 make package
 ```
 
-`make test-images` 对 `linux/amd64,linux/arm64` 执行不发布的跨架构构建。发布目标通过
-Buildx 生成 SBOM 和 provenance；`runtime-fips` 设置 `GODEBUG=fips140=only`，但只有
-Security/FIPS Owner 批准工具链、基础镜像和证据后才能作为认证 FIPS 制品发布。
+`make build-image` 默认使用 `--load`，因此只构建并加载当前主机架构。要在 AMD64 主机上
+构建并加载 ARM64 镜像，可显式设置 Buildx 平台：
+
+```bash
+make build-image VERSION=dev TAG=dev-arm64 \
+  BUILD_ACTION="--platform=linux/arm64 --load"
+
+docker image inspect neuvector/manager:dev-arm64 \
+  --format '{{.Os}}/{{.Architecture}}'
+```
+
+多架构镜像不能通过传统 Docker image store 的 `--load` 一次加载。发布 AMD64 和 ARM64
+多架构镜像时，应登录目标 Registry 后使用 `push-image`：
+
+```bash
+docker login registry.example.com
+
+make push-image VERSION=dev \
+  IMAGE=registry.example.com/neuvector/manager:dev \
+  TARGET_PLATFORMS=linux/amd64,linux/arm64
+
+docker buildx imagetools inspect registry.example.com/neuvector/manager:dev
+```
+
+同一标签会发布 OCI Image Index，容器运行时会根据节点架构自动选择对应镜像。不使用
+Registry 时，也可以将多架构结果导出为 OCI archive：
+
+```bash
+make build-image VERSION=dev TAG=dev \
+  BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=oci,dest=/tmp/manager-dev.oci.tar"
+```
+
+`make test-images` 对 `linux/amd64,linux/arm64` 执行不发布、不输出镜像的跨架构构建验证。
+在 AMD64 Linux 主机上构建 ARM64 镜像时，Builder 还需具备 ARM64 binfmt/QEMU 支持；可通过
+`docker buildx inspect neuvector --bootstrap` 检查支持的平台。
+
+发布目标通过 Buildx 生成 SBOM 和 provenance；`runtime-fips` 设置 `GODEBUG=fips140=only`，
+但只有 Security/FIPS Owner 批准工具链、基础镜像和证据后才能作为认证 FIPS 制品发布。
 
 运行时使用 UID/GID `1000:1000`，证书通过只读文件挂载。网络受限时可覆盖依赖源：
 
 ```bash
 make build-image \
   GOPROXY=https://goproxy.cn,direct \
-  PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+  PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
+  HTTPS_PROXY=http://proxy.example:8080 \
+  PULL_BASE_IMAGES=false
 ```
+
+`HTTPS_PROXY` 默认为空，避免把开发机代理写入构建配置；`PULL_BASE_IMAGES=false` 默认优先使用
+Builder 本地已有基础镜像，需要强制刷新时可显式设置为 `true`。
 
 `make package` 默认输出传统目录制品到 `stage/`，只包含 Manager binary、CLI、support command、
 数据文件和许可证，不生成 Scala/JAR 制品。
