@@ -20,7 +20,7 @@ ARG TARGETARCH
 ARG VERSION=interim/master.xxxx
 ARG COMMIT=unknown
 ARG BUILD_DATE=unknown
-ARG GOPROXY=https://proxy.golang.org,direct
+ARG GOPROXY=https://goproxy.cn,direct
 WORKDIR /src/admin-go
 COPY admin-go/go.mod admin-go/go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
