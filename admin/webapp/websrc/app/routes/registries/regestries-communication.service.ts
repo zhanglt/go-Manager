@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { RepoGetResponse, Summary } from '@common/types';
 import {
   filter,
@@ -15,6 +15,7 @@ import { FormControl } from '@angular/forms';
 export interface RegistryDetails {
   selectedRegistry: Summary;
   isAllView: boolean;
+  isFedRepo?: boolean;
   repositories?: RepoGetResponse;
   allScannedImagesSummary?: any;
 }
@@ -30,48 +31,37 @@ export class RegistriesCommunicationService {
   detailFilter: FormControl;
   selectedRegistry$: Observable<Summary | undefined> =
     this.selectedRegistrySubject$.asObservable();
+
   private refreshingDetailsSubject$ = new BehaviorSubject<boolean>(false);
   refreshingDetails$ = this.refreshingDetailsSubject$.asObservable();
-  registryDetails$ = this.selectedRegistry$
-    .pipe(
-      filter(summary => summary !== undefined),
-      // distinctUntilChanged(),
-      switchMap(summary => {
-        if (!!summary!.isAllView) {
-          return this.registriesService.getAllScannedImagesSummary().pipe(
-            map(allScannedImagesSummary => ({
-              selectedRegistry: summary,
-              isAllView: true,
-              isFedRepo: false,
-              allScannedImagesSummary,
-            })),
-            finalize(() => {
-              if (this.refreshingDetailsSubject$.value) {
-                this.refreshingDetailsSubject$.next(false);
-              }
-            })
-          );
-        } else if (!!summary!.isFedRepo) {
-          return this.registriesService
-            .getFederatedRepoScanRegistrySummary(summary!.name)
-            .pipe(
-              map(repositories => ({
-                selectedRegistry: summary,
-                isAllView: false,
-                isFedRepo: true,
-                repositories,
-              })),
-              finalize(() => {
-                if (this.refreshingDetailsSubject$.value) {
-                  this.refreshingDetailsSubject$.next(false);
-                }
-              })
-            );
-        } else {
-          return this.registriesService.getRepo(summary!.name).pipe(
+
+  registryDetails$ = combineLatest([
+    this.selectedRegistry$.pipe(filter(summary => summary !== undefined)),
+    this.refreshDetailsSubject$.pipe(startWith(null)),
+  ]).pipe(
+    switchMap(([summary]) => {
+      if (!!summary!.isAllView) {
+        return this.registriesService.getAllScannedImagesSummary().pipe(
+          map(allScannedImagesSummary => ({
+            selectedRegistry: summary!,
+            isAllView: true,
+            isFedRepo: false,
+            allScannedImagesSummary,
+          })),
+          finalize(() => {
+            if (this.refreshingDetailsSubject$.value) {
+              this.refreshingDetailsSubject$.next(false);
+            }
+          })
+        );
+      } else if (!!summary!.isFedRepo) {
+        return this.registriesService
+          .getFederatedRepoScanRegistrySummary(summary!.name)
+          .pipe(
             map(repositories => ({
-              selectedRegistry: summary,
+              selectedRegistry: summary!,
               isAllView: false,
+              isFedRepo: true,
               repositories,
             })),
             finalize(() => {
@@ -80,10 +70,23 @@ export class RegistriesCommunicationService {
               }
             })
           );
-        }
-      })
-    )
-    .pipe() as Observable<RegistryDetails>;
+      } else {
+        return this.registriesService.getRepo(summary!.name).pipe(
+          map(repositories => ({
+            selectedRegistry: summary!,
+            isAllView: false,
+            repositories,
+          })),
+          finalize(() => {
+            if (this.refreshingDetailsSubject$.value) {
+              this.refreshingDetailsSubject$.next(false);
+            }
+          })
+        );
+      }
+    })
+  ) as Observable<RegistryDetails>;
+
   private startingScanSubject$ = new BehaviorSubject<boolean>(false);
   startingScan$ = this.startingScanSubject$.asObservable();
   private stoppingScanSubject$ = new BehaviorSubject<boolean>(false);
