@@ -20,10 +20,20 @@ describe('LicenseInfoComponent', () => {
     component.license = {
       info: {
         email: 'someEmail',
+        enforce: true,
+        expire: '2099-12-31',
         installation_id: 'someId',
+        instance_id: 'someInstanceId',
+        instance_key: 'someInstanceKey',
+        issue: '2026-01-01',
+        license_model: 'node',
         name: 'someName',
+        node_limit: 100,
         phone: 'somePhone',
+        scan: true,
+        serverless: false,
       },
+      day_to_expire: 30,
     };
     fixture.detectChanges();
   });

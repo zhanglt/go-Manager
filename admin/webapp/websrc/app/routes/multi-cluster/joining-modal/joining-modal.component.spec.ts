@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { JoiningModalComponent } from './joining-modal.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -22,7 +22,7 @@ describe('JoiningModalComponent', () => {
     close: jasmine.createSpy('close'),
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [JoiningModalComponent],
       providers: [

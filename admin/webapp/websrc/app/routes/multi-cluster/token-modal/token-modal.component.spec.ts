@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TokenModalComponent } from './token-modal.component';
 import {
@@ -24,7 +24,7 @@ describe('TokenModalComponent', () => {
     close: jasmine.createSpy('close'),
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TokenModalComponent],
       providers: [

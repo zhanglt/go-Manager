@@ -17,9 +17,9 @@ describe('Component: Header', () => {
   let fixture: ComponentFixture<HeaderComponent>;
 
   beforeEach(async () => {
-    let store = {};
+    let store: Record<string, string> = {};
     const mockSessionStorage = {
-      get: (key: string): string => {
+      get: (key: string): string | null => {
         return key in store ? store[key] : null;
       },
       set: (key: string, value: string) => {
