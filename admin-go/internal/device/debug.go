@@ -333,7 +333,6 @@ func (h *Handler) finishJob(key string, job *supportJob, err error) {
 	job.err = err
 	job.cancel()
 	job.timer = time.AfterFunc(h.debugFileTTL, func() { h.expireJob(key, job) })
-	close(job.done)
 	h.jobsMu.Unlock()
 	if h.metrics != nil {
 		outcome := "success"
@@ -344,6 +343,8 @@ func (h *Handler) finishJob(key string, job *supportJob, err error) {
 	}
 	<-h.supportSlots
 	h.jobsWG.Done()
+	// A closed done channel guarantees that replacement requests can reuse the slot.
+	close(job.done)
 }
 
 func (h *Handler) expireJob(key string, job *supportJob) {
