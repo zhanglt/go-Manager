@@ -1,6 +1,7 @@
 [files]
 extend-exclude = [
-  "admin/src/main/resources/**"
+  "admin/src/main/resources/**",
+  "admin-go/assets/web/root/**"
 ]
 
 [default.extend-words]
