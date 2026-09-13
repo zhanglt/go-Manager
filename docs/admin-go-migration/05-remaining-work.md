@@ -166,7 +166,7 @@ cache-only 验证、push 和内容验证目标。builder/runtime 镜像固定多
 本地 OCI evidence 还验证 attestation manifest 同时包含 `https://spdx.dev/Document` SBOM 和
 `https://slsa.dev/provenance/v1` provenance predicate。
 
-Angular 完整开发工具链 audit 当前仍报告 36 个既有告警（3 low、8 moderate、23 high、
+Angular 完整开发工具链 audit 当前仍报告 42 个既有告警（3 low、9 moderate、28 high、
 2 critical），但 `--omit=dev` 生产依赖审计为 0。本项未进行可能破坏 UI 兼容性的大版本升级；
 开发工具链告警由 RW-007 和 Renovate 持续跟踪。
 
@@ -187,7 +187,7 @@ Angular 完整开发工具链 audit 当前仍报告 36 个既有告警（3 low�
 Go test/race/vet/gofmt、33 项 Python 工具测试、patch whitespace、Scala 路由清单重新
 生成比对及 263/263 strict coverage。安全 job 使用固定版本的 `go-licenses`、`govulncheck`、
 `pip-audit`、生产 UI 依赖 audit 和 gitleaks，并执行前端 lint/format check；Go 工具链固定为已修复标准库漏洞的
-1.26.5，`quic-go` 升至 0.59.1。镜像 job 实际构建 OCI layout，并由
+1.26.6，`quic-go` 升至 0.59.1。镜像 job 实际构建 OCI layout，并由
 `verify_oci_attestations.py` 递归 Buildx 的嵌套 OCI index，并从被引用的 in-toto layer 验证
 SPDX SBOM 与 SLSA v1 provenance，不能仅靠 Docker 参数字符串通过。
 

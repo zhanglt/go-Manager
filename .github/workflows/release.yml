@@ -6,6 +6,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      TARGET_REF: ${{ github.ref_name }}
     permissions:
       contents: read
       # write is needed for:
@@ -38,19 +40,22 @@ jobs:
             secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials password | PRIME_REGISTRY_PASSWORD
       - name: Parse target tag
         run: |
-          TARGET=${{ github.ref_name }}
-          echo "TAG=${TARGET#v}" >> $GITHUB_ENV
+          if [[ ! "$TARGET_REF" =~ ^v[0-9A-Za-z][0-9A-Za-z._-]*$ ]]; then
+            echo "Unsupported release tag: $TARGET_REF" >&2
+            exit 1
+          fi
+          printf 'TAG=%s\n' "${TARGET_REF#v}" >> "$GITHUB_ENV"
       - name: Validate normal multi-architecture image
         run: |
           make build-image \
-            VERSION="${{ github.ref_name }}" TAG="${TAG}" \
+            VERSION="$TARGET_REF" TAG="$TAG" \
             TARGET_PLATFORMS=linux/amd64,linux/arm64 \
             IMAGE_ARGS="--cache-from type=gha,scope=manager-final --cache-to type=gha,scope=manager-final,mode=max" \
             BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
       - name: Validate FIPS-only multi-architecture image
         run: |
           make build-image \
-            VERSION="${{ github.ref_name }}" TAG="${TAG}" \
+            VERSION="$TARGET_REF" TAG="$TAG" \
             IMAGE_TARGET=runtime-fips IMAGE="neuvector/manager-fips:${TAG}" \
             TARGET_PLATFORMS=linux/amd64,linux/arm64 \
             IMAGE_ARGS="--cache-from type=gha,scope=manager-fips --cache-to type=gha,scope=manager-fips,mode=max" \
