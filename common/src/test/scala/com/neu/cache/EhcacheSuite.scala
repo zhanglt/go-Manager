@@ -1,9 +1,10 @@
 package com.neu.cache
 
 import net.sf.ehcache.CacheManager
-import org.scalatest.{ BeforeAndAfterAll, FunSuite }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
-class EhcacheSuite extends FunSuite with BeforeAndAfterAll {
+class EhcacheSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   given cacheKeyGenerator: ToStringCacheKeyGenerator.type = ToStringCacheKeyGenerator
   given cacheManager: CacheManager                        = CacheManager.getInstance()
@@ -20,7 +21,7 @@ class EhcacheSuite extends FunSuite with BeforeAndAfterAll {
   test("getOrElseInsert returns new value if no match") {
     val cache  = Ehcache[String, String](cacheName)
     val result = cache.getOrElseInsert("key2")("value27")
-    assert(result === "value2")
+    assert(result === "value27")
   }
 
   test("getOrElseInsert returns cached value matched") {

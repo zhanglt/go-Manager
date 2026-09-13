@@ -1,8 +1,8 @@
 package com.neu.cache
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CacheSuite extends FunSuite {
+class CacheSuite extends AnyFunSuite {
   test("caches value if there's no cache") {
     val KeyGenerator = ToStringCacheKeyGenerator
     val cache        = MapCache[String, String](KeyGenerator)
