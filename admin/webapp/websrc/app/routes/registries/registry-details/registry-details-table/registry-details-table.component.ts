@@ -64,6 +64,10 @@ export class RegistryDetailsTableComponent implements OnInit, OnChanges {
     {
       field: 'base_os',
       cellRenderer: 'osCellRenderer',
+      valueGetter: params =>
+        params.data
+          ? `${params.data.base_os}_${params.data.os_scan_status}`
+          : '',
       headerValueGetter: () => this.translate.instant('scan.gridHeader.OS'),
       minWidth: 200,
     },
@@ -76,6 +80,10 @@ export class RegistryDetailsTableComponent implements OnInit, OnChanges {
     {
       field: 'vulnerabilities',
       cellRenderer: 'vulnerabilitiesCellRenderer',
+      valueGetter: params =>
+        params.data
+          ? `${params.data.critical}_${params.data.high}_${params.data.medium}`
+          : '',
       comparator: (valueA, valueB, nodeA, nodeB) => {
         if (
           nodeA.data.critical + nodeA.data.high + nodeA.data.medium ===

@@ -1,21 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { RegistryDetailsTableComponent } from './registry-details-table.component';
 
 describe('RegistryDetailsTableComponent', () => {
   let component: RegistryDetailsTableComponent;
-  let fixture: ComponentFixture<RegistryDetailsTableComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [RegistryDetailsTableComponent],
-    }).compileComponents();
-  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RegistryDetailsTableComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    component = new RegistryDetailsTableComponent(
+      null as never,
+      { instant: (key: string) => key } as never,
+      null as never
+    );
   });
 
   it('should create', () => {

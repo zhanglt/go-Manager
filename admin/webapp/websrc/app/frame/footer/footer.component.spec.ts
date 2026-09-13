@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, inject } from '@angular/core/testing';
+import { TestBed, inject, waitForAsync } from '@angular/core/testing';
 import { FooterComponent } from './footer.component';
 
 import { SwitchersService } from '../../core/switchers/switchers.service';
@@ -12,7 +12,7 @@ describe('Component: Footer', () => {
     }).compileComponents();
   });
 
-  it('should create an instance', async(
+  it('should create an instance', waitForAsync(
     inject([SwitchersService], switchersService => {
       let component = new FooterComponent(switchersService);
       expect(component).toBeTruthy();

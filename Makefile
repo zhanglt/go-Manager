@@ -10,8 +10,10 @@ BUILDX_ARGS ?= --sbom=true --attest type=provenance,mode=max
 BUILD_ACTION ?= --load
 IMAGE_TARGET ?= final
 IMAGE_ARGS ?=
-GOPROXY ?= https://proxy.golang.org,direct
+GOPROXY ?= https://goproxy.cn,direct
 PIP_INDEX_URL ?= https://pypi.org/simple
+HTTPS_PROXY ?=
+PULL_BASE_IMAGES ?= false
 
 COMMIT := $(shell git rev-parse --short HEAD)
 BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -81,6 +83,8 @@ build-image: buildx-machine
 		--build-arg VERSION=$(VERSION) --build-arg COMMIT=$(COMMIT) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) --build-arg GOPROXY=$(GOPROXY) \
 		--build-arg PIP_INDEX_URL=$(PIP_INDEX_URL) \
+		--build-arg HTTPS_PROXY=$(HTTPS_PROXY) --build-arg https_proxy=$(HTTPS_PROXY) \
+		--pull=$(PULL_BASE_IMAGES) \
 		-t "$(IMAGE)" $(BUILD_ACTION) .
 	@echo "Built $(IMAGE) target $(IMAGE_TARGET)"
 

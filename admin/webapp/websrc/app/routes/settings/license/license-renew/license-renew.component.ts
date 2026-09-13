@@ -16,7 +16,10 @@ export class LicenseRenewComponent {
   submittingForm = false;
   errorMessage!: string;
   renewLicenseForm = new FormGroup({
-    license_key: new FormControl('', Validators.required),
+    license_key: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   constructor(private settingService: SettingsService) {}
@@ -25,7 +28,7 @@ export class LicenseRenewComponent {
     this.errorMessage = '';
     this.submittingForm = true;
     this.settingService
-      .renewLicense(this.renewLicenseForm.value)
+      .renewLicense(this.renewLicenseForm.getRawValue())
       .pipe(
         finalize(() => {
           this.submittingForm = false;

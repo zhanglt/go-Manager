@@ -1,93 +1,90 @@
 name: Release
-
 on:
   push:
     tags:
       - 'v*'
-
 jobs:
-
   publish:
     runs-on: ubuntu-latest
+    env:
+      TARGET_REF: ${{ github.ref_name }}
     permissions:
       contents: read
       # write is needed for:
       # - OIDC for cosign's use in ecm-distro-tools/publish-image.
       # - Read vault secrets in rancher-eio/read-vault-secrets.
       id-token: write
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-    - name: Enable arm64 emulation
-      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
-      with:
-        platforms: arm64
-
-    - name: Configure buildx
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-      with:
-        name: neuvector
-
-    - name: Load Secrets from Vault
-      uses: rancher-eio/read-vault-secrets@7282bf97898cd1c16c89f837e0bb442e6d384c89 # v3
-      with:
-        secrets: |
-          secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | RANCHER_DOCKER_USERNAME ;
-          secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | RANCHER_DOCKER_PASSWORD ;
-          secret/data/github/repo/${{ github.repository }}/dockerhub/neuvector/credentials username | DOCKER_USERNAME ;
-          secret/data/github/repo/${{ github.repository }}/dockerhub/neuvector/credentials password | DOCKER_PASSWORD ;
-          secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials registry | PRIME_REGISTRY ;
-          secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials username | PRIME_REGISTRY_USERNAME ;
-          secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials password | PRIME_REGISTRY_PASSWORD
-    - name: Parse target tag
-      run: |
-        TARGET=${{ github.ref_name }}
-        echo "TAG=${TARGET#v}" >> $GITHUB_ENV
-    - name: Validate normal multi-architecture image
-      run: |
-        make build-image \
-          VERSION="${{ github.ref_name }}" TAG="${TAG}" \
-          TARGET_PLATFORMS=linux/amd64,linux/arm64 \
-          IMAGE_ARGS="--cache-from type=gha,scope=manager-final --cache-to type=gha,scope=manager-final,mode=max" \
-          BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
-    - name: Validate FIPS-only multi-architecture image
-      run: |
-        make build-image \
-          VERSION="${{ github.ref_name }}" TAG="${TAG}" \
-          IMAGE_TARGET=runtime-fips IMAGE="neuvector/manager-fips:${TAG}" \
-          TARGET_PLATFORMS=linux/amd64,linux/arm64 \
-          IMAGE_ARGS="--cache-from type=gha,scope=manager-fips --cache-to type=gha,scope=manager-fips,mode=max" \
-          BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
-    - name: Publish neuvector manifest
-      uses: rancher/ecm-distro-tools/actions/publish-image@10ab39987d39be83da6a252c1c3b540e496e0287 # v0.66.0
-      with:
-        push-to-public: true
-        push-to-prime: false
-        image: manager
-        tag: ${{ env.TAG }}
-        platforms: linux/amd64,linux/arm64
-
-        public-registry: docker.io
-        public-repo: neuvector
-        public-username: ${{ env.DOCKER_USERNAME }}
-        public-password: ${{ env.DOCKER_PASSWORD }}
-    - name: Publish rancher manifest
-      uses: rancher/ecm-distro-tools/actions/publish-image@10ab39987d39be83da6a252c1c3b540e496e0287 # v0.66.0
-      env:
-        IMAGE_PREFIX: neuvector-
-      with:
-        image: neuvector-manager
-        tag: ${{ env.TAG }}
-        platforms: linux/amd64,linux/arm64
-
-        public-registry: docker.io
-        public-repo: rancher
-        public-username: ${{ env.RANCHER_DOCKER_USERNAME }}
-        public-password: ${{ env.RANCHER_DOCKER_PASSWORD }}
-
-        prime-registry: ${{ env.PRIME_REGISTRY }}
-        prime-repo: rancher
-        prime-username: ${{ env.PRIME_REGISTRY_USERNAME }}
-        prime-password: ${{ env.PRIME_REGISTRY_PASSWORD }}
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Enable arm64 emulation
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        with:
+          platforms: arm64
+      - name: Configure buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        with:
+          name: neuvector
+      - name: Load Secrets from Vault
+        uses: rancher-eio/read-vault-secrets@7282bf97898cd1c16c89f837e0bb442e6d384c89
+        with:
+          secrets: |
+            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | RANCHER_DOCKER_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | RANCHER_DOCKER_PASSWORD ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/neuvector/credentials username | DOCKER_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/neuvector/credentials password | DOCKER_PASSWORD ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials registry | PRIME_REGISTRY ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials username | PRIME_REGISTRY_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials password | PRIME_REGISTRY_PASSWORD
+      - name: Parse target tag
+        run: |
+          if [[ ! "$TARGET_REF" =~ ^v[0-9A-Za-z][0-9A-Za-z._-]*$ ]]; then
+            echo "Unsupported release tag: $TARGET_REF" >&2
+            exit 1
+          fi
+          printf 'TAG=%s\n' "${TARGET_REF#v}" >> "$GITHUB_ENV"
+      - name: Validate normal multi-architecture image
+        run: |
+          make build-image \
+            VERSION="$TARGET_REF" TAG="$TAG" \
+            TARGET_PLATFORMS=linux/amd64,linux/arm64 \
+            IMAGE_ARGS="--cache-from type=gha,scope=manager-final --cache-to type=gha,scope=manager-final,mode=max" \
+            BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
+      - name: Validate FIPS-only multi-architecture image
+        run: |
+          make build-image \
+            VERSION="$TARGET_REF" TAG="$TAG" \
+            IMAGE_TARGET=runtime-fips IMAGE="neuvector/manager-fips:${TAG}" \
+            TARGET_PLATFORMS=linux/amd64,linux/arm64 \
+            IMAGE_ARGS="--cache-from type=gha,scope=manager-fips --cache-to type=gha,scope=manager-fips,mode=max" \
+            BUILD_ACTION="--platform=linux/amd64,linux/arm64 --output=type=cacheonly"
+      - name: Publish neuvector manifest
+        uses: rancher/ecm-distro-tools/actions/publish-image@2a5f19818678d4406e1d8f66e675b72fb0074965 # v0.76.0
+        with:
+          push-to-public: true
+          push-to-prime: false
+          image: manager
+          tag: ${{ env.TAG }}
+          platforms: linux/amd64,linux/arm64
+          public-registry: docker.io
+          public-repo: neuvector
+          public-username: ${{ env.DOCKER_USERNAME }}
+          public-password: ${{ env.DOCKER_PASSWORD }}
+      - name: Publish rancher manifest
+        uses: rancher/ecm-distro-tools/actions/publish-image@2a5f19818678d4406e1d8f66e675b72fb0074965 # v0.76.0
+        env:
+          IMAGE_PREFIX: neuvector-
+        with:
+          image: neuvector-manager
+          tag: ${{ env.TAG }}
+          platforms: linux/amd64,linux/arm64
+          public-registry: docker.io
+          public-repo: rancher
+          public-username: ${{ env.RANCHER_DOCKER_USERNAME }}
+          public-password: ${{ env.RANCHER_DOCKER_PASSWORD }}
+          prime-registry: ${{ env.PRIME_REGISTRY }}
+          prime-repo: rancher
+          prime-username: ${{ env.PRIME_REGISTRY_USERNAME }}
+          prime-password: ${{ env.PRIME_REGISTRY_PASSWORD }}

@@ -1,0 +1,14 @@
+# This repository is owned by the Rancher UI team.
+#
+# Owners are deliberately NOT declared here.
+#
+# The canonical list of Rancher UI repositories and their owning teams lives in:
+#   https://github.com/rancher/dashboard/blob/master/.github/OWNERS.md
+#
+# To find out who to contact about this repository, see that file.
+
+# For Neuvector team's ownership configuration
+* @neuvector/nv-ui
+cli/ @neuvector/backend
+package/requirements.txt @neuvector/backend
+.github/ @neuvector/backend

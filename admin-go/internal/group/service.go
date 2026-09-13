@@ -1,11 +1,13 @@
 package group
 
 import (
-	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/neuvector/manager/admin-go/internal/transfer"
@@ -83,12 +85,22 @@ func (h *Handler) UpdateSystemRequest(c *gin.Context) {
 }
 
 func decodeServiceBody(c *gin.Context, target any) bool {
-	value, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		transfer.WriteBodyError(c, err)
-		return false
+	var reader io.Reader = c.Request.Body
+	encoding := strings.TrimSpace(c.GetHeader("Content-Encoding"))
+	if encoding != "" {
+		if !strings.EqualFold(encoding, "gzip") {
+			transfer.WriteBodyError(c, errors.New("unsupported content encoding"))
+			return false
+		}
+		compressed, err := gzip.NewReader(c.Request.Body)
+		if err != nil {
+			transfer.WriteBodyError(c, err)
+			return false
+		}
+		defer compressed.Close()
+		reader = compressed
 	}
-	decoder := json.NewDecoder(bytes.NewReader(value))
+	decoder := json.NewDecoder(reader)
 	if err := decoder.Decode(target); err != nil {
 		transfer.WriteBodyError(c, err)
 		return false
