@@ -1,6 +1,8 @@
 package group
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -282,6 +284,52 @@ func TestServiceUpdateValidation(t *testing.T) {
 		if response.Code != http.StatusBadRequest {
 			t.Errorf("input %q returned %d", input, response.Code)
 		}
+	}
+}
+
+func TestServiceUpdateAcceptsGzipBody(t *testing.T) {
+	input := `{"config":{"policy_mode":"Monitor","profile_mode":"Learn","services":["nodes"]}}`
+	controllerServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		if r.Method != http.MethodPatch || r.URL.EscapedPath() != "/v1/fed/cluster/member-one/v1/service/config" || string(body) != input {
+			t.Errorf("request=%s %s body=%s", r.Method, r.URL.EscapedPath(), body)
+		}
+		_, _ = w.Write([]byte("ok"))
+	}))
+	defer controllerServer.Close()
+
+	var compressed bytes.Buffer
+	writer := gzip.NewWriter(&compressed)
+	if _, err := writer.Write([]byte(input)); err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	request := httptest.NewRequest(http.MethodPatch, "/service", &compressed)
+	request.Header.Set("Token", "token")
+	request.Header.Set("Content-Encoding", "gzip")
+	response := httptest.NewRecorder()
+	testEngine(t, controllerServer).ServeHTTP(response, request)
+	if response.Code != http.StatusOK || response.Body.String() != "ok" {
+		t.Fatalf("response=%d %s", response.Code, response.Body.String())
+	}
+}
+
+func TestServiceUpdateRejectsInvalidGzipBody(t *testing.T) {
+	controllerServer := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+		t.Fatal("Controller must not be called")
+	}))
+	defer controllerServer.Close()
+
+	request := httptest.NewRequest(http.MethodPatch, "/service", strings.NewReader("not-gzip"))
+	request.Header.Set("Token", "token")
+	request.Header.Set("Content-Encoding", "gzip")
+	response := httptest.NewRecorder()
+	testEngine(t, controllerServer).ServeHTTP(response, request)
+	if response.Code != http.StatusBadRequest || response.Body.String() != "invalid request body" {
+		t.Fatalf("response=%d %s", response.Code, response.Body.String())
 	}
 }
 
